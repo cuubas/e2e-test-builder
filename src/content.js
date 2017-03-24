@@ -1,6 +1,6 @@
 //content script
 var lastEventTarget = null,
-  extensionId = 'cfeikbgmncemnmkfghlbbnamgjajgdkb',
+  extensionId = 'hbpilpdepompcfkejfpnmpnjdeldcogd',
   api = {
     recordingEnabled: false,
     toggleRecording: function (request, callback) {
