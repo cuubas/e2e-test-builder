@@ -1,2 +1,10 @@
 <button ng-click="$ctrl.click()">{{$ctrl.isRecordingEnabled?'Recording...':'Record'}}</button>
-<p ng-repeat="cmd in $ctrl.commands">{{cmd|json}}</p>
+<div ng-repeat="cmd in $ctrl.commands">{{cmd|json}}</div>
+<input list="commands" />
+
+<datalist id="commands">
+  <option value="assertText"></option>
+  <option value="assertValue"></option>
+  <option value="assertElementPresent"></option>
+  <option value="assertVisible"></option>
+</datalist>

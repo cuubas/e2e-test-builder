@@ -1,5 +1,6 @@
 var ListComponent = {
   bindings: {
+    type: '<'
   },
   template: require('./list.partial.html'),
   controller: 'ListController'

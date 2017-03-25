@@ -3,24 +3,26 @@ var messenger = require('./../../../common/messenger');
 function ListController($http, $scope, $window) {
   var $ctrl = this;
   $ctrl.commands = [];
+
   $ctrl.$onInit = function () {
     $window.messageHandler = messenger.bind({
       trackClick: function (request, callback) {
-        $ctrl.commands.push(request);
+        $ctrl.commands.push({ type: 'click', locator: request.locator, value: request.value });
         $scope.$digest();
       },
       trackInput: function (request, callback) {
-        $ctrl.commands.push(request);
+        $ctrl.commands.push({ type: 'sendKeys', locator: request.locator, value: request.value });
         $scope.$digest();
       },
-      assert: function (request, callback) {
-        $ctrl.commands.push(request);
+      assertText: function (request, callback) {
+        $ctrl.commands.push({ type: 'assertText', locator: request.locator, value: request.value });
         $scope.$digest();
-      }      
+      }
     }, true);
 
     checkRecordingStatus();
   };
+
   $ctrl.click = function () {
     messenger.send({ call: 'toggleRecording' }, checkRecordingStatus);
   }

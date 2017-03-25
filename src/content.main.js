@@ -1,4 +1,5 @@
 var messenger = require('./common/messenger');
+var locator = require('./common/locator').css;
 
 //content script
 var lastEventTarget = null,
@@ -7,11 +8,10 @@ var lastEventTarget = null,
     toggleRecording: function (request, callback) {
       this.recordingEnabled = request.value;
     },
-    getRightClickTarget: function (request, callback) {
-      callback(lastEventTarget.className);
-    },
-    alert: function (request, callback) {
-      alert(request.value);
+    transformRightClick: function (request, callback) {
+      if (request.type === 'assertText') {
+        callback({ call: request.type, locator: locator(lastEventTarget), value: lastEventTarget.textContent });
+      }
     }
   };
 
@@ -19,13 +19,13 @@ document.addEventListener("mousedown", function (event) {
   lastEventTarget = event.target;
   // left click, is recording enabled?
   if (event.button === 0 && api.recordingEnabled) {
-    messenger.send({ call: "trackClick", target: lastEventTarget.className });
+    messenger.send({ call: "trackClick", locator: locator(lastEventTarget) });
   }
 }, true);
 
 document.addEventListener("blur", function (event) {
   if (api.recordingEnabled && (event.target.tagName === 'INPUT' || event.target.tagName === 'TEXTAREA')) {
-    messenger.send({ call: "trackInput", target: event.target.className, value: event.target.value });
+    messenger.send({ call: "trackInput", locator: locator(event.target), value: event.target.value });
   }
 }, true);
 // get initial state
