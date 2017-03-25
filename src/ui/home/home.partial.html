@@ -1,0 +1,9 @@
+<div class="toolbar">
+  <button>Open</button>
+  <button>Save</button>
+  <button>Run</button>
+  <button ng-click="$ctrl.click()">{{$ctrl.isRecordingEnabled?'Recording...':'Record'}}</button>
+</div>
+<div>
+  <list commands="$ctrl.commands" recording="$ctrl.isRecordingEnabled"></list>
+</div>

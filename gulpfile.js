@@ -4,6 +4,9 @@ var gulp = require('gulp');
 var merge = require('merge-stream');
 var webpack = require('gulp-webpack');
 var ngAnnotate = require('gulp-ng-annotate');
+var sourcemaps = require('gulp-sourcemaps');
+var postcss = require('gulp-postcss');
+var autoprefixer = require('autoprefixer');
 var sass = require('gulp-sass');
 var shouldWatch = false;
 
@@ -19,7 +22,9 @@ gulp.task('copy-assets', () => {
 
 gulp.task('build-ui-styles', function () {
   return gulp.src('./src/ui/app.scss')
+    .pipe(sourcemaps.init())
     .pipe(sass().on('error', sass.logError))
+    .pipe(postcss([ autoprefixer() ]))
     .pipe(gulp.dest('./build/ui'));
 });
 

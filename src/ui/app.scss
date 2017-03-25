@@ -1,5 +1,8 @@
 body {
   background: #fff;
+  margin: 0;
 }
 
 @import './components/list/list.scss';
+
+@import './home/home.scss';

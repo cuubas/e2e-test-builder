@@ -1,4 +1,31 @@
 list {
   display: block;
-  background: orange;
+  .item {
+    display: flex;
+    flex-direction: row;
+    align-content: stretch;
+    border-bottom: 1px solid #eee;
+    &:first-child {
+      border-top: 1px solid #eee;
+    }
+    >div {
+      border-left: 1px solid #eee;
+      flex-grow: 1;
+      padding: 2px;
+      &:nth-child(1) {
+        flex: 0.8;
+        flex-grow: 0.8;
+        border-left: none;
+      }
+    }
+    input {
+      box-sizing: border-box;
+      width: 100%;
+      min-width: 0;
+      border: 0;
+      -webkit-appearance: none;
+      padding: 6px 0px;
+      outline: none;
+    }
+  }
 }
