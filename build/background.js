@@ -42,51 +42,92 @@
 /************************************************************************/
 /******/ ([
 /* 0 */
-/***/ function(module, exports) {
+/***/ function(module, exports, __webpack_require__) {
+
+	var messenger = __webpack_require__(1);
 
 	var recordingEnabled = false,
+	  uiWindow,
+	  tab,
 	  api = {
-	    trackClick: function (request, callback) {
-	      console.info(request);
-	    },
-	    trackInput: function (request, callback) {
-	      console.info(request);
-	    },
 	    isRecordingEnabled: function (request, callback) {
 	      callback(recordingEnabled);
+	    },
+	    toggleRecording: function () {
+	      recordingEnabled = !recordingEnabled;
+	      chrome.browserAction.setIcon({ path: recordingEnabled ? "assets/icon-recording.png" : "assets/icon.png" });
+	      chrome.tabs.sendMessage(tab.id, { call: "toggleRecording", value: recordingEnabled });
 	    }
 	  };
 
 	function handleClick(info, tab) {
-	  chrome.tabs.sendMessage(tab.id, { call: "getRightClickTarget" }, function (className) {
-	    console.info("right click on:" + className);
-	  });
+	  if (recordingEnabled) {
+	    chrome.tabs.sendMessage(tab.id, { call: "getRightClickTarget" }, function (className) {
+	      uiWindow.messageHandler({ call: 'assert', target: className });
+	    });
+	  }
 	}
 
-	function toggleRecording(tab) {
-	  recordingEnabled = !recordingEnabled;
-	  chrome.browserAction.setIcon({ path: recordingEnabled ? "assets/icon-recording.png" : "assets/icon.png" });
-	  chrome.tabs.sendMessage(tab.id, { call: "toggleRecording", value: recordingEnabled });
+	function openHelperWindow(_tab) {
+	  tab = _tab;
+	  if (!uiWindow || uiWindow.closed) {
+	    uiWindow = window.open("ui/index.html", "extension_popup", "width=500,height=500,status=no,scrollbars=yes,resizable=no");
+	  }
 	}
 
 	// Create a parent item and two children.
 	chrome.contextMenus.create({ "title": "Assert Element", contexts: ["all"], onclick: handleClick });
 
-	chrome.browserAction.onClicked.addListener(toggleRecording);
+	chrome.browserAction.onClicked.addListener(openHelperWindow);
 
 	// create link to api
+	messenger.bind(api);
+
+	// proxy all messages to the helper window as well
 	chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
-	  if (!request) {
-	    return;
-	  }
-	  if (request.call && typeof (api[request.call]) === 'function') {
-	    api[request.call].call(api, request, sendResponse);
-	  } else if (request.get && typeof (api[request.get]) !== 'function') {
-	    sendResponse(api[request.get]);
-	  } else if (request.set && typeof (api[request.set]) !== 'function') {
-	    api[request.set] = request.value;
+	  if (uiWindow && !request.$called) {
+	    return uiWindow.messageHandler(request, sender, sendResponse);
 	  }
 	});
+
+/***/ },
+/* 1 */
+/***/ function(module, exports) {
+
+	module.exports = {
+	  bind: bind,
+	  send: send
+	};
+	var extensionId = chrome.runtime.id;
+	function bind(target, returnOnly) {
+	  // create link to target
+	  if (!returnOnly) {
+	    chrome.runtime.onMessage.addListener(messageHandler);
+	  }
+	  return messageHandler;
+
+	  function messageHandler(request, sender, sendResponse) {
+	    if (!request) {
+	      return;
+	    }
+	    if (request.call && typeof (target[request.call]) === 'function') {
+	      target[request.call].call(target, request, sendResponse);
+	      request.$called = true;
+	    } else if (request.get && typeof (target[request.get]) !== 'function') {
+	      sendResponse(target[request.get]);
+	    } else if (request.set && typeof (target[request.set]) !== 'function') {
+	      target[request.set] = request.value;
+	    }
+	  }
+	}
+
+	function send(message, callback) {
+	  if (typeof callback === 'function') {
+	    chrome.runtime.sendMessage(extensionId, message, {}, callback);
+	  } else {
+	    chrome.runtime.sendMessage(extensionId, message);
+	  }
+	}
 
 /***/ }
 /******/ ]);
