@@ -37,7 +37,7 @@ function CssLocator(target) {
   return 'css=' + result.join(' ');
 }
 
-CssLocator.classBlacklist = ['ng-scope'];
+CssLocator.classBlacklist = [/^ng\-/];
 CssLocator.attributes = [
   {
     name: 'id',
@@ -47,7 +47,7 @@ CssLocator.attributes = [
   {
     name: 'class',
     prefix: '.',
-    format: (v) => v.split(' ').filter((c) => CssLocator.classBlacklist.indexOf(c) === -1).join('.')
+    format: (v) => v.split(' ').filter((c) => !CssLocator.classBlacklist.some((regex)=>regex.test(c))).join('.')
   },
   'type',
   'alt',
