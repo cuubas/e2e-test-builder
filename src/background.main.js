@@ -2,7 +2,6 @@ var messenger = require('./common/messenger');
 
 var recordingEnabled = false,
   uiWindow,
-  tab,
   api = {
     isRecordingEnabled: function (request, callback) {
       callback(recordingEnabled);
@@ -10,7 +9,12 @@ var recordingEnabled = false,
     toggleRecording: function () {
       recordingEnabled = !recordingEnabled;
       chrome.browserAction.setIcon({ path: recordingEnabled ? "assets/icon-recording.png" : "assets/icon.png" });
-      chrome.tabs.sendMessage(tab.id, { call: "toggleRecording", value: recordingEnabled });
+      // notify all tabs
+      chrome.tabs.query({}, function (tabs) {
+        tabs.forEach(function (tab) {
+          chrome.tabs.sendMessage(tab.id, { call: "toggleRecording", value: recordingEnabled });
+        })
+      });
     }
   };
 
@@ -23,7 +27,6 @@ function handleClick(type, info, tab) {
 }
 
 function openHelperWindow(_tab) {
-  tab = _tab;
   if (!uiWindow || uiWindow.closed) {
     uiWindow = window.open("ui/index.html", "extension_popup", "width=700,height=500,status=no,scrollbars=yes,resizable=no");
   }
