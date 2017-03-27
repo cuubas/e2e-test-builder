@@ -1,7 +1,8 @@
 var messenger = require('./../../common/messenger');
 
 function HomeController($scope, $window) {
-  var $ctrl = this;
+  var $ctrl = this,
+    file;
   this.commands = [];
   checkRecordingStatus();
 
@@ -11,16 +12,28 @@ function HomeController($scope, $window) {
 
   $ctrl.open = function () {
     chrome.runtime.sendNativeMessage('com.cuubas.ioproxy',
-      { op: "open", path: $window.localStorage.lastPath },
+      { op: "open", lastPath: $window.localStorage.lastPath },
       function (response) {
-        var error = response && response.error || chrome.runtime.lastError
-        if (error) {
-          alert(JSON.stringify(error));
-          return;
+        if (!handleError(response)) {
+          if (response.path) {
+            $ctrl.path = $window.localStorage.lastPath = response.path;
+          }
+          file = response;
+          $scope.$digest();
         }
+      });
+  }
 
-        $window.localStorage.lastPath = response.path;
-        console.log(response);
+  $ctrl.save = function (ev, saveAs) {
+    if (!file || saveAs) {
+      file = { data: file && file.data || "hello world" };
+    }
+    chrome.runtime.sendNativeMessage('com.cuubas.ioproxy',
+      { op: "write", path: file.path, data: file.data, lastPath: $window.localStorage.lastPath },
+      function (response) {
+        if (!handleError(response)) {
+          console.log(response);
+        }
       });
   }
 
@@ -31,6 +44,16 @@ function HomeController($scope, $window) {
       $scope.$digest();
     });
   }
+
+  function handleError(response) {
+    var error = response && response.message || chrome.runtime.lastError
+    if (response.code < 1) {
+      alert(JSON.stringify(error));
+      return true;
+    }
+    return false;
+  }
+
 }
 
 module.exports = function (module) {

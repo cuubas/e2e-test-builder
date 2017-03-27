@@ -1,9 +1,10 @@
 <div class="toolbar">
-  <button ng-click="$ctrl.open()">Open</button>
-  <button ng-click="$ctrl.save()">Save</button>
-  <button ng-click="$ctrl.run()">Run</button>
+  <button ng-click="$ctrl.open($event)">Open</button>
+  <button ng-click="$ctrl.save($event)">Save</button>
+  <button ng-click="$ctrl.save($event, true)">Save as</button>
+  <button ng-click="$ctrl.run($event)">Run</button>
   <span class="separator"></span>
-  <button ng-click="$ctrl.toggleRecording()">{{$ctrl.isRecordingEnabled?'Recording...':'Record'}}</button>
+  <button ng-click="$ctrl.toggleRecording($event)">{{$ctrl.isRecordingEnabled?'Recording...':'Record'}}</button>
 </div>
 <div>
   <list commands="$ctrl.commands" recording="$ctrl.isRecordingEnabled"></list>

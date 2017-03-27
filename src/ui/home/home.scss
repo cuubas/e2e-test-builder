@@ -5,6 +5,8 @@
   flex-direction: row;
   button {
     flex: 1;
+    flex-basis: auto;
+    flex-shrink: 0;
     flex-grow: 0;
     margin: 0px 4px;
     &:first-child {
