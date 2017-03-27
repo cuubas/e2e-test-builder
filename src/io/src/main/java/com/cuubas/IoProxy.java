@@ -3,8 +3,10 @@ package com.cuubas;
 import javafx.stage.*;
 import javafx.application.*;
 import java.io.File;
-
+import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.OpenOption;
+import java.nio.file.StandardOpenOption;
 
 import com.google.gson.Gson;
 import com.google.gson.internal.LinkedTreeMap;
@@ -16,17 +18,22 @@ public class IoProxy extends Application {
       LinkedTreeMap<String, Object> input = read();
       String op = (String) input.get("op");
       if ("open".equals(op)) {
-        openFile(stage, (String) input.get("path"));
+        openFile(stage, input);
+      } else if ("write".equals(op)) {
+        writeFile(stage, input);
+      } else if ("read".equals(op)) {
+        readFile(input);
       } else {
-        write(new ErrorMessage("unknown op:" + op));
+        write(new StatusMessage("unknown op:" + op, StatusMessage.ERROR));
       }
     } catch (Exception ex) {
-      write(ex.toString());
+      write(new StatusMessage("exception:" + ex.toString(), StatusMessage.ERROR));
     }
   }
 
-  public void openFile(Stage stage, String name) throws Exception {
+  public void openFile(Stage stage, LinkedTreeMap options) throws Exception {
     FileChooser fileChooser = new FileChooser();
+    String name = (String) options.get("lastPath");
     if (name != null && !name.isEmpty()) {
       fileChooser.setInitialDirectory(new File(name).getParentFile());
     }
@@ -35,9 +42,36 @@ public class IoProxy extends Application {
     if (selectedFile != null) {
       write(new FileMessage(selectedFile));
     } else {
-      write(new ErrorMessage("no file selected"));
+      write(new StatusMessage("no file selected", StatusMessage.ERROR));
     }
     System.exit(0);
+  }
+
+  public void readFile(LinkedTreeMap options) throws Exception {
+    File file = new File((String) options.get("path"));
+    write(new FileMessage(file));
+  }
+
+  public void writeFile(Stage stage, LinkedTreeMap options) throws Exception {
+    File file;
+    String data = (String) options.get("data");
+    if (!options.containsKey("path")) {
+      FileChooser fileChooser = new FileChooser();
+      String name = (String) options.get("lastPath");
+      if (name != null && !name.isEmpty()) {
+        fileChooser.setInitialDirectory(new File(name).getParentFile());
+        fileChooser.setInitialFileName(new File(name).getName());
+      }
+      file = fileChooser.showSaveDialog(stage);
+    } else {
+      file = new File((String) options.get("path"));
+    }
+    if (file != null) {
+      Files.write(file.toPath(), data.getBytes());
+      write(new StatusMessage("Saved", StatusMessage.OK));
+    } else {
+      write(new StatusMessage("no file selected", StatusMessage.ERROR));
+    }
   }
 
   public LinkedTreeMap read() throws Exception {
