@@ -46,9 +46,9 @@ function HomeController($scope, $window) {
   }
 
   function handleError(response) {
-    var error = response && response.message || chrome.runtime.lastError
-    if (response.code < 1) {
-      alert(JSON.stringify(error));
+    var error = response && response.code < 1 ? response : chrome.runtime.lastError
+    if (error) {
+      alert(error.message || "an error occured");
       return true;
     }
     return false;
