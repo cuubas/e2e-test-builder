@@ -1,6 +1,7 @@
 "use strict";
 
 var gulp = require('gulp');
+var util = require("gulp-util");
 var merge = require('merge-stream');
 var webpack = require('gulp-webpack');
 var ngAnnotate = require('gulp-ng-annotate');
@@ -24,7 +25,7 @@ gulp.task('build-ui-styles', function () {
   return gulp.src('./src/ui/app.scss')
     .pipe(sourcemaps.init())
     .pipe(sass().on('error', sass.logError))
-    .pipe(postcss([ autoprefixer() ]))
+    .pipe(postcss([autoprefixer()]))
     .pipe(gulp.dest('./build/ui'));
 });
 
@@ -61,6 +62,18 @@ gulp.task('build-content-script', () => {
     .pipe(gulp.dest(`build`));
 });
 
+gulp.task('build-io-proxy', (done) => {
+  var exec = require('child_process').exec;
+  var child = exec("mvn package", { cwd: 'src/io' }, (err) => {
+    if (err) {
+      util.log(err);
+    }else {
+      util.log('done');
+    }
+    gulp.src("src/io/target/ioproxy-1.0.jar").pipe(gulp.dest("host"));
+  });
+});
+
 gulp.task('build', ['copy', 'copy-assets', 'build-background-script', 'build-content-script', 'build-ui', 'build-ui-styles']);
 
 gulp.task('default', () => {
@@ -68,4 +81,5 @@ gulp.task('default', () => {
   gulp.start('build');
   gulp.watch(['src/manifest.json', 'src/ui/index.html'], ['copy']);
   gulp.watch('src/ui/**/*.scss', ['build-ui-styles']);
+  gulp.watch('src/io/src/**/*', ['build-io-proxy']);
 });
