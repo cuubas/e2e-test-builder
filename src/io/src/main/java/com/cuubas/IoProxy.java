@@ -29,6 +29,7 @@ public class IoProxy extends Application {
     } catch (Exception ex) {
       write(new StatusMessage("exception:" + ex.toString(), StatusMessage.ERROR));
     }
+    System.exit(0);
   }
 
   public void openFile(Stage stage, LinkedTreeMap options) throws Exception {
@@ -44,7 +45,6 @@ public class IoProxy extends Application {
     } else {
       write(new StatusMessage("no file selected", StatusMessage.ERROR));
     }
-    System.exit(0);
   }
 
   public void readFile(LinkedTreeMap options) throws Exception {
