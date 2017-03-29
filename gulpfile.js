@@ -33,6 +33,7 @@ gulp.task('build-ui', () => {
   return gulp.src(`src/ui/app.main.js`)
     .pipe(webpack({
       watch: shouldWatch,
+      devtool: shouldWatch ? 'inline-source-map' : undefined,
       module: {
         loaders: [
           { test: /\.html$/, loaders: ["html"] },
@@ -48,6 +49,7 @@ gulp.task('build-background-script', () => {
   return gulp.src(`src/background.main.js`)
     .pipe(webpack({
       watch: shouldWatch,
+      devtool: shouldWatch ? 'inline-source-map' : undefined,
       output: { filename: 'background.js' }
     }))
     .pipe(gulp.dest(`build`));
@@ -57,6 +59,7 @@ gulp.task('build-content-script', () => {
   return gulp.src(`src/content.main.js`)
     .pipe(webpack({
       watch: shouldWatch,
+      devtool: shouldWatch ? 'inline-source-map' : undefined,
       output: { filename: 'content.js' }
     }))
     .pipe(gulp.dest(`build`));
@@ -67,7 +70,7 @@ gulp.task('build-io-proxy', (done) => {
   var child = exec("mvn package", { cwd: 'src/io' }, (err) => {
     if (err) {
       util.log(err);
-    }else {
+    } else {
       util.log('done');
     }
     gulp.src("src/io/target/ioproxy-1.0.jar").pipe(gulp.dest("host"));
