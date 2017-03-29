@@ -63,6 +63,7 @@ function HomeController($rootScope, $scope, $window) {
       { op: "write", path: file.path, data: formatter.stringify($ctrl.testCase), lastPath: $window.localStorage.lastPath },
       function (response) {
         if (!handleError(response)) {
+          file = response;
           if (response.path) {
             $rootScope.pageTitle = $window.localStorage.lastPath = response.path;
             $scope.$apply();
