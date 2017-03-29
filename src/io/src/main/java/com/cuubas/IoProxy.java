@@ -41,7 +41,7 @@ public class IoProxy extends Application {
     final File selectedFile = fileChooser.showOpenDialog(stage);
 
     if (selectedFile != null) {
-      write(new FileMessage(selectedFile));
+      write(new FileMessage(selectedFile, true));
     } else {
       write(new StatusMessage("no file selected", StatusMessage.ERROR));
     }
@@ -49,7 +49,7 @@ public class IoProxy extends Application {
 
   public void readFile(LinkedTreeMap options) throws Exception {
     File file = new File((String) options.get("path"));
-    write(new FileMessage(file));
+    write(new FileMessage(file, true));
   }
 
   public void writeFile(Stage stage, LinkedTreeMap options) throws Exception {
@@ -68,7 +68,7 @@ public class IoProxy extends Application {
     }
     if (file != null) {
       Files.write(file.toPath(), data.getBytes());
-      write(new StatusMessage("Saved", StatusMessage.OK));
+      write(new FileMessage(file, false));
     } else {
       write(new StatusMessage("no file selected", StatusMessage.ERROR));
     }
