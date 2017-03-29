@@ -1,5 +1,5 @@
 var messenger = require('./common/messenger');
-var locator = require('./common/locator').css;
+var locator = require('./common/locators').css;
 
 //content script
 var lastEventTarget = null,

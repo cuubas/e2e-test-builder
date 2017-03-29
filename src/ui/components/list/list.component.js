@@ -2,7 +2,7 @@ module.exports = function (module) {
   var ListComponent = {
     bindings: {
       recording: '<',
-      commands: '<'
+      items: '<'
     },
     template: require('./list.partial.html'),
     controller: 'ListController'

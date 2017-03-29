@@ -6,15 +6,15 @@ function ListController($scope, $window) {
   $ctrl.$onInit = function () {
     $window.messageHandler = messenger.bind({
       trackClick: function (request, callback) {
-        $ctrl.commands.push({ type: 'click', locator: request.locator, value: request.value });
+        $ctrl.items.push({ command: 'click', locator: request.locator, value: request.value, type: 'command' });
         $scope.$digest();
       },
       trackInput: function (request, callback) {
-        $ctrl.commands.push({ type: 'sendKeys', locator: request.locator, value: request.value });
+        $ctrl.items.push({ command: 'sendKeys', locator: request.locator, value: request.value, type: 'command' });
         $scope.$digest();
       },
       assertText: function (request, callback) {
-        $ctrl.commands.push({ type: 'assertText', locator: request.locator, value: request.value });
+        $ctrl.items.push({ command: 'assertText', locator: request.locator, value: request.value, type: 'command' });
         $scope.$digest();
       }
     }, true);

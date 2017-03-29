@@ -7,5 +7,5 @@
   <button ng-click="$ctrl.toggleRecording($event)">{{$ctrl.isRecordingEnabled?'Recording...':'Record'}}</button>
 </div>
 <div>
-  <list commands="$ctrl.commands" recording="$ctrl.isRecordingEnabled"></list>
+  <list items="$ctrl.testCase.items" recording="$ctrl.isRecordingEnabled"></list>
 </div>

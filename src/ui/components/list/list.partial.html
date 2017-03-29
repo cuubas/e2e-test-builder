@@ -1,8 +1,12 @@
-
-<div ng-repeat="cmd in $ctrl.commands" class="item">
-  <div><input list="commands" ng-model="cmd.type" /></div>
-  <div><input ng-model="cmd.locator" /></div>
-  <div><input ng-model="cmd.value" /></div>
+<div ng-repeat="item in $ctrl.items" ng-switch="item.type">
+  <div ng-switch-when="comment" class="item">
+    <div><input ng-model="item.value" /></div>
+  </div>
+  <div ng-switch-default class="item">
+    <div><input list="commands" ng-model="item.command" /></div>
+    <div><input ng-model="item.locator" /></div>
+    <div><input ng-model="item.value" /></div>
+  </div>
 </div>
 
 <datalist id="commands">

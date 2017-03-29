@@ -1,6 +1,4 @@
-module.exports = {
-  css: CssLocator
-};
+module.exports = CssLocator;
 
 function CssLocator(target) {
   var element = target, result = [];

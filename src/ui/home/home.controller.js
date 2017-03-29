@@ -1,10 +1,33 @@
 var messenger = require('./../../common/messenger');
+var supportedFormats = require('./../../common/supported-formats');
 
 function HomeController($scope, $window) {
-  var $ctrl = this,
-    file;
-  this.commands = [];
-  checkRecordingStatus();
+  var $ctrl = this, file, formatter;
+
+  $ctrl.testCase = {};
+
+  $ctrl.$onInit = function () {
+    checkRecordingStatus();
+
+    if ($window.localStorage.lastPath) {
+      chrome.runtime.sendNativeMessage('com.cuubas.ioproxy',
+        { op: "read", path: $window.localStorage.lastPath },
+        function (response) {
+          if (!handleError(response)) {
+            file = response;
+            formatter = supportedFormats.filter((f) => f.test(file.path))[0];
+            if (formatter) {
+              $ctrl.testCase = formatter.parse(response.data);
+              $scope.$digest();
+            } else {
+              alert('unsupported file format');
+            }
+          } else {
+            $window.localStorage.removeItem('lastPath');
+          }
+        });
+    }
+  };
 
   $ctrl.toggleRecording = function () {
     messenger.send({ call: 'toggleRecording' }, checkRecordingStatus);
@@ -16,20 +39,26 @@ function HomeController($scope, $window) {
       function (response) {
         if (!handleError(response)) {
           if (response.path) {
-            $ctrl.path = $window.localStorage.lastPath = response.path;
+            $window.localStorage.lastPath = response.path;
           }
           file = response;
-          $scope.$digest();
+          formatter = supportedFormats.filter((f) => f.test(file.path))[0];
+          if (formatter) {
+            $ctrl.testCase = formatter.parse(response.data);
+            $scope.$digest();
+          } else {
+            alert('unsupported file format');
+          }
         }
       });
   }
 
   $ctrl.save = function (ev, saveAs) {
     if (!file || saveAs) {
-      file = { data: file && file.data || "hello world" };
+
     }
     chrome.runtime.sendNativeMessage('com.cuubas.ioproxy',
-      { op: "write", path: file.path, data: file.data, lastPath: $window.localStorage.lastPath },
+      { op: "write", path: file.path, data: formatter.stringify($ctrl.testCase), lastPath: $window.localStorage.lastPath },
       function (response) {
         if (!handleError(response)) {
           console.log(response);
@@ -53,7 +82,8 @@ function HomeController($scope, $window) {
     }
     return false;
   }
-
+  $ctrl.$onInit();
+  
 }
 
 module.exports = function (module) {
