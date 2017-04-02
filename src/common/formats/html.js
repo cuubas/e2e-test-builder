@@ -43,13 +43,13 @@ function parse(content) {
 function stringify(testCase) {
   var content = testCase.items.map((item) => {
     if (item.type === 'comment') {
-      return `<!--${item.value}-->`;
+      return `<!--${item.value||''}-->`;
     } else {
       return `
 <tr>
-	<td>${item.command}</td>
-	<td>${item.locator}</td>
-	<td>${item.value}</td>
+	<td>${item.command||''}</td>
+	<td>${item.locator||''}</td>
+	<td>${item.value||''}</td>
 </tr>`
     }
   }).join('\n');
