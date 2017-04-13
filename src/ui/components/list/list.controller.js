@@ -1,9 +1,7 @@
 var messenger = require('./../../../common/messenger');
 var elementHelper = require('./../../../common/element-helper');
-var colors = {
-  good: '#c2f6c8',
-  bad: '#ffdede'
-};
+var positiveColor = '#c2f6c8';
+var negativeColor = '#ffdede';
 
 function ListController($scope, $window) {
   var $ctrl = this;
@@ -28,13 +26,13 @@ function ListController($scope, $window) {
 
   $ctrl.highlight = function (ev, item) {
     chrome.tabs.sendMessage($window.currentTabId, { call: 'highlight', locator: item.locator }, function (highlighted) {
-      elementHelper.highlight(ev.target.parentNode, colors[highlighted ? 'good' : 'bad']);
+      elementHelper.highlight(ev.target.parentNode, highlighted ? positiveColor : negativeColor);
     });
   };
 
   $ctrl.execute = function (ev, item) {
     chrome.tabs.sendMessage($window.currentTabId, { call: 'execute', command: item.command, locator: item.locator, value: item.value }, function (executed) {
-      elementHelper.highlight(ev.target.parentNode, colors[executed ? 'good' : 'bad']);
+      elementHelper.highlight(ev.target.parentNode, executed ? positiveColor : negativeColor);
     });
   };
 }
