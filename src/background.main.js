@@ -21,8 +21,8 @@ var recordingEnabled = false,
     }
   };
 
-function handleContextMenuClick(type, info, tab) {
-    chrome.tabs.sendMessage(tab.id, { call: "handleContextMenuClick", type: type });
+function handleContextMenuClick(command, info, tab) {
+    chrome.tabs.sendMessage(tab.id, { call: "handleContextMenuClick", command: command });
 }
 
 function openHelperWindow(_tab) {

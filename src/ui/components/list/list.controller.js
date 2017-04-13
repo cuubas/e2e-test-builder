@@ -8,19 +8,11 @@ function ListController($scope, $window) {
 
   $ctrl.$onInit = function () {
     messenger.bind({
-      trackClick: function (request, callback) {
-        $ctrl.items.push({ command: 'click', locator: request.locator, value: request.value, type: 'command' });
-        $scope.$digest();
-      },
-      trackInput: function (request, callback) {
-        $ctrl.items.push({ command: 'sendKeys', locator: request.locator, value: request.value, type: 'command' });
-        $scope.$digest();
-      },
-      assertText: function (request, callback) {
-        $ctrl.items.push({ command: 'assertText', locator: request.locator, value: request.value, type: 'command' });
+      recordCommand: function (request, callback) {
+        $ctrl.items.push({ command: request.command, locator: request.locator, value: request.value, type: 'command' });
         $scope.$digest();
       }
-    }, true);
+    });
 
   };
 

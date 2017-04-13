@@ -29,8 +29,8 @@ var lastEventTarget = null,
       }
     },
     handleContextMenuClick: function (request, callback) {
-      if (request.type === 'assertText') {
-        messenger.send({ call: request.type, locator: locator(lastEventTarget), value: lastEventTarget.textContent });
+      if (request.command === 'assertText') {
+        messenger.send({ call: 'recordCommand', command: request.command, locator: locator(lastEventTarget), value: lastEventTarget.textContent });
       }
     }
   };
@@ -39,13 +39,13 @@ document.addEventListener("mousedown", function (event) {
   lastEventTarget = event.target;
   // left click, is recording enabled?
   if (event.button === 0 && api.recordingEnabled) {
-    messenger.send({ call: "trackClick", locator: locator(lastEventTarget) });
+    messenger.send({ call: 'recordCommand', command: "click", locator: locator(lastEventTarget) });
   }
 }, true);
 
 document.addEventListener("blur", function (event) {
   if (api.recordingEnabled && (event.target.tagName === 'INPUT' || event.target.tagName === 'TEXTAREA')) {
-    messenger.send({ call: "trackInput", locator: locator(event.target), value: event.target.value });
+    messenger.send({ call: 'recordCommand', command: "sendKeys", locator: locator(event.target), value: event.target.value });
   }
 }, true);
 
