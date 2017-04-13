@@ -4,18 +4,47 @@ list {
     display: flex;
     flex-direction: row;
     align-content: stretch;
-    border-bottom: 1px solid #eee;
+    border-bottom: 2px solid #eee;
+    flex-wrap: wrap;
     &:first-child {
+      border-top: 2px solid #eee;
+    }
+    .command,
+    .locator,
+    .value,
+    .comment {
+      border-left: 1px solid #eee;
+      padding: 2px;
+      box-sizing: border-box;
+      flex: 1 0 0;
+    }
+    .comment {
+      background-color: #d9efff;
+    }
+    .locator,
+    .value {
+      flex: 2 0 0;
+      min-width: 100%;
       border-top: 1px solid #eee;
     }
-    >div {
-      border-left: 1px solid #eee;
-      flex-grow: 1;
-      padding: 2px;
-      &:nth-child(1) {
-        flex: 0.8;
-        flex-grow: 0.8;
-        border-left: none;
+    @media screen and (min-width:350px) {
+      .locator,
+      .value {
+        min-width: 250px;
+      }
+      .locator {
+        border-top: 0;
+      }
+    }
+    @media screen and (min-width:450px) {
+      .command {
+        min-width: 150px;
+        max-width: 150px;
+      }
+    }
+    @media screen and (min-width:650px) {
+      .value {
+        border-top: 0;
       }
     }
     input {

@@ -1,11 +1,11 @@
 <div ng-repeat="item in $ctrl.items" ng-switch="item.type">
   <div ng-switch-when="comment" class="item">
-    <div><input ng-model="item.value" /></div>
+    <div class="comment"><input ng-model="item.value" /></div>
   </div>
   <div ng-switch-default class="item">
-    <div><input list="commands" ng-model="item.command" ng-dblclick="$ctrl.execute($event, item, $index)"/></div>
-    <div><input ng-model="item.locator" ng-click="$ctrl.highlight($event, item)" /></div>
-    <div><input ng-model="item.value" /></div>
+    <div class="command"><input list="commands" ng-model="item.command" ng-dblclick="$ctrl.execute($event, item, $index)" placeholder="command"/></div>
+    <div class="locator"><input ng-model="item.locator" ng-click="$ctrl.highlight($event, item)" placeholder="locator" /></div>
+    <div class="value"><input ng-model="item.value" placeholder="value" /></div>
   </div>
 </div>
 
