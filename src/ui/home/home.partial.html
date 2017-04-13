@@ -1,4 +1,4 @@
-<div class="toolbar">
+<div class="home__toolbar">
   <button ng-click="$ctrl.open($event)">Open</button>
   <button ng-click="$ctrl.save($event)">Save</button>
   <button ng-click="$ctrl.save($event, true)">Save as</button>
@@ -6,6 +6,6 @@
   <span class="separator"></span>
   <button ng-click="$ctrl.toggleRecording($event)">{{$ctrl.isRecordingEnabled?'Recording...':'Record'}}</button>
 </div>
-<div>
+<div class="home__content">
   <list items="$ctrl.testCase.items" recording="$ctrl.isRecordingEnabled"></list>
 </div>

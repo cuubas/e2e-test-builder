@@ -1,6 +1,16 @@
+html, body {
+  height: 100vh;
+}
 body {
   background: #fff;
   margin: 0;
+  overflow: hidden;
+}
+
+main {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
 }
 
 @import './components/list/list.scss';
