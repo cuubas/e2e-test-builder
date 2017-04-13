@@ -3,7 +3,7 @@
     <div><input ng-model="item.value" /></div>
   </div>
   <div ng-switch-default class="item">
-    <div><input list="commands" ng-model="item.command" /></div>
+    <div><input list="commands" ng-model="item.command" ng-dblclick="$ctrl.execute($event, item, $index)"/></div>
     <div><input ng-model="item.locator" ng-click="$ctrl.highlight($event, item)" /></div>
     <div><input ng-model="item.value" /></div>
   </div>

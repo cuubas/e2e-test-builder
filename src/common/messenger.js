@@ -5,11 +5,8 @@ module.exports = {
 var extensionId = chrome.runtime.id;
 function bind(target, returnOnly) {
   // create link to target
-  if (!returnOnly) {
-    chrome.runtime.onMessage.addListener(messageHandler);
-  }
-  return messageHandler;
-
+  chrome.runtime.onMessage.addListener(messageHandler);
+  
   function messageHandler(request, sender, sendResponse) {
     if (!request) {
       return;

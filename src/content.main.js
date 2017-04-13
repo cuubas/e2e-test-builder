@@ -14,9 +14,18 @@ var lastEventTarget = null,
       var element = elementHelper.find(request.locator, document)
       if (element) {
         elementHelper.highlight(element);
-        callback({ highlighted: true });
+        callback(true);
       } else {
-        callback({ highlighted: false });
+        callback(false);
+      }
+    },
+    execute: function (request, callback) {
+      var element = elementHelper.find(request.locator, document);
+      if (element && request.command === 'click') {
+        element.click();
+        callback(true);
+      } else {
+        callback(false);
       }
     },
     transformRightClick: function (request, callback) {
