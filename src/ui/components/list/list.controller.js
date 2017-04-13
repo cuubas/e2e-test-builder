@@ -1,4 +1,9 @@
 var messenger = require('./../../../common/messenger');
+var elementHelper = require('./../../../common/element-helper');
+var colors = {
+  good: '#c2f6c8',
+  bad: '#ffdede'
+};
 
 function ListController($scope, $window) {
   var $ctrl = this;
@@ -23,13 +28,13 @@ function ListController($scope, $window) {
 
   $ctrl.highlight = function (ev, item) {
     chrome.tabs.sendMessage($window.currentTabId, { call: 'highlight', locator: item.locator }, function (highlighted) {
-      // highlighted = true|false
+      elementHelper.highlight(ev.target.parentNode, colors[highlighted ? 'good' : 'bad']);
     });
   };
 
   $ctrl.execute = function (ev, item) {
     chrome.tabs.sendMessage($window.currentTabId, { call: 'execute', command: item.command, locator: item.locator, value: item.value }, function (executed) {
-      // executed = true|false
+      elementHelper.highlight(ev.target.parentNode, colors[executed ? 'good' : 'bad']);
     });
   };
 }
