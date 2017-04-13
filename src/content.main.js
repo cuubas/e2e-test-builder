@@ -28,9 +28,9 @@ var lastEventTarget = null,
         callback(false);
       }
     },
-    transformRightClick: function (request, callback) {
+    handleContextMenuClick: function (request, callback) {
       if (request.type === 'assertText') {
-        callback({ call: request.type, locator: locator(lastEventTarget), value: lastEventTarget.textContent });
+        messenger.send({ call: request.type, locator: locator(lastEventTarget), value: lastEventTarget.textContent });
       }
     }
   };

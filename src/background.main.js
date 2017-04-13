@@ -22,9 +22,7 @@ var recordingEnabled = false,
   };
 
 function handleContextMenuClick(type, info, tab) {
-    chrome.tabs.sendMessage(tab.id, { call: "transformRightClick", type: type }, function (response) {
-      messenger.send(response);
-    });
+    chrome.tabs.sendMessage(tab.id, { call: "handleContextMenuClick", type: type });
 }
 
 function openHelperWindow(_tab) {
