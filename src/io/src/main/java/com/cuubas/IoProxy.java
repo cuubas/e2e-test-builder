@@ -3,15 +3,13 @@ package com.cuubas;
 import javafx.stage.*;
 import javafx.application.*;
 import java.io.File;
-import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.OpenOption;
-import java.nio.file.StandardOpenOption;
 
 import com.google.gson.Gson;
 import com.google.gson.internal.LinkedTreeMap;
 
 public class IoProxy extends Application {
+  public static int VERSION = 1;
 
   public void start(Stage stage) throws Exception {
     try {
@@ -23,6 +21,8 @@ public class IoProxy extends Application {
         writeFile(stage, input);
       } else if ("read".equals(op)) {
         readFile(input);
+      } else if ("version".equals(op)) {
+        write(new VersionMessage(VERSION));
       } else {
         write(new StatusMessage("unknown op:" + op, StatusMessage.ERROR));
       }
