@@ -5,9 +5,13 @@ function HomeController($rootScope, $scope, $window) {
   var $ctrl = this, file, formatter;
 
   $ctrl.testCase = {};
-  
+
   $ctrl.$onInit = function () {
     checkRecordingStatus();
+
+    messenger.bind({
+      recordingToggled: checkRecordingStatus
+    });
 
     if ($window.localStorage.lastPath) {
       $rootScope.pageTitle = $window.localStorage.lastPath;
@@ -32,7 +36,7 @@ function HomeController($rootScope, $scope, $window) {
   };
 
   $ctrl.toggleRecording = function () {
-    messenger.send({ call: 'toggleRecording' }, checkRecordingStatus);
+    messenger.send({ call: 'toggleRecording' });
   }
 
   $ctrl.open = function () {
