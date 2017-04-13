@@ -1,5 +1,7 @@
 var messenger = require('./common/messenger');
-var locator = require('./common/locators').css;
+var locators = require('./common/locators');
+var elementHelper = require('./common/element-helper');
+var locator = locators.css;
 
 //content script
 var lastEventTarget = null,
@@ -7,6 +9,15 @@ var lastEventTarget = null,
     recordingEnabled: false,
     toggleRecording: function (request, callback) {
       this.recordingEnabled = request.value;
+    },
+    highlight: function (request, callback) {
+      var element = elementHelper.find(request.locator, document)
+      if (element) {
+        elementHelper.highlight(element);
+        callback({ highlighted: true });
+      } else {
+        callback({ highlighted: false });
+      }
     },
     transformRightClick: function (request, callback) {
       if (request.type === 'assertText') {
@@ -28,6 +39,7 @@ document.addEventListener("blur", function (event) {
     messenger.send({ call: "trackInput", locator: locator(event.target), value: event.target.value });
   }
 }, true);
+
 // get initial state
 messenger.send({ call: 'isRecordingEnabled' }, function (value) {
   api.recordingEnabled = value;

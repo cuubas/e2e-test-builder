@@ -21,6 +21,9 @@ function ListController($scope, $window) {
 
   };
 
+  $ctrl.highlight = function (ev, item) {
+    messenger.send({ call: 'dispatch', action: 'highlight', locator: item.locator });
+  }
 }
 
 module.exports = function (module) {
