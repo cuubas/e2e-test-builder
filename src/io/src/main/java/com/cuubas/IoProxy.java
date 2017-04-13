@@ -21,8 +21,8 @@ public class IoProxy extends Application {
         writeFile(stage, input);
       } else if ("read".equals(op)) {
         readFile(input);
-      } else if ("version".equals(op)) {
-        write(new VersionMessage(VERSION));
+      } else if ("about".equals(op)) {
+        write(new AboutMessage(VERSION));
       } else {
         write(new StatusMessage("unknown op:" + op, StatusMessage.ERROR));
       }
