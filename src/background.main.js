@@ -37,6 +37,8 @@ function openHelperWindow(_tab) {
       recordingEnabled = true;
       api.toggleRecording();
     });
+  } else {
+    uiWindow.focus();
   }
 }
 
