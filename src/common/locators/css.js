@@ -6,9 +6,11 @@ function CssLocator(target) {
   while (element.tagName !== 'BODY') {
     // go through known attributes (in order) and create css selector
     for (var i = 0; i < CssLocator.attributes.length; i++) {
-      var attr = CssLocator.attributes[i], value, prefix = '', suffix = '';
+      var attr = CssLocator.attributes[i], value, prefix = '', suffix = '', index;
       // take as is
-      if (typeof (attr) === 'string') {
+      if (attr === 'tagName') {
+        value = element.tagName.toLowerCase();
+      } else if (typeof (attr) === 'string') {
         value = element.getAttribute(attr);
         prefix = element.tagName.toLowerCase() + '[' + attr + '="';
         suffix = '"]';
@@ -18,13 +20,19 @@ function CssLocator(target) {
       } else if (typeof (attr) === 'object') {
         value = element.getAttribute(attr.name);
         if (value && attr.format) {
-          value = attr.format(value);
+          value = attr.format(value, element);
         }
         prefix = attr.prefix || '';
         suffix = attr.suffix || '';
       }
 
       if (value) {
+        // get element index
+        index = Array.prototype.indexOf.call(element.parentNode.children, element);
+        if (index > 0 && element.parentNode.querySelectorAll(prefix + value + suffix).length > 1) {
+          suffix +=':nth-child(' + (index + 1) + ')';
+        }
+        
         result.unshift(prefix + value + suffix);
         break;
       }
@@ -45,10 +53,15 @@ CssLocator.attributes = [
   {
     name: 'class',
     prefix: '.',
-    format: (v) => v.split(' ').filter((c) => !CssLocator.classBlacklist.some((regex)=>regex.test(c))).join('.')
+    format: (v, element) => v.split(' ').filter((c) => !CssLocator.classBlacklist.some((regex)=>regex.test(c))).join('.')
   },
   'type',
   'alt',
   'title',
-  'value'
+  'value',
+  'tagName'
 ];
+
+CssLocator.find = function(locator, parent) {
+  return parent.querySelector(locator);
+};
