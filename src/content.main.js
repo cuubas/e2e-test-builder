@@ -20,13 +20,16 @@ var lastEventTarget = null,
       }
     },
     execute: function (request, callback) {
-      var element = elementHelper.find(request.locator, document);
-      if (element && request.command === 'click') {
-        element.click();
-        callback(true);
-      } else {
-        callback(false);
+      if (request.commands && request.commands.length) {
+        var item = request.commands[0];
+        var element = elementHelper.find(item.locator, document);
+        if (element && item.command === 'click') {
+          element.click();
+          callback(true);
+          return;
+        }
       }
+      callback(false);
     },
     handleContextMenuClick: function (request, callback) {
       if (request.command === 'assertText') {

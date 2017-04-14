@@ -40,6 +40,10 @@ function HomeController($rootScope, $scope, $window) {
       .catch(handleError);
   };
 
+  $ctrl.run = function () {
+    chrome.tabs.sendMessage($window.currentTabId, { call: 'execute', commands: $ctrl.testCase.items });
+  };
+
   $ctrl.save = function (ev, saveAs) {
     ioproxy.write(!saveAs && file ? file.path : undefined, formatter.stringify($ctrl.testCase), $window.localStorage.lastPath)
       .then((response) => {

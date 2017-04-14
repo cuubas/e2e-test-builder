@@ -23,7 +23,7 @@ function ListController($scope, $window) {
   };
 
   $ctrl.execute = function (ev, item) {
-    chrome.tabs.sendMessage($window.currentTabId, { call: 'execute', command: item.command, locator: item.locator, value: item.value }, function (executed) {
+    chrome.tabs.sendMessage($window.currentTabId, { call: 'execute', commands: [item] }, function (executed) {
       elementHelper.highlight(ev.target.parentNode, executed ? positiveColor : negativeColor);
     });
   };
