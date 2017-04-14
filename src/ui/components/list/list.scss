@@ -6,8 +6,34 @@ list {
     align-content: stretch;
     border-bottom: 2px solid #eee;
     flex-wrap: wrap;
+    background-color: #fff;
     &:first-child {
       border-top: 2px solid #eee;
+    }
+    .handle {
+      min-width: 16px;
+      position: relative;
+      cursor: move;
+      &:before,
+      &:after {
+        position: absolute;
+        left: 2px;
+        right: 2px;
+        border-color: #8e8e8e;
+        border-style: dotted;
+        content: '';
+        border-top-width: 4px;
+        border-bottom-width: 4px;
+        border-left-width: 0;
+        border-right-width: 0;
+        height: 4px;
+      }
+      &:before {
+        top: 2px;
+      }
+      &:after {
+        bottom: 2px;
+      }
     }
     .command,
     .locator,

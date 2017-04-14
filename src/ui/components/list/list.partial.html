@@ -1,14 +1,17 @@
-<div ng-repeat="item in $ctrl.items" ng-switch="item.type">
-  <div ng-switch-when="comment" class="item">
-    <div class="comment"><input ng-model="item.value" /></div>
-  </div>
-  <div ng-switch-default class="item">
-    <div class="command"><input list="commands" ng-model="item.command" ng-dblclick="$ctrl.execute($event, item, $index)" placeholder="command"/></div>
-    <div class="locator"><input ng-model="item.locator" ng-click="$ctrl.highlight($event, item)" placeholder="locator" /></div>
-    <div class="value"><input ng-model="item.value" placeholder="value" /></div>
+<div sv-root sv-on-sort="ctrl.onSort($indexFrom, $indexTo)" sv-part="ctrl.items">
+  <div ng-repeat="item in ctrl.items" ng-switch="item.type" sv-element>
+    <div ng-switch-when="comment" class="item">
+      <div sv-handle class="handle"></div>
+      <div class="comment"><input ng-model="item.value" /></div>
+    </div>
+    <div ng-switch-default class="item">
+      <div sv-handle class="handle"></div>
+      <div class="command"><input list="commands" ng-model="item.command" ng-dblclick="ctrl.execute($event, item, $index)" placeholder="command" /></div>
+      <div class="locator"><input ng-model="item.locator" ng-click="ctrl.highlight($event, item)" placeholder="locator" /></div>
+      <div class="value"><input ng-model="item.value" placeholder="value" /></div>
+    </div>
   </div>
 </div>
-
 <datalist id="commands">
   <option value="click"></option>
   <option value="sendKeys"></option>

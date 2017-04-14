@@ -2,10 +2,12 @@ module.exports = function (module) {
   var ListComponent = {
     bindings: {
       recording: '<',
-      items: '<'
+      items: '<',
+      onChange: '&'
     },
     template: require('./list.partial.html'),
-    controller: 'ListController'
+    controller: 'ListController',
+    controllerAs: 'ctrl'
   };
 
   require('./list.controller')(module);

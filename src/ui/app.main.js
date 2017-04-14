@@ -1,7 +1,9 @@
 var angular = require('angular');
+require('angular-sortable-view');
 
 var app = angular.module('E2EUI', [
-  require('angular-route')
+  require('angular-route'),
+  'angular-sortable-view'
 ]);
 
 // source in extra components

@@ -4,10 +4,11 @@ var ioproxy = require('./../../common/ioproxy');
 
 function HomeController($rootScope, $scope, $window) {
   var $ctrl = this, file, formatter;
-
   $ctrl.testCase = {};
 
   $ctrl.$onInit = function () {
+    $ctrl.dirty = false;
+
     checkRecordingStatus();
 
     // ioproxy.about().then(function (response) {
@@ -19,7 +20,6 @@ function HomeController($rootScope, $scope, $window) {
     });
 
     if ($window.localStorage.lastPath) {
-      $rootScope.pageTitle = '';
       $ctrl.read($window.localStorage.lastPath);
     };
   };
@@ -44,12 +44,19 @@ function HomeController($rootScope, $scope, $window) {
     chrome.tabs.sendMessage($window.currentTabId, { call: 'execute', commands: $ctrl.testCase.items });
   };
 
+  $ctrl.onChange = function () {
+    $ctrl.dirty = true;
+    updateTitle();
+  }
+
   $ctrl.save = function (ev, saveAs) {
     ioproxy.write(!saveAs && file ? file.path : undefined, formatter.stringify($ctrl.testCase), $window.localStorage.lastPath)
       .then((response) => {
         file = response;
         if (response.path) {
-          $rootScope.pageTitle = $window.localStorage.lastPath = response.path;
+          $window.localStorage.lastPath = response.path;
+          $ctrl.dirty = false;
+          updateTitle();
           $scope.$apply();
         }
       })
@@ -58,10 +65,15 @@ function HomeController($rootScope, $scope, $window) {
 
   $ctrl.$onInit();
 
+  function updateTitle() {
+    $rootScope.pageTitle = file.path + ($ctrl.dirty ? ' *' : '');
+  }
+
   function processFile(_file) {
     file = _file;
     if (file.path) {
-      $rootScope.pageTitle = $window.localStorage.lastPath = file.path;
+      $window.localStorage.lastPath = file.path;
+      updateTitle();
     }
     formatter = supportedFormats.filter((f) => f.test(file.path))[0];
     if (formatter) {

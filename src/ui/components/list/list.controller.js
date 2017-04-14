@@ -10,6 +10,7 @@ function ListController($scope, $window) {
     messenger.bind({
       recordCommand: function (request, callback) {
         $ctrl.items.push({ command: request.command, locator: request.locator, value: request.value, type: 'command' });
+        $ctrl.onChange();
         $scope.$digest();
       }
     });
@@ -26,6 +27,10 @@ function ListController($scope, $window) {
     chrome.tabs.sendMessage($window.currentTabId, { call: 'execute', commands: [item] }, function (executed) {
       elementHelper.highlight(ev.target.parentNode, executed ? positiveColor : negativeColor);
     });
+  };
+  
+  $ctrl.onSort = function (indexFrom, indexTo) {
+    $ctrl.onChange();
   };
 }
 
