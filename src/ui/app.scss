@@ -1,6 +1,8 @@
-html, body {
+html,
+body {
   height: 100vh;
 }
+
 body {
   background: #fff;
   margin: 0;
@@ -13,6 +15,23 @@ main {
   height: 100vh;
 }
 
-@import './components/list/list.scss';
+.toolbar {
+  margin: 4px;
+  display: flex;
+  flex-direction: row;
+  flex-shrink: 0;
+  flex-wrap: wrap;
+  button {
+    flex: 1;
+    flex-basis: auto;
+    flex-shrink: 0;
+    flex-grow: 0;
+    margin: 4px;
+  }
+  .separator {
+    flex: 1;
+  }
+}
 
+@import './components/list/list.scss';
 @import './home/home.scss';

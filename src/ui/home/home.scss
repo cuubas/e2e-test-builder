@@ -1,22 +1,4 @@
 .home {
-  &__toolbar {
-    margin: 4px;
-    display: flex;
-    flex-direction: row;
-    flex-shrink: 0;
-    flex-wrap: wrap;
-    button {
-      flex: 1;
-      flex-basis: auto;
-      flex-shrink: 0;
-      flex-grow: 0;
-      margin: 4px;
-    }
-    .separator {
-      flex: 1;
-    }
-  }
-
   &__content {
     display: flex;
     flex-direction: column;

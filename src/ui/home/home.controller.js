@@ -28,6 +28,17 @@ function HomeController($rootScope, $scope, $window) {
     messenger.send({ call: 'toggleRecording' });
   };
 
+  $ctrl.create = function () {
+    if ($ctrl.dirty && !confirm("Some changes are not persisted yet, are you sure?")) {
+      return;
+    }
+    $ctrl.testCase = {};
+    $ctrl.baseUrl = '/';
+    $ctrl.tittle = 'test case';
+    $ctrl.testCase.items = [];
+    $ctrl.save(null, true);
+  };
+
   $ctrl.read = function (path) {
     ioproxy.read(path)
       .then(processFile)

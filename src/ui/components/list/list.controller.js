@@ -28,10 +28,14 @@ function ListController($scope, $window) {
       elementHelper.highlight(ev.target.parentNode, executed ? positiveColor : negativeColor);
     });
   };
-  
+
   $ctrl.onSort = function (indexFrom, indexTo) {
     $ctrl.onChange();
   };
+
+  $ctrl.add = function (type) {
+    $ctrl.items.push({ type: type });
+  }
 }
 
 module.exports = function (module) {
