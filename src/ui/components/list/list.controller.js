@@ -44,6 +44,11 @@ function ListController($scope, $window) {
 
   $ctrl.add = function (type) {
     $ctrl.items.push({ type: type });
+  };
+
+  $ctrl.remove = function(ev, item) {
+    $ctrl.items.splice($ctrl.items.indexOf(item), 1);
+    $ctrl.onChange();
   }
 }
 

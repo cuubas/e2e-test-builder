@@ -1,47 +1,104 @@
 list {
   display: block;
+  .item-wrapper:first-child {
+    .item {
+      border-top: 2px solid #eee;
+    }
+  }
   .item {
     display: flex;
     flex-direction: row;
     align-content: stretch;
-    border-bottom: 2px solid #eee;
+    border-bottom: 1px solid #eee;
     flex-wrap: wrap;
     background-color: #fff;
-    &:first-child {
-      border-top: 2px solid #eee;
-    }
     &.in-progress .command {
       background-color: #ffd881;
     }
     &.done .command {
       background-color: #c2f6c8;
     }
-    &.failed .command{
+    &.failed .command {
       background-color: #ffd3d3;
+    }
+    &:hover {
+      background-color: #f6f6f6;
+      .handle,
+      .remove {
+        opacity: 0.8;
+      }
+    }
+    &.item--comment {
+      background-color: #d9efff;
+      &:hover {
+        background-color: #cbe9ff;
+      }
+    }
+    .handle,
+    .command,
+    .comment,
+    .value,
+    .locator,
+    .remove {
+      border-bottom: 1px solid #eee;
     }
     .handle {
       min-width: 16px;
       position: relative;
       cursor: move;
+      color: #8e8e8e;
+      opacity: 0.5;
+      order: 0;
       &:before,
       &:after {
         position: absolute;
-        left: 2px;
-        right: 2px;
-        border-color: #8e8e8e;
+        left: 5px;
+        right: 5px;
+        border-color: currentColor;
         border-style: dotted;
         content: '';
-        border-top-width: 4px;
-        border-bottom-width: 4px;
+        border-top-width: 2px;
+        border-bottom-width: 2px;
         border-left-width: 0;
         border-right-width: 0;
-        height: 4px;
+        height: 3px;
       }
       &:before {
-        top: 2px;
+        top: 7px;
       }
       &:after {
-        bottom: 2px;
+        bottom: 7px;
+      }
+    }
+    .remove {
+      position: relative;
+      flex: 1 0 0;
+      max-width: 14px;
+      display: block;
+      width: 12px;
+      height: 12px;
+      color: #8e8e8e;
+      opacity: 0.5;
+      cursor: pointer;
+      padding: 10px 2px 9px;
+      order: 2;
+      &:hover {
+        opacity: 1;
+      }
+      &:before,
+      &:after {
+        position: absolute;
+        left: 6px;
+        content: ' ';
+        height: 12px;
+        width: 2px;
+        background-color: currentColor;
+      }
+      &:before {
+        transform: rotate(45deg);
+      }
+      &:after {
+        transform: rotate(-45deg);
       }
     }
     .command,
@@ -53,22 +110,30 @@ list {
       box-sizing: border-box;
       flex: 1 0 0;
     }
+    .command {
+      order: 1;
+    }
+    .locator {
+      order: 3;
+    }
     .comment {
-      background-color: #d9efff;
+      order: 2;
+    }
+    .value {
+      order: 5;
     }
     .locator,
     .value {
       flex: 2 0 0;
       min-width: 100%;
-      border-top: 1px solid #eee;
     }
     @media screen and (min-width:350px) {
       .locator,
       .value {
         min-width: 250px;
       }
-      .locator {
-        border-top: 0;
+      .remove {
+        order: 4;
       }
     }
     @media screen and (min-width:450px) {
@@ -79,7 +144,7 @@ list {
     }
     @media screen and (min-width:650px) {
       .value {
-        border-top: 0;
+        order: 4;
       }
     }
     input {
@@ -88,7 +153,7 @@ list {
       min-width: 0;
       border: 0;
       -webkit-appearance: none;
-      padding: 6px 0px;
+      padding: 6px 3px;
       outline: none;
       background-color: transparent;
     }
