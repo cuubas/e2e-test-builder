@@ -10,6 +10,7 @@
       <div class="locator"><input ng-model="item.locator" ng-click="ctrl.highlight($event, item)" placeholder="locator" /></div>
       <div class="value"><input ng-model="item.value" placeholder="value" /></div>
     </div>
+    <div class="message" ng-if="item.message" ng-bind="item.message"></div>
   </div>
 </div>
 <div class="toolbar">

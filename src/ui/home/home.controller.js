@@ -55,6 +55,7 @@ function HomeController($rootScope, $scope, $window) {
     
     $ctrl.testCase.items.forEach((item) => {
       item.state = undefined;
+      item.message = undefined;
     });
 
     chrome.tabs.sendMessage($window.currentTabId, { call: 'execute', commands: $ctrl.testCase.items, index: 0, count: $ctrl.testCase.items.length });

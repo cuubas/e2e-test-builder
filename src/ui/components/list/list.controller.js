@@ -17,6 +17,9 @@ function ListController($scope, $window) {
       },
       commandStateChange: function (request, callback) {
         $ctrl.items[request.index].state = request.state;
+        if (request.message) {
+          $ctrl.items[request.index].message = request.message;
+        }
         $scope.$digest();
       },
     });
@@ -30,6 +33,8 @@ function ListController($scope, $window) {
   };
 
   $ctrl.execute = function (ev, item) {
+    item.message = undefined;
+    item.state = undefined;
     chrome.tabs.sendMessage($window.currentTabId, { call: 'execute', commands: $ctrl.items, index: $ctrl.items.indexOf(item), count: 1 });
   };
 
