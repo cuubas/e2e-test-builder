@@ -10,6 +10,15 @@ list {
     &:first-child {
       border-top: 2px solid #eee;
     }
+    &.in-progress .command {
+      background-color: #ffd881;
+    }
+    &.done .command {
+      background-color: #c2f6c8;
+    }
+    &.failed .command{
+      background-color: #ffd3d3;
+    }
     .handle {
       min-width: 16px;
       position: relative;

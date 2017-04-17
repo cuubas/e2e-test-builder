@@ -2,6 +2,7 @@ var messenger = require('./common/messenger');
 var locators = require('./common/locators');
 var elementHelper = require('./common/element-helper');
 var locator = locators.css;
+var runner = require('./common/runner');
 
 //content script
 var lastEventTarget = null,
@@ -20,16 +21,9 @@ var lastEventTarget = null,
       }
     },
     execute: function (request, callback) {
-      if (request.commands && request.commands.length) {
-        var item = request.commands[0];
-        var element = elementHelper.find(item.locator, document);
-        if (element && item.command === 'click') {
-          element.click();
-          callback(true);
-          return;
-        }
-      }
-      callback(false);
+      runner.execute(request.commands, request.index, request.count, (index, state) => {
+        messenger.send({ call: 'commandStateChange', index: index, state: state });
+      });
     },
     handleContextMenuClick: function (request, callback) {
       if (request.command === 'assertText') {

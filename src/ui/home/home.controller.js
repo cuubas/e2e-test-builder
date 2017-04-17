@@ -52,7 +52,12 @@ function HomeController($rootScope, $scope, $window) {
   };
 
   $ctrl.run = function () {
-    chrome.tabs.sendMessage($window.currentTabId, { call: 'execute', commands: $ctrl.testCase.items });
+    
+    $ctrl.testCase.items.forEach((item) => {
+      item.state = undefined;
+    });
+
+    chrome.tabs.sendMessage($window.currentTabId, { call: 'execute', commands: $ctrl.testCase.items, index: 0, count: $ctrl.testCase.items.length });
   };
 
   $ctrl.onChange = function () {

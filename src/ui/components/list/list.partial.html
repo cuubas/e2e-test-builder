@@ -4,7 +4,7 @@
       <div sv-handle class="handle"></div>
       <div class="comment"><input ng-model="item.value" /></div>
     </div>
-    <div ng-switch-default class="item">
+    <div ng-switch-default class="item" ng-class="{'in-progress': item.state === ctrl.STATES.INPROGRESS, 'done': item.state === ctrl.STATES.DONE, 'failed': item.state === ctrl.STATES.FAILED }">
       <div sv-handle class="handle"></div>
       <div class="command"><input list="commands" ng-model="item.command" ng-dblclick="ctrl.execute($event, item, $index)" placeholder="command" /></div>
       <div class="locator"><input ng-model="item.locator" ng-click="ctrl.highlight($event, item)" placeholder="locator" /></div>

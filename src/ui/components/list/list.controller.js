@@ -1,10 +1,12 @@
 var messenger = require('./../../../common/messenger');
 var elementHelper = require('./../../../common/element-helper');
+var runner = require('../../../common/runner');
 var positiveColor = '#c2f6c8';
-var negativeColor = '#ffdede';
+var negativeColor = '#ffd3d3';
 
 function ListController($scope, $window) {
   var $ctrl = this;
+  $ctrl.STATES = require('../../../common/runner-states');
 
   $ctrl.$onInit = function () {
     messenger.bind({
@@ -12,7 +14,11 @@ function ListController($scope, $window) {
         $ctrl.items.push({ command: request.command, locator: request.locator, value: request.value, type: 'command' });
         $ctrl.onChange();
         $scope.$digest();
-      }
+      },
+      commandStateChange: function (request, callback) {
+        $ctrl.items[request.index].state = request.state;
+        $scope.$digest();
+      },
     });
 
   };
@@ -24,9 +30,7 @@ function ListController($scope, $window) {
   };
 
   $ctrl.execute = function (ev, item) {
-    chrome.tabs.sendMessage($window.currentTabId, { call: 'execute', commands: [item] }, function (executed) {
-      elementHelper.highlight(ev.target.parentNode, executed ? positiveColor : negativeColor);
-    });
+    chrome.tabs.sendMessage($window.currentTabId, { call: 'execute', commands: $ctrl.items, index: $ctrl.items.indexOf(item), count: 1 });
   };
 
   $ctrl.onSort = function (indexFrom, indexTo) {
