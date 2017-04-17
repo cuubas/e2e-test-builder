@@ -1,8 +1,37 @@
 list {
   display: block;
-  .item-wrapper:first-child {
-    .item {
-      border-top: 2px solid #eee;
+  padding: 10px 0px;
+  .item-wrapper {
+    .toolbar {
+      display: none;
+      height: 0;
+      margin: 0;
+      position: relative;
+      padding-left: 17px;
+      a {
+        transform: translate(0, -50%);
+        display: inline-block;
+        height: 16px;
+        width: 16px;
+        cursor: pointer;
+        z-index: 1;
+        background: #fff;
+        border-radius: 100%;
+        svg {
+          width: 16px;
+          height: 16px;
+        }
+      }
+    }
+    &:hover {
+      .toolbar {
+        display: block;
+      }
+    }
+    &:first-child {
+      .item {
+        border-top: 2px solid #eee;
+      }
     }
   }
   .item {

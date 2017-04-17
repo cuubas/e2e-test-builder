@@ -35,7 +35,7 @@ function HomeController($rootScope, $scope, $window) {
     $ctrl.testCase = {};
     $ctrl.baseUrl = '/';
     $ctrl.tittle = 'test case';
-    $ctrl.testCase.items = [];
+    $ctrl.testCase.items = [{type:'command'}];
     $ctrl.save(null, true);
   };
 
@@ -52,7 +52,7 @@ function HomeController($rootScope, $scope, $window) {
   };
 
   $ctrl.run = function () {
-    
+
     $ctrl.testCase.items.forEach((item) => {
       item.state = undefined;
       item.message = undefined;
@@ -95,6 +95,9 @@ function HomeController($rootScope, $scope, $window) {
     formatter = supportedFormats.filter((f) => f.test(file.path))[0];
     if (formatter) {
       $ctrl.testCase = formatter.parse(file.data);
+      if (!$ctrl.testCase.items.length) {
+        $ctrl.testCase.items.push({ type: 'command' });
+      }
       $scope.$apply();
     } else {
       throw new Error('unsupported file format');
