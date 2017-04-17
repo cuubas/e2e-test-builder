@@ -1,8 +1,8 @@
 <div sv-root sv-on-sort="ctrl.onSort($indexFrom, $indexTo)" sv-part="ctrl.items">
   <div ng-repeat="item in ctrl.items" ng-switch="item.type" sv-element class="item-wrapper">
     <div class="toolbar">
-      <a ng-click="ctrl.add('command', $index)" class="add-command" title="insert a command here"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M16.5 11H13V7.5c0-.275-.225-.5-.5-.5h-2c-.275 0-.5.225-.5.5V11H6.5c-.275 0-.5.225-.5.5v2c0 .275.225.5.5.5H10v3.5c0 .275.225.5.5.5h2c.275 0 .5-.225.5-.5V14h3.5c.275 0 .5-.225.5-.5v-2c0-.275-.225-.5-.5-.5z"/></svg></a>
-      <a ng-click="ctrl.add('comment', $index)" class="add-comment" title="insert a comment here"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 7H8c-.55 0-1 .45-1 1v6c0 .55.45 1 1 1h1v3l3.037-3H18c.55 0 1-.45 1-1V8c0-.55-.45-1-1-1z"/></svg></a>
+      <a ng-click="ctrl.add('command', $index)" class="add-command" title="insert command here"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M16.5 11H13V7.5c0-.275-.225-.5-.5-.5h-2c-.275 0-.5.225-.5.5V11H6.5c-.275 0-.5.225-.5.5v2c0 .275.225.5.5.5H10v3.5c0 .275.225.5.5.5h2c.275 0 .5-.225.5-.5V14h3.5c.275 0 .5-.225.5-.5v-2c0-.275-.225-.5-.5-.5z"/></svg></a>
+      <a ng-click="ctrl.add('comment', $index)" class="add-comment" title="insert comment here"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 7H8c-.55 0-1 .45-1 1v6c0 .55.45 1 1 1h1v3l3.037-3H18c.55 0 1-.45 1-1V8c0-.55-.45-1-1-1z"/></svg></a>
     </div>
     <div ng-switch-when="comment" class="item item--comment">
       <div sv-handle class="handle"></div>
@@ -18,8 +18,8 @@
     </div>
     <div class="message" ng-if="item.message" ng-bind="item.message"></div>
     <div class="toolbar">
-      <a ng-click="ctrl.add('command', $index+1)" class="add-command" title="insert a command here"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M16.5 11H13V7.5c0-.275-.225-.5-.5-.5h-2c-.275 0-.5.225-.5.5V11H6.5c-.275 0-.5.225-.5.5v2c0 .275.225.5.5.5H10v3.5c0 .275.225.5.5.5h2c.275 0 .5-.225.5-.5V14h3.5c.275 0 .5-.225.5-.5v-2c0-.275-.225-.5-.5-.5z"/></svg></a>
-      <a ng-click="ctrl.add('comment', $index+1)" class="add-comment" title="insert a comment here"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 7H8c-.55 0-1 .45-1 1v6c0 .55.45 1 1 1h1v3l3.037-3H18c.55 0 1-.45 1-1V8c0-.55-.45-1-1-1z"/></svg></a>
+      <a ng-click="ctrl.add('command', $index+1)" class="add-command" title="insert command here"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M16.5 11H13V7.5c0-.275-.225-.5-.5-.5h-2c-.275 0-.5.225-.5.5V11H6.5c-.275 0-.5.225-.5.5v2c0 .275.225.5.5.5H10v3.5c0 .275.225.5.5.5h2c.275 0 .5-.225.5-.5V14h3.5c.275 0 .5-.225.5-.5v-2c0-.275-.225-.5-.5-.5z"/></svg></a>
+      <a ng-click="ctrl.add('comment', $index+1)" class="add-comment" title="insert comment here"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 7H8c-.55 0-1 .45-1 1v6c0 .55.45 1 1 1h1v3l3.037-3H18c.55 0 1-.45 1-1V8c0-.55-.45-1-1-1z"/></svg></a>
     </div>
   </div>
 </div>

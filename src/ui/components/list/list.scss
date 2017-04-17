@@ -8,6 +8,19 @@ list {
       margin: 0;
       position: relative;
       padding-left: 17px;
+      &:before {
+        position: absolute;
+        content: ' ';
+        display: block;
+        top:-4px;
+        left: 0;
+        width: 0;
+        height: 0;
+        border-style: solid;
+        border-width: 3px 0 3px 6px;
+        border-color: transparent transparent transparent #000000;
+        opacity: 0.2;
+      }
       a {
         transform: translate(0, -50%);
         display: inline-block;
