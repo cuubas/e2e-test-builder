@@ -1,11 +1,11 @@
-<div class="toolbar">
-  <button ng-click="$ctrl.create($event)">New</button>
-  <button ng-click="$ctrl.open($event)">Open</button>
-  <button ng-click="$ctrl.save($event)">Save</button>
-  <button ng-click="$ctrl.save($event, true)">Save as</button>
-  <button ng-click="$ctrl.run($event)">Run</button>
+<div class="toolbar home__toolbar">
+  <a ng-click="$ctrl.create($event)" title="create new test case" class="halflings halflings-file"></a>
+  <a ng-click="$ctrl.open($event)" title="open existing test case" class="halflings halflings-folder-open"></a>
+  <a ng-click="$ctrl.save($event)" title="save" class="halflings halflings-floppy-disk"></a>
+  <a ng-click="$ctrl.save($event, true)" title="save as ..." class="halflings halflings-floppy-save"></a>
   <span class="separator"></span>
-  <button ng-click="$ctrl.toggleRecording($event)">{{$ctrl.isRecordingEnabled?'Recording...':'Record'}}</button>
+  <a ng-click="$ctrl.run($event)" title="execute commands" class="halflings halflings-play"></a>
+  <a ng-click="$ctrl.toggleRecording($event)" title="{{$ctrl.isRecordingEnabled?'stop recording':'start recording'}}" class="halflings" ng-class="{'halflings-record':$ctrl.isRecordingEnabled, 'halflings-record-empty':!$ctrl.isRecordingEnabled}"></a>
 </div>
 <div class="home__content">
   <list items="$ctrl.testCase.items" on-change="$ctrl.onChange()" recording="$ctrl.isRecordingEnabled"></list>

@@ -1,4 +1,12 @@
 .home {
+  &__toolbar {
+    a {
+      cursor: pointer;
+      font-size: 16px;
+      padding: 4px;
+      color: #222c37;
+    }
+  }
   &__content {
     display: flex;
     flex-direction: column;
