@@ -4,10 +4,11 @@ var STATES = require('./runner-states');
 function Runner() {
   this.accessors = [];
   this.interval = 500;
+  this.timeout = undefined;
 }
 
 Runner.prototype.callWhenReady = function (callback) {
-  setTimeout(callback, this.interval);
+  this.timeout = setTimeout(callback, this.interval);
 };
 
 Runner.prototype.onBeforeExecute = function (commands, index, callback) {
@@ -19,6 +20,8 @@ Runner.prototype.onAfterExecute = function (commands, index, state, message, cal
 };
 
 Runner.prototype.start = function (commands, index, count, changeCallback) {
+  this.stop();
+  
   if (!index) {
     index = 0;
   }
@@ -49,6 +52,10 @@ Runner.prototype.start = function (commands, index, count, changeCallback) {
     }
   }
 
+};
+
+Runner.prototype.stop = function () {
+  clearTimeout(this.timeout);
 };
 
 Runner.prototype.execute = function (command, index, changeCallback) {

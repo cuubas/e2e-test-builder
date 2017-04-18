@@ -1,6 +1,5 @@
 var messenger = require('./../../../common/messenger');
 var elementHelper = require('./../../../common/element-helper');
-var runner = require('../../../common/runner');
 var positiveColor = '#c2f6c8';
 var negativeColor = '#ffd3d3';
 
@@ -21,7 +20,7 @@ function ListController($scope, $window) {
           $ctrl.items[request.index].message = request.message;
         }
         $scope.$digest();
-      },
+      }
     });
 
   };

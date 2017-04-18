@@ -4,7 +4,8 @@
   <a ng-click="$ctrl.save($event)" title="save" class="halflings halflings-floppy-disk"></a>
   <a ng-click="$ctrl.save($event, true)" title="save as ..." class="halflings halflings-floppy-save"></a>
   <span class="separator"></span>
-  <a ng-click="$ctrl.run($event)" title="execute commands" class="halflings halflings-play"></a>
+  <a ng-click="$ctrl.run($event)" ng-if="!$ctrl.running" title="execute commands" class="halflings halflings-play"></a>
+  <a ng-click="$ctrl.interruptRunner($event)" ng-if="$ctrl.running" title="cancels" class="halflings halflings-stop"></a>
   <a ng-click="$ctrl.toggleRecording($event)" title="{{$ctrl.isRecordingEnabled?'stop recording':'start recording'}}" class="halflings" ng-class="{'halflings-record':$ctrl.isRecordingEnabled, 'halflings-record-empty':!$ctrl.isRecordingEnabled}"></a>
 </div>
 <div class="home__content">

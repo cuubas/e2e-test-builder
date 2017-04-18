@@ -1,6 +1,7 @@
 var messenger = require('./../../common/messenger');
 var supportedFormats = require('./../../common/supported-formats');
 var ioproxy = require('./../../common/ioproxy');
+var runnerStates = require('../../common/runner-states');
 
 function HomeController($rootScope, $scope, $window) {
   var $ctrl = this, file, formatter;
@@ -8,7 +9,7 @@ function HomeController($rootScope, $scope, $window) {
 
   $ctrl.$onInit = function () {
     $ctrl.dirty = false;
-
+    $ctrl.running = false;
     checkRecordingStatus();
 
     // ioproxy.about().then(function (response) {
@@ -16,7 +17,14 @@ function HomeController($rootScope, $scope, $window) {
     // });
 
     messenger.bind({
-      recordingToggled: checkRecordingStatus
+      recordingToggled: checkRecordingStatus,
+      commandStateChange: function (request, callback) {
+        if ($ctrl.running && request.index === $ctrl.testCase.items.length - 1 && (request.state === runnerStates.DONE || request.state === runnerStates.FAILED)) {
+          $ctrl.running = false;
+          $scope.$digest();
+          // digest will be triggerred in list controller
+        }
+      }
     });
 
     if ($window.localStorage.lastPath) {
@@ -35,7 +43,7 @@ function HomeController($rootScope, $scope, $window) {
     $ctrl.testCase = {};
     $ctrl.baseUrl = '/';
     $ctrl.tittle = 'test case';
-    $ctrl.testCase.items = [{type:'command'}];
+    $ctrl.testCase.items = [{ type: 'command' }];
     $ctrl.save(null, true);
   };
 
@@ -51,14 +59,22 @@ function HomeController($rootScope, $scope, $window) {
       .catch(handleError);
   };
 
-  $ctrl.run = function () {
-
+  $ctrl.reset = function () {
     $ctrl.testCase.items.forEach((item) => {
       item.state = undefined;
       item.message = undefined;
     });
+  };
 
+  $ctrl.run = function () {
+    $ctrl.reset();
+    $ctrl.running = true;
     chrome.tabs.sendMessage($window.currentTabId, { call: 'execute', commands: $ctrl.testCase.items, index: 0, count: $ctrl.testCase.items.length });
+  };
+
+  $ctrl.interruptRunner = function () {
+    chrome.tabs.sendMessage($window.currentTabId, { call: 'interruptRunner' });
+    $ctrl.running = false;
   };
 
   $ctrl.onChange = function () {

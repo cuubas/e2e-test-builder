@@ -25,6 +25,9 @@ var lastEventTarget = null,
         messenger.send({ call: 'commandStateChange', index: index, state: state, message: message });
       });
     },
+    interruptRunner: function () {
+      runner.stop();
+    },
     handleContextMenuClick: function (request, callback) {
       if (request.command === 'assertText') {
         messenger.send({ call: 'recordCommand', command: request.command, locator: locator(lastEventTarget), value: lastEventTarget.textContent });
