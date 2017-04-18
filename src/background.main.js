@@ -28,7 +28,6 @@ function handleContextMenuClick(command, info, tab) {
 function openHelperWindow(_tab) {
   if (!uiWindow || uiWindow.closed) {
     uiWindow = window.open("ui/index.html", "extension_popup", "width=700,height=500,status=no,scrollbars=yes,resizable=no");
-    uiWindow.currentTabId = currentTabId;
     chrome.contextMenus.update(recordingContextMenuItemId, { enabled: true });
 
     // can't record without ui window
@@ -40,6 +39,7 @@ function openHelperWindow(_tab) {
   } else {
     uiWindow.focus();
   }
+  uiWindow.currentTabId = currentTabId;
 }
 
 // Create a parent item and two children.
