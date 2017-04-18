@@ -18,7 +18,7 @@ gulp.task('copy', () => {
 });
 
 gulp.task('copy-assets', () => {
-  return gulp.src('assets/*').pipe(gulp.dest('build/assets/'));
+  return gulp.src('assets/**/*').pipe(gulp.dest('build/assets/'));
 });
 
 gulp.task('build-ui-styles', function () {
