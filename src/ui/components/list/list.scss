@@ -41,7 +41,8 @@ list {
         display: block;
       }
     }
-    &:first-child {
+    &:first-child,
+    &.sv-helper + .item-wrapper {
       .item {
         border-top: 2px solid #eee;
       }
@@ -117,8 +118,9 @@ list {
       flex: 1 0 0;
       max-width: 14px;
       display: block;
-      width: 12px;
+      width: 14px;
       height: 12px;
+      min-width: 14px;
       color: #8e8e8e;
       opacity: 0.5;
       cursor: pointer;
@@ -172,7 +174,7 @@ list {
     @media screen and (min-width:350px) {
       .locator,
       .value {
-        min-width: 250px;
+        min-width: 220px;
       }
       .remove {
         order: 4;
@@ -180,11 +182,11 @@ list {
     }
     @media screen and (min-width:450px) {
       .command {
-        min-width: 150px;
+        min-width: 130px;
         max-width: 150px;
       }
     }
-    @media screen and (min-width:650px) {
+    @media screen and (min-width:621px) {
       .value {
         order: 4;
       }
