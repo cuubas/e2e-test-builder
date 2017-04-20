@@ -20,6 +20,10 @@ function ListController($scope, $window) {
           $ctrl.items[request.index].message = request.message;
         }
         $scope.$digest();
+      },
+      elementSelected: function (request) {
+        $ctrl.items[request.index].locator = request.locator;
+        $scope.$digest();
       }
     });
 
@@ -37,6 +41,19 @@ function ListController($scope, $window) {
     chrome.tabs.sendMessage($window.currentTabId, { call: 'execute', commands: $ctrl.items, index: $ctrl.items.indexOf(item), count: 1 });
   };
 
+  $ctrl.selectElement = function (ev, item) {
+    if (item.selecting) {
+      delete item.selecting;
+      chrome.tabs.sendMessage($window.currentTabId, { call: 'cancelSelect' });
+      return;
+    }
+    $ctrl.items.forEach(function (item) {
+      delete item.selecting;
+    });
+    item.selecting = true;
+    chrome.tabs.sendMessage($window.currentTabId, { call: 'select', locator: item.locator, index: $ctrl.items.indexOf(item) });
+  };
+
   $ctrl.onSort = function (indexFrom, indexTo) {
     $ctrl.onChange();
   };
@@ -45,7 +62,7 @@ function ListController($scope, $window) {
     $ctrl.items.splice(index, 0, { type: type });
   };
 
-  $ctrl.remove = function(ev, item) {
+  $ctrl.remove = function (ev, item) {
     $ctrl.items.splice($ctrl.items.indexOf(item), 1);
     $ctrl.onChange();
   }

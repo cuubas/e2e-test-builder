@@ -12,7 +12,7 @@ list {
         position: absolute;
         content: ' ';
         display: block;
-        top:-4px;
+        top: -4px;
         left: 0;
         width: 0;
         height: 0;
@@ -42,7 +42,7 @@ list {
       }
     }
     &:first-child,
-    &.sv-helper + .item-wrapper {
+    &.sv-helper+.item-wrapper {
       .item {
         border-top: 2px solid #eee;
       }
@@ -159,6 +159,21 @@ list {
     }
     .locator {
       order: 3;
+      position: relative;
+      input {
+        padding-right: 20px;
+      }
+      .select-handle {
+        position: absolute;
+        right: 5px;
+        top: 9px;
+        color:#8e8e8e;
+        opacity: 0.5;
+        cursor: pointer;
+        &:hover{
+          opacity: 1;
+        }
+      }
     }
     .comment {
       order: 2;

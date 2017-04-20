@@ -3,6 +3,7 @@ var locators = require('./common/locators');
 var elementHelper = require('./common/element-helper');
 var locator = locators.css;
 var runner = require('./common/runner');
+var selector = require('./common/selector');
 
 // load runner extensions
 require('./common/runner/commands');
@@ -31,6 +32,14 @@ var lastEventTarget = null,
     },
     interruptRunner: function () {
       runner.stop();
+    },
+    select: function (request) {
+      selector.start(request.locator, (element) => {
+        messenger.send({ call: 'elementSelected', locator: locator(element), index: request.index });
+      });
+    },
+    cancelSelect: function () {
+      selector.stop();
     },
     handleContextMenuClick: function (request, callback) {
       if (request.command === 'assertText') {
