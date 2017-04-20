@@ -68,10 +68,13 @@ CssLocator.attributes = [
 
 CssLocator.find = function (locator, parent) {
   locator = locator.trim();
+  if (!locator) {
+    return undefined;
+  }
   var containsStartIndex = locator.indexOf(':contains(');
   var containsEndIndex = locator.indexOf(')', containsStartIndex);
   var result, item;
-  if (containsStartIndex !==-1 && containsEndIndex !==-1) {
+  if (containsStartIndex !== -1 && containsEndIndex !== -1) {
     var prefix = locator.substring(0, containsStartIndex);
     var text = locator.substring(containsStartIndex + ":contains(".length + 1, containsEndIndex - 1).toLowerCase();
     var suffix = locator.substring(containsEndIndex + 1).trim();

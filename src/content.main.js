@@ -4,6 +4,10 @@ var elementHelper = require('./common/element-helper');
 var locator = locators.css;
 var runner = require('./common/runner');
 
+// load runner extensions
+require('./common/runner/commands');
+require('./common/runner/accessors');
+
 //content script
 var lastEventTarget = null,
   api = {

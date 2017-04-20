@@ -5,10 +5,23 @@ function Runner() {
   this.accessors = [];
   this.interval = 500;
   this.timeout = undefined;
+  this.commands = {};
+  this.accessors = {};
+  this.accessorCommands = [];
+  this.variables = {};
+  this.STATES = STATES;
 }
 
 Runner.prototype.callWhenReady = function (callback) {
   this.timeout = setTimeout(callback, this.interval);
+};
+
+Runner.prototype.findElement = function (locator, parent) {
+  var element = elementHelper.find(locator, parent || document);
+  if (!element) {
+    throw new Error("element could not be found");
+  }
+  return element;
 };
 
 Runner.prototype.onBeforeExecute = function (commands, index, callback) {
@@ -19,9 +32,49 @@ Runner.prototype.onAfterExecute = function (commands, index, state, message, cal
   callback();
 };
 
+// borrowed from Selenium ide fork: https://github.com/FDIM/selenium/commit/2dbb4f2764c1e3d6f1c7c74bdbe9f896aaefafe8
+Runner.prototype.injectVariables = function (str) {
+  var stringResult = str;
+
+  // Find all of the matching variable references
+  ///////// only change is here to support . (dot) in variables
+  var match = stringResult.match(/\$\{[^\}]+\}/g);
+  if (!match) {
+    return stringResult;
+  }
+
+  // For each match, lookup the variable value, and replace if found
+  for (var i = 0; match && i < match.length; i++) {
+    var variable = match[i]; // The replacement variable, with ${}
+    var name = variable.substring(2, variable.length - 1); // The replacement variable without ${}
+    // extension for default values support
+    var defaultValue = false;
+    if (name.indexOf('||') !== -1) {
+      var parts = name.split('||');
+      name = parts[0].trim();
+      defaultValue = parts[1].trim();
+    }
+    var replacement = this.variables[name];
+    if (!replacement && defaultValue) {
+      if (/^["'].*["']$/.test(defaultValue)) {
+        replacement = defaultValue.substring(1, defaultValue.length - 1);
+      } else {
+        replacement = this.variables[defaultValue];
+      }
+    }
+    if (replacement && typeof (replacement) === 'string' && replacement.indexOf('$') != -1) {
+      replacement = replacement.replace(/\$/g, '$$$$'); //double up on $'s because of the special meaning these have in 'replace'
+    }
+    if (replacement != undefined) {
+      stringResult = stringResult.replace(variable, replacement);
+    }
+  }
+  return stringResult;
+};
+
 Runner.prototype.start = function (commands, index, count, changeCallback) {
   this.stop();
-  
+
   if (!index) {
     index = 0;
   }
@@ -61,15 +114,47 @@ Runner.prototype.stop = function () {
 Runner.prototype.execute = function (command, index, changeCallback) {
   changeCallback(index, STATES.INPROGRESS);
 
-  setTimeout(() => {
-    var element = elementHelper.find(command.locator, document);
-    if (element && command.command === 'click') {
-      element.click();
-      changeCallback(index, STATES.DONE);
-      return;
+  // handle variables
+  command.command = this.injectVariables(command.command || '');
+  command.locator = this.injectVariables(command.locator || '');
+  command.value = this.injectVariables(command.value || '');
+
+  var cmd = this.commands[command.command];
+  // try accessorCommands if exact command is not available
+  if (!cmd) {
+    var prefix = this.accessorCommands.filter((c) => command.command.indexOf(c) === 0)[0];
+    if (prefix) {
+      var accessorName = command.command.substring(prefix.length);
+      accessorName = accessorName.substring(0, 1).toLowerCase() + accessorName.substring(1);
+      var accessor = this.accessors[accessorName];
+      if (accessor) {
+        try {
+          command.input = accessor.call(this, command);
+        } catch (err) {
+          changeCallback(index, STATES.FAILED, accessorName + ' accessor: ' + (err.message || ''))
+          return;
+        }
+        cmd = this.commands[prefix];
+      }
     }
-    changeCallback(index, STATES.FAILED, 'unknown command or invalid locator');
-  }, 2000);
+  }
+
+  if (typeof (cmd) === 'function') {
+    try {
+      if (cmd.length > 1) { // uses callback
+        cmd.call(this, command, (state, message) => {
+          changeCallback(index, state, message);
+        });
+      } else {
+        cmd.call(this, command);
+        changeCallback(index, STATES.DONE);
+      }
+    } catch (err) {
+      changeCallback(index, STATES.FAILED, err.message || "an error occured");
+    }
+  } else {
+    changeCallback(index, STATES.FAILED, "unknown command");
+  }
 }
 
 module.exports = new Runner();
