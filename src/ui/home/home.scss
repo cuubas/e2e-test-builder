@@ -5,6 +5,9 @@
       font-size: 16px;
       padding: 4px;
       color: #222c37;
+      &:hover{
+        color: lighten(#222c37, 30);
+      }
     }
   }
   &__content {
