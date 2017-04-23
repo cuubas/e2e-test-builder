@@ -1,4 +1,6 @@
 "use strict";
+var tasks = process.argv.slice(2);
+
 var fs = require('fs');
 var gulp = require('gulp');
 var util = require("gulp-util");
@@ -12,7 +14,10 @@ var zip = require('gulp-zip');
 var uglify = require('gulp-uglify');
 var replace = require('gulp-replace');
 var UglifyJSPlugin = require('uglifyjs-webpack-plugin');
-var shouldWatch = false, shouldUglify = false;
+
+// few flags
+var shouldWatch = tasks.length === 0;
+var shouldUglify = tasks[0].indexOf('release') !== -1;
 
 var babelLoader = {
   test: /.js$/,
@@ -120,14 +125,12 @@ gulp.task('pack', () => {
 });
 
 gulp.task('build', ['copy-assets', 'build-manifest', 'build-background-script', 'build-content-script', 'build-ui-html', 'build-ui', 'build-ui-styles']);
-gulp.task('build-release', (cb) => {
-  shouldUglify = true;
-  gulp.start('build', cb);
+gulp.task('build-release', ['build']);
+gulp.task('release', ['build'], (cb) => {
+  gulp.start('pack', [], cb);
 });
-gulp.task('release', ['build-release', 'pack']);
 
 gulp.task('default', () => {
-  shouldWatch = true;
   gulp.start('build');
   gulp.watch(['src/manifest.json', 'package.json'], ['build-manifest']);
   gulp.watch('src/ui/index.html', ['build-ui-html']);
