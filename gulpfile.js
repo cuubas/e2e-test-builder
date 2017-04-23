@@ -107,6 +107,13 @@ gulp.task('build-io-proxy', (done) => {
 });
 
 gulp.task('pack', () => {
+  try {
+    fs.unlinkSync('build.zip');
+  } catch (err) {
+    if (err.code !== 'ENOENT') {
+      throw err;
+    }
+  }
   return gulp.src(['build/**/*', '!**/*.db'])
     .pipe(zip('build.zip'))
     .pipe(gulp.dest('./'));
