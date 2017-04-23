@@ -17,7 +17,7 @@ var UglifyJSPlugin = require('uglifyjs-webpack-plugin');
 
 // few flags
 var shouldWatch = tasks.length === 0;
-var shouldUglify = tasks[0].indexOf('release') !== -1;
+var shouldUglify = tasks.length && tasks[0].indexOf('release') !== -1;
 
 var babelLoader = {
   test: /.js$/,
