@@ -6,7 +6,7 @@ function genericCallback(resolve, reject, response) {
   if (response && response.code > 0) {
     resolve(response);
   } else {
-    reject(chrome.runtime.lastError || (response && response.message) || "unknown error");
+    reject((chrome.runtime.lastError && chrome.runtime.lastError.message) || (response && response.message) || "unknown error");
   }
 }
 
