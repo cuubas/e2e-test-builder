@@ -10,7 +10,7 @@
   "devDependencies": {
     "angular": "^1.6.3",
     "angular-route": "^1.6.3",
-    "angular-sortable-view": "0.0.15",
+    "angular-sortable-view": "https://github.com/FDIM/angular-sortable-view.git#3a4a611cc92b2c6978b43047c38c22905849be93",
     "autoprefixer": "^6.7.7",
     "babel-core": "^6.24.1",
     "babel-loader": "^7.0.0",

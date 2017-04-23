@@ -3,11 +3,12 @@ module.exports = function (module) {
     bindings: {
       recording: '<',
       items: '<',
+      selectedIndex: '<',
+      onSelect: '&',
       onChange: '&'
     },
     template: require('./list.partial.html'),
-    controller: 'ListController',
-    controllerAs: 'ctrl'
+    controller: 'ListController'
   };
 
   require('./list.controller')(module);

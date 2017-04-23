@@ -9,5 +9,5 @@
   <a ng-click="$ctrl.toggleRecording($event)" title="{{$ctrl.isRecordingEnabled?'stop recording':'start recording'}}" class="halflings" ng-class="{'halflings-record':$ctrl.isRecordingEnabled, 'halflings-record-empty':!$ctrl.isRecordingEnabled}"></a>
 </div>
 <div class="home__content">
-  <list items="$ctrl.testCase.items" on-change="$ctrl.onChange()" recording="$ctrl.isRecordingEnabled"></list>
+  <list items="$ctrl.testCase.items" selected-index="$ctrl.selectedIndex" on-select="$ctrl.onSelect(index)" on-change="$ctrl.onChange()" recording="$ctrl.isRecordingEnabled"></list>
 </div>

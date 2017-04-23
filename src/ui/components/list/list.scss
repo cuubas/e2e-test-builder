@@ -76,6 +76,12 @@ list {
         background-color: #cbe9ff;
       }
     }
+    &.item--selected {
+      .handle {
+        background: #000000;
+        color: #fff;
+      }
+    }
     .handle,
     .command,
     .comment,
@@ -166,10 +172,10 @@ list {
         position: absolute;
         right: 5px;
         top: 9px;
-        color:#8e8e8e;
+        color: #8e8e8e;
         opacity: 0.5;
         cursor: pointer;
-        &:hover{
+        &:hover {
           opacity: 1;
         }
       }

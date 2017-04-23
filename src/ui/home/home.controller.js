@@ -6,6 +6,7 @@ var runnerStates = require('../../common/runner-states');
 function HomeController($rootScope, $scope, $window) {
   var $ctrl = this, file, formatter, promptMessage = "Some changes are not persisted yet, are you sure?";
   $ctrl.testCase = {};
+  $ctrl.selectedIndex = 0;
 
   $ctrl.$onInit = function () {
     $ctrl.dirty = false;
@@ -82,7 +83,7 @@ function HomeController($rootScope, $scope, $window) {
   $ctrl.run = function () {
     $ctrl.reset();
     $ctrl.running = true;
-    chrome.tabs.sendMessage($window.currentTabId, { call: 'execute', commands: $ctrl.testCase.items, index: 0, count: $ctrl.testCase.items.length });
+    chrome.tabs.sendMessage($window.currentTabId, { call: 'execute', commands: $ctrl.testCase.items, index: $ctrl.selectedIndex, count: $ctrl.testCase.items.length });
   };
 
   $ctrl.interruptRunner = function () {
@@ -92,8 +93,15 @@ function HomeController($rootScope, $scope, $window) {
 
   $ctrl.onChange = function () {
     $ctrl.dirty = true;
+    if ($ctrl.selectedIndex >= $ctrl.testCase.items.length) {
+      $ctrl.selectedIndex = $ctrl.testCase.items.length - 1;
+    }
     updateTitle();
-  }
+  };
+
+  $ctrl.onSelect = function (index) {
+    $ctrl.selectedIndex = index;
+  };
 
   $ctrl.save = function (ev, saveAs) {
     if (!formatter) {
