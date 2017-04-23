@@ -4,6 +4,7 @@ var recordingEnabled = false,
   currentWindowId,
   currentTabId,
   uiWindow,
+  uiWindowSettings = JSON.parse(window.localStorage.uiWindowSettings || '{}'),
   recordingContextMenuItemId,
   api = {
     isRecordingEnabled: function (request, callback) {
@@ -22,19 +23,41 @@ var recordingEnabled = false,
   };
 
 function handleContextMenuClick(command, info, tab) {
-    chrome.tabs.sendMessage(tab.id, { call: "handleContextMenuClick", command: command });
+  chrome.tabs.sendMessage(tab.id, { call: "handleContextMenuClick", command: command });
 }
 
-function openHelperWindow(_tab) {
+function openUiWindow(_tab) {
   if (!uiWindow || uiWindow.closed) {
-    uiWindow = window.open("ui/index.html", "extension_popup", "width=700,height=500,status=no,scrollbars=yes,resizable=no");
+    var props = "width=" + (uiWindowSettings.width || 700) + ",height=" + (uiWindowSettings.height || 500) + ",status=no,scrollbars=yes,resizable=no";
+    if (uiWindowSettings.x) {
+      props += ',left=' + uiWindowSettings.x;
+    }
+    if (uiWindowSettings.y) {
+      props += ',top=' + uiWindowSettings.y;
+    }
+    uiWindow = window.open("ui/index.html", "extension_popup", props);
     chrome.contextMenus.update(recordingContextMenuItemId, { enabled: true });
 
     // can't record without ui window
     uiWindow.addEventListener('beforeunload', function () {
+      // remember ui window settings
+      uiWindowSettings.width = uiWindow.outerWidth;
+      uiWindowSettings.height = uiWindow.outerHeight;
+      uiWindowSettings.x = uiWindow.screenLeft;
+      uiWindowSettings.y = uiWindow.screenTop;
+
+      window.localStorage.uiWindowSettings = JSON.stringify(uiWindowSettings);
+
       uiWindow = undefined;
       recordingEnabled = true;
       api.toggleRecording();
+    });
+    uiWindow.addEventListener('keydown', function (ev) {
+      if (ev.which === 116 || (ev.ctrlKey && ev.which === 82)) { // f5 or ctrl+r
+        ev.preventDefault();
+        uiWindow.close();
+        setTimeout(openUiWindow, 100);
+      }
     });
   } else {
     uiWindow.focus();
@@ -48,7 +71,7 @@ chrome.contextMenus.create({ type: 'separator' });
 
 chrome.contextMenus.create({ "title": "Assert Text", contexts: ["all"], onclick: handleContextMenuClick.bind(this, 'assertText') });
 
-chrome.browserAction.onClicked.addListener(openHelperWindow);
+chrome.browserAction.onClicked.addListener(openUiWindow);
 
 // create link to api
 messenger.bind(api);
