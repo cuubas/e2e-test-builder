@@ -31,7 +31,9 @@ function HomeController($rootScope, $scope, $window) {
 
     if ($window.localStorage.lastPath) {
       $ctrl.read($window.localStorage.lastPath);
-    };
+    } else {
+      $ctrl.testCase = $ctrl.newTestCase();
+    }
   };
 
   $ctrl.$onDestroy = function () {
@@ -42,14 +44,19 @@ function HomeController($rootScope, $scope, $window) {
     messenger.send({ call: 'toggleRecording' });
   };
 
+  $ctrl.newTestCase = function () {
+    var res = {};
+    res.baseUrl = '/';
+    res.title = 'test case';
+    res.items = [{ type: 'command' }];
+    return res;
+  }
+
   $ctrl.create = function () {
     if ($ctrl.dirty && !confirm(promptMessage)) {
       return;
     }
-    $ctrl.testCase = {};
-    $ctrl.baseUrl = '/';
-    $ctrl.tittle = 'test case';
-    $ctrl.testCase.items = [{ type: 'command' }];
+    $ctrl.testCase = $ctrl.newTestCase();
     $ctrl.save(null, true);
   };
 
@@ -89,6 +96,9 @@ function HomeController($rootScope, $scope, $window) {
   }
 
   $ctrl.save = function (ev, saveAs) {
+    if (!formatter) {
+      formatter = supportedFormats[0];
+    }
     ioproxy.write(!saveAs && file ? file.path : undefined, formatter.stringify($ctrl.testCase), $window.localStorage.lastPath)
       .then((response) => {
         file = response;
