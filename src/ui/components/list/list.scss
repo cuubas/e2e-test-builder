@@ -30,10 +30,9 @@ list {
         z-index: 1;
         background: #fff;
         border-radius: 100%;
-        svg {
-          width: 16px;
-          height: 16px;
-        }
+        font-size: 9px;
+        text-align: center;
+        line-height: 16px;
       }
     }
     &:hover {
