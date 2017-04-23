@@ -2,7 +2,7 @@
   "manifest_version": 2,
   "name": "E2E Test Builder",
   "description": "This extension allows you to record clicks and perform various assertions. Supports well known Selenium ide test cases",
-  "version": "1.0",
+  "version": "{{package.version}}",
   "browser_action": {
     "default_icon": "assets/icon.png"
   },

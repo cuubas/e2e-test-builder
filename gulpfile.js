@@ -1,27 +1,44 @@
 "use strict";
-
+var fs = require('fs');
 var gulp = require('gulp');
 var util = require("gulp-util");
-var merge = require('merge-stream');
 var webpack = require('gulp-webpack');
 var ngAnnotate = require('gulp-ng-annotate');
 var sourcemaps = require('gulp-sourcemaps');
 var postcss = require('gulp-postcss');
 var autoprefixer = require('autoprefixer');
 var sass = require('gulp-sass');
-var shouldWatch = false;
+var zip = require('gulp-zip');
+var uglify = require('gulp-uglify');
+var replace = require('gulp-replace');
+var UglifyJSPlugin = require('uglifyjs-webpack-plugin');
+var shouldWatch = false, shouldUglify = false;
 
-gulp.task('copy', () => {
-  var manifest = gulp.src('src/manifest.json').pipe(gulp.dest('build/'));
-  var ui = gulp.src('src/ui/index.html').pipe(gulp.dest('build/ui/'));
-  return merge(manifest, ui);
-});
+var babelLoader = {
+  test: /.js$/,
+  loader: 'babel-loader',
+  exclude: /node_modules/,
+  query: {
+    plugins: ["transform-es2015-arrow-functions", "transform-es2015-template-literals"]
+  }
+};
 
 gulp.task('copy-assets', () => {
   return gulp.src('assets/**/*').pipe(gulp.dest('build/assets/'));
 });
 
-gulp.task('build-ui-styles', function () {
+gulp.task('build-manifest', () => {
+  var pack = JSON.parse(fs.readFileSync('./package.json'));
+  return gulp.src('src/manifest.json')
+    .pipe(replace('{{package.version}}', pack.version))
+    .pipe(gulp.dest('build/'));
+});
+
+gulp.task('build-ui-html', () => {
+  return gulp.src('src/ui/index.html').pipe(gulp.dest('build/ui/'));
+});
+
+gulp.task('build-ui-styles', () => {
   return gulp.src('./src/ui/app.scss')
     .pipe(sourcemaps.init())
     .pipe(sass().on('error', sass.logError))
@@ -38,19 +55,26 @@ gulp.task('build-ui', () => {
         loaders: [
           { test: /\.html$/, loaders: ["html"] },
           { test: /src.*\.js$/, loaders: ['ng-annotate'] },
+          shouldUglify ? babelLoader : []
         ]
       },
+      plugins: shouldUglify ? [new UglifyJSPlugin()] : [],
       output: { filename: 'app.js' }
     }))
     .pipe(gulp.dest(`build/ui`));
 });
+
 
 gulp.task('build-background-script', () => {
   return gulp.src(`src/background.main.js`)
     .pipe(webpack({
       watch: shouldWatch,
       devtool: shouldWatch ? 'inline-source-map' : undefined,
-      output: { filename: 'background.js' }
+      module: {
+        loaders: [shouldUglify ? babelLoader : []]
+      },
+      output: { filename: 'background.js' },
+      plugins: shouldUglify ? [new UglifyJSPlugin()] : []
     }))
     .pipe(gulp.dest(`build`));
 });
@@ -60,7 +84,11 @@ gulp.task('build-content-script', () => {
     .pipe(webpack({
       watch: shouldWatch,
       devtool: shouldWatch ? 'inline-source-map' : undefined,
-      output: { filename: 'content.js' }
+      module: {
+        loaders: [shouldUglify ? babelLoader : []]
+      },
+      output: { filename: 'content.js' },
+      plugins: shouldUglify ? [new UglifyJSPlugin()] : [],
     }))
     .pipe(gulp.dest(`build`));
 });
@@ -78,12 +106,24 @@ gulp.task('build-io-proxy', (done) => {
   });
 });
 
-gulp.task('build', ['copy', 'copy-assets', 'build-background-script', 'build-content-script', 'build-ui', 'build-ui-styles']);
+gulp.task('pack', () => {
+  return gulp.src(['build/**/*', '!**/*.db'])
+    .pipe(zip('build.zip'))
+    .pipe(gulp.dest('./'));
+});
+
+gulp.task('build', ['copy-assets', 'build-manifest', 'build-background-script', 'build-content-script', 'build-ui-html', 'build-ui', 'build-ui-styles']);
+gulp.task('build-release', (cb) => {
+  shouldUglify = true;
+  gulp.start('build', cb);
+});
+gulp.task('release', ['build-release', 'pack']);
 
 gulp.task('default', () => {
   shouldWatch = true;
   gulp.start('build');
-  gulp.watch(['src/manifest.json', 'src/ui/index.html'], ['copy']);
+  gulp.watch(['src/manifest.json', 'package.json'], ['build-manifest']);
+  gulp.watch('src/ui/index.html', ['build-ui-html']);
   gulp.watch('src/ui/**/*.scss', ['build-ui-styles']);
   gulp.watch('src/io/src/**/*', ['build-io-proxy']);
 });
