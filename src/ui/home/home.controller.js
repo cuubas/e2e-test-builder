@@ -4,7 +4,7 @@ var ioproxy = require('./../../common/ioproxy');
 var runnerStates = require('../../common/runner-states');
 
 function HomeController($rootScope, $scope, $window) {
-  var $ctrl = this, file, formatter;
+  var $ctrl = this, file, formatter, promptMessage = "Some changes are not persisted yet, are you sure?";
   $ctrl.testCase = {};
 
   $ctrl.$onInit = function () {
@@ -27,9 +27,15 @@ function HomeController($rootScope, $scope, $window) {
       }
     });
 
+    $window.addEventListener('beforeunload', handleOnBeforeUnload);
+
     if ($window.localStorage.lastPath) {
       $ctrl.read($window.localStorage.lastPath);
     };
+  };
+
+  $ctrl.$onDestroy = function () {
+    $window.removeEventListener('beforeunload', handleOnBeforeUnload);
   };
 
   $ctrl.toggleRecording = function () {
@@ -37,7 +43,7 @@ function HomeController($rootScope, $scope, $window) {
   };
 
   $ctrl.create = function () {
-    if ($ctrl.dirty && !confirm("Some changes are not persisted yet, are you sure?")) {
+    if ($ctrl.dirty && !confirm(promptMessage)) {
       return;
     }
     $ctrl.testCase = {};
@@ -130,6 +136,12 @@ function HomeController($rootScope, $scope, $window) {
 
   function handleError(error) {
     alert(error);
+  }
+
+  function handleOnBeforeUnload(ev) {
+    if ($ctrl.dirty) {
+      ev.returnValue = promptMessage;
+    }
   }
 
 }
