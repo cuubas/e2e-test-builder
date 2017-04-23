@@ -24,8 +24,21 @@ Runner.prototype.findElement = function (locator, parent) {
   return element;
 };
 
+Runner.prototype.assertValue = function (input, value) {
+  var regex;
+  value = String(value || '');
+  if (value.indexOf('regexp:') === 0) {
+    regex = new RegExp(value.substring(7));
+  } else if (value.indexOf('regexpi:') === 0) {
+    regex = new RegExp(value.substring(8));
+  } else {
+    return input.toLowerCase() === value.toLowerCase();
+  }
+  return regex.test(input);
+};
+
 Runner.prototype.onBeforeExecute = function (commands, index, callback) {
-  callback();
+  callback(true);
 };
 
 Runner.prototype.onAfterExecute = function (commands, index, state, message, callback) {
@@ -90,18 +103,26 @@ Runner.prototype.start = function (commands, index, count, changeCallback) {
     if (commands[index].type === 'comment') {
       self.callWhenReady(step.bind(this, index + 1));
     } else {
-      self.onBeforeExecute(commands, index, function () {
+      self.onBeforeExecute(commands, index, function (shouldContinue) {
         steps++;
-        self.execute(commands[index], index, (index, state, message) => {
-          changeCallback(index, state, message);
+        if (shouldContinue) {
+          self.execute(commands[index], index, (index, state, message) => {
+            changeCallback(index, state, message);
 
-          self.onAfterExecute(commands, index, state, message, function () {
-            if ((state === STATES.DONE || state === STATES.FAILED) && steps < count && index + 1 < commands.length) {
-              self.callWhenReady(step.bind(this, index + 1));
-            }
+            self.onAfterExecute(commands, index, state, message, function () {
+              done(index, state);
+            });
           });
-        });
+        } else {
+          done(index);
+        }
       });
+    }
+  }
+
+  function done(index, state) {
+    if (steps < count && index + 1 < commands.length) {
+      self.callWhenReady(step.bind(this, index + 1));
     }
   }
 

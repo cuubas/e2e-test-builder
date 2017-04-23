@@ -3,11 +3,15 @@ var runner = require('./../runner');
 runner.accessorCommands.push('assert', 'verify', 'echo', 'store');
 
 runner.commands.assert = function (command) {
-
+  if (!runner.assertValue(command.input || command.locator, command.value)) {
+    throw new Error("assert failed: " + (command.input || command.locator) + ' doesn\'t match ' + command.value);
+  }
 };
 
 runner.commands.verify = function (command) {
-  throw new Error('verify not implemented');
+  if (!runner.assertValue(command.input || command.locator, command.value)) {
+    throw new Error("verify failed: " + (command.input || command.locator) + ' doesn\'t match ' + command.value);
+  }
 };
 
 runner.commands.click = function (command) {
@@ -44,4 +48,10 @@ runner.commands.eval = function (command) {
   } catch (err) {
     eval(command.locator);
   }
+};
+
+runner.commands.type = function (command) {
+  var element = this.findElement(command.locator);
+  element.scrollIntoViewIfNeeded();
+  element.value = command.value;
 };
