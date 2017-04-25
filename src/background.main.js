@@ -37,33 +37,33 @@ function openUiWindow(_tab) {
     }
     uiWindow = window.open("ui/index.html", "extension_popup", props);
     chrome.contextMenus.update(recordingContextMenuItemId, { enabled: true });
-
-    // can't record without ui window
-    uiWindow.addEventListener('beforeunload', function () {
-      // remember ui window settings
-      uiWindowSettings.width = uiWindow.outerWidth;
-      uiWindowSettings.height = uiWindow.outerHeight;
-      uiWindowSettings.x = uiWindow.screenLeft;
-      uiWindowSettings.y = uiWindow.screenTop;
-
-      window.localStorage.uiWindowSettings = JSON.stringify(uiWindowSettings);
-
-      uiWindow = undefined;
-      recordingEnabled = true;
-      api.toggleRecording();
-    });
-    uiWindow.addEventListener('keydown', function (ev) {
-      if (ev.which === 116 || (ev.ctrlKey && ev.which === 82)) { // f5 or ctrl+r
-        ev.preventDefault();
-        uiWindow.close();
-        setTimeout(openUiWindow, 100);
-      }
-    });
   } else {
     uiWindow.focus();
   }
-  uiWindow.currentTabId = currentTabId;
 }
+
+function registerUiWindow(wnd) {
+  uiWindow = wnd;
+  uiWindow.currentTabId = currentTabId;
+
+  // can't record without ui window
+  uiWindow.addEventListener('beforeunload', function () {
+    // remember ui window settings
+    uiWindowSettings.width = uiWindow.outerWidth;
+    uiWindowSettings.height = uiWindow.outerHeight;
+    uiWindowSettings.x = uiWindow.screenLeft;
+    uiWindowSettings.y = uiWindow.screenTop;
+
+    window.localStorage.uiWindowSettings = JSON.stringify(uiWindowSettings);
+
+    uiWindow = undefined;
+    recordingEnabled = true;
+    api.toggleRecording();
+  });
+}
+
+// expose api
+window.$registerUiWindow = registerUiWindow;
 
 // Create a parent item and two children.
 recordingContextMenuItemId = chrome.contextMenus.create({ "title": "Record interactions", type: 'checkbox', checked: false, enabled: false, contexts: ["all"], onclick: api.toggleRecording.bind(api) });

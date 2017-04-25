@@ -34,3 +34,8 @@ app.config(function ($routeProvider, RequiredNativeClientVersion) {
       }
     });
 });
+
+// register this window with background page (in case window is reloaded)
+chrome.runtime.getBackgroundPage((page)=>{
+  page.$registerUiWindow(window);
+});
