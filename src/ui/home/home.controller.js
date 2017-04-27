@@ -93,6 +93,9 @@ function HomeController($rootScope, $scope, $window) {
 
   $ctrl.onChange = function () {
     $ctrl.dirty = true;
+    if ($ctrl.testCase.items.length === 0) {
+      $ctrl.testCase.items.push({ type: 'command' });
+    }
     if ($ctrl.selectedIndex >= $ctrl.testCase.items.length) {
       $ctrl.selectedIndex = $ctrl.testCase.items.length - 1;
     }
