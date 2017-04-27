@@ -1,2 +1,10 @@
-#!/usr/bin/env bash
-java -jar ioproxy-1.0.jar %*
+#!/bin/sh
+java=java
+if [ -d /Library/Internet\ Plug-Ins/JavaAppletPlugin.plugin/Contents/Home/bin ]; then
+    java=/Library/Internet\ Plug-Ins/JavaAppletPlugin.plugin/Contents/Home/bin/java
+fi
+
+if [ "" != "$JAVA_HOME" ]; then
+    java="$JAVA_HOME/bin/java"
+fi
+exec "$java" -jar /Users/domas/Downloads/host/ioproxy-1.0.jar "$@"
