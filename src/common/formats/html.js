@@ -10,6 +10,25 @@ function test(filename) {
   return filename.indexOf('.html') === filename.length - 5;
 }
 
+function escapeAttribute(value) {
+  return (value || '').replace(/"/g, '\"');
+}
+var charsMap = {
+  '<': 'lt',
+  '>': 'gt',
+  '"': 'quot',
+  '&': 'amp'
+};
+function escapeHtml(value) {
+  if (typeof (value) === 'undefined' || value === null) {
+    value = '';
+  }
+  value = String(value);
+  return value.replace(/[<>"&]/g, (char) => {
+    return '&' + charsMap[char] + ';';
+  });
+}
+
 function parse(content) {
   var result = {};
   result.items = [];
@@ -43,13 +62,12 @@ function parse(content) {
 function stringify(testCase) {
   var content = testCase.items.map((item) => {
     if (item.type === 'comment') {
-      return `<!--${item.value||''}-->`;
+      return `<!--${escapeHtml(item.value)}-->`;
     } else {
-      return `
-<tr>
-	<td>${item.command||''}</td>
-	<td>${item.locator||''}</td>
-	<td>${item.value||''}</td>
+      return `<tr>
+	<td>${escapeHtml(item.command)}</td>
+	<td>${escapeHtml(item.locator)}</td>
+	<td>${escapeHtml(item.value)}</td>
 </tr>`
     }
   }).join('\n');
@@ -58,13 +76,13 @@ function stringify(testCase) {
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head profile="http://selenium-ide.openqa.org/profiles/test-case">
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<link rel="selenium.base" href="${testCase.baseUrl}" />
-<title>${testCase.title}</title>
+<link rel="selenium.base" href="${escapeAttribute(testCase.baseUrl)}" />
+<title>${escapeHtml(testCase.title)}</title>
 </head>
 <body>
 <table cellpadding="1" cellspacing="1" border="1">
 <thead>
-<tr><td rowspan="1" colspan="3">${testCase.title}</td></tr>
+<tr><td rowspan="1" colspan="3">${escapeHtml(testCase.title)}</td></tr>
 </thead><tbody>
 `;
   var suffix = `
