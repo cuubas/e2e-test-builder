@@ -64,11 +64,11 @@ function stringify(testCase) {
     if (item.type === 'comment') {
       return `<!--${escapeHtml(item.value)}-->`;
     } else {
-      return `<tr>
-	<td>${escapeHtml(item.command)}</td>
-	<td>${escapeHtml(item.locator)}</td>
-	<td>${escapeHtml(item.value)}</td>
-</tr>`
+      return '<tr>'
+        + `\n\t<td>${escapeHtml(item.command)}</td>`
+        + `\n\t<td>${escapeHtml(item.locator)}</td>`
+        + `\n\t<td>${escapeHtml(item.value)}</td>`
+        + '\n</tr>';
     }
   }).join('\n');
   var prefix = `<?xml version="1.0" encoding="UTF-8"?>
@@ -85,11 +85,7 @@ function stringify(testCase) {
 <tr><td rowspan="1" colspan="3">${escapeHtml(testCase.title)}</td></tr>
 </thead><tbody>
 `;
-  var suffix = `
-</tbody></table>
-</body>
-</html>
-`;
+  var suffix = "\n</tbody></table>\n\t</body>\n\t</html>\n\t";
 
   return prefix + content + suffix;
 }
