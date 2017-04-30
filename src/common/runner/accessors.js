@@ -24,3 +24,7 @@ runner.accessors.scrollLeft = runner.propertyAccessor.bind(runner, 'scrollLeft')
 runner.accessors.eval = function (command) {
   return eval(command.locator);
 };
+
+runner.accessors.cssCount = function (command) {
+  return this.findElements(command.locator).length;
+};

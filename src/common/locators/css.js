@@ -73,28 +73,26 @@ CssLocator.find = function (locator, parent) {
   }
   var containsStartIndex = locator.indexOf(':contains(');
   var containsEndIndex = locator.indexOf(')', containsStartIndex);
-  var result, item;
+  var result = [], item;
   if (containsStartIndex !== -1 && containsEndIndex !== -1) {
     var prefix = locator.substring(0, containsStartIndex);
     var text = locator.substring(containsStartIndex + ":contains(".length + 1, containsEndIndex - 1).toLowerCase();
     var suffix = locator.substring(containsEndIndex + 1).trim();
-    var items = parent.querySelectorAll(prefix);
+    var items = prefix ? parent.querySelectorAll(prefix) : [parent];
     for (var i = 0, len = items.length; i < len; i++) {
       item = items[i];
       if (item.textContent.toLowerCase().indexOf(text) !== -1) {
         if (suffix) {
-          result = CssLocator.find(suffix, item);
-          if (result) {
-            break;
-          }
+          CssLocator.find(suffix, item).forEach((it) => {
+            result.push(it);
+          });
         } else {
-          result = item;
-          break;
+          result.push(item);
         }
       }
     }
   } else {
-    result = parent.querySelector(locator);
+    result = Array.prototype.slice.call(parent.querySelectorAll(locator));
   }
   return result;
 };

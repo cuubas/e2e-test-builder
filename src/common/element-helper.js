@@ -2,10 +2,11 @@ var locators = require("./locators");
 
 module.exports = {
   find: find,
+  findAll: findAll,
   highlight: highlight
 };
 
-function find(locator, parent) {
+function findAll(locator, parent) {
   var index = locator && locator.indexOf('=');
   if (index) {
     try {
@@ -18,12 +19,17 @@ function find(locator, parent) {
   return null;
 }
 
+function find(locator, parent) {
+  var list = findAll(locator, parent) || [];
+  return list[0];
+}
+
 function highlight(element, color) {
   // ignore if element is highlighted now
   if (element.dataset._highlighted === '1') {
     return;
   }
-  
+
   element.dataset._highlighted = '1';
   var backgroundColor = element.style.backgroundColor;
   var transition = element.style.transition;

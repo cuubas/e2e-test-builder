@@ -17,11 +17,15 @@ Runner.prototype.callWhenReady = function (callback) {
 };
 
 Runner.prototype.findElement = function (locator, parent) {
-  var element = elementHelper.find(locator, parent || document);
+  var element = elementHelper.find(locator, parent || document.documentElement);
   if (!element) {
     throw new Error("element could not be found");
   }
   return element;
+};
+
+Runner.prototype.findElements = function (locator, parent) {
+  return elementHelper.findAll(locator, parent || document.documentElement);
 };
 
 Runner.prototype.assertValue = function (input, value) {
@@ -31,6 +35,8 @@ Runner.prototype.assertValue = function (input, value) {
     regex = new RegExp(value.substring(7));
   } else if (value.indexOf('regexpi:') === 0) {
     regex = new RegExp(value.substring(8));
+  } else if (typeof (input) === 'number') {
+    return String(input) === value;
   } else {
     return input.toLowerCase() === value.toLowerCase();
   }
