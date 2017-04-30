@@ -184,4 +184,21 @@ Runner.prototype.execute = function (command, index, changeCallback) {
   }
 }
 
+Runner.prototype.getSupportedCommands = function () {
+  var list = [];
+  // expose direct commands
+  Object.keys(this.commands).forEach((cmd) => {
+    list.push({ value: cmd, title: cmd.substring(0, 1).toUpperCase() + cmd.substring(1) });
+  });
+  // expose accessors
+  var accessors = Object.keys(this.accessors);
+  this.accessorCommands.forEach((prefix) => {
+    accessors.forEach((cmd) => {
+      cmd = cmd.substring(0, 1).toUpperCase() + cmd.substring(1);
+      list.push({ value: prefix + cmd, title: prefix.substring(0, 1).toUpperCase() + prefix.substring(1) + ' ' + cmd });
+    });
+  });
+  return list;
+};
+
 module.exports = new Runner();

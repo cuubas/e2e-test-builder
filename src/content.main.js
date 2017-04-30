@@ -46,6 +46,9 @@ var lastEventTarget = null,
       if (request.command === 'assertText') {
         messenger.send({ call: 'recordCommand', command: request.command, locator: locator(lastEventTarget), value: lastEventTarget.textContent });
       }
+    },
+    supportedCommands: function (request, callback) {
+      callback(runner.getSupportedCommands());
     }
   };
 

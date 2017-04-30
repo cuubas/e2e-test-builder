@@ -5,7 +5,9 @@ var runnerStates = require('../../common/runner-states');
 
 function HomeController($rootScope, $scope, $window) {
   var $ctrl = this, file, formatter, promptMessage = "Some changes are not persisted yet, are you sure?";
+  var unwatchCurrentTab;
   $ctrl.testCase = {};
+  $ctrl.supportedCommands = [];
   $ctrl.selectedIndex = 0;
 
   $ctrl.$onInit = function () {
@@ -35,6 +37,10 @@ function HomeController($rootScope, $scope, $window) {
     } else {
       $ctrl.testCase = $ctrl.newTestCase();
     }
+    // when active tab changes update supported commands
+    unwatchCurrentTab = $scope.$watch(function () {
+      return $window.currentTabId;
+    }, updateSupportedCommands);
   };
 
   $ctrl.$onDestroy = function () {
@@ -163,6 +169,30 @@ function HomeController($rootScope, $scope, $window) {
     if ($ctrl.dirty) {
       ev.returnValue = promptMessage;
     }
+  }
+
+  function updateSupportedCommands() {
+    if (!$window.currentTabId) {
+      return;
+    }
+    chrome.tabs.sendMessage($window.currentTabId, { call: 'supportedCommands' }, (list) => {
+      list.sort((a, b) => {
+        if (a.value < b.value) {
+          return -1;
+        }
+
+        if (a.value > b.value) {
+          return 1;
+        }
+
+        return 0;
+      });
+      $ctrl.supportedCommands = list;
+      if (list.length > 0) {
+        unwatchCurrentTab();
+      }
+      $scope.$apply();
+    });
   }
 
 }
