@@ -6,6 +6,7 @@ var runner = require('./common/runner');
 var selector = require('./common/selector');
 
 // load runner extensions
+require('./common/runner/key-input');
 require('./common/runner/commands');
 require('./common/runner/accessors');
 

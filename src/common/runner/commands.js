@@ -20,6 +20,12 @@ runner.commands.click = function (command) {
   element.click();
 };
 
+runner.commands.focus = function (command) {
+  var element = this.findElement(command.locator);
+  element.scrollIntoViewIfNeeded();
+  element.focus();
+};
+
 runner.commands.sleep = function (command, callback) {
   var timeout = parseInt(command.value || command.locator);
   if (isNaN(timeout)) {
@@ -54,4 +60,12 @@ runner.commands.type = function (command) {
   var element = this.findElement(command.locator);
   element.scrollIntoViewIfNeeded();
   element.value = command.value;
+  element.dispatchEvent(new Event('change'));
+};
+
+runner.commands.sendKeys = function (command) {
+  var element = this.findElement(command.locator);
+  element.scrollIntoViewIfNeeded();
+  var chars = command.value.split('');
+  chars.forEach(runner.simulateKeyInput.bind(runner, element));
 };
