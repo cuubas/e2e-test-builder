@@ -1,9 +1,9 @@
 var messenger = require('./common/messenger');
 
 var recordingEnabled = false,
-  currentWindowId,
   currentTabId,
   uiWindow,
+  skipNextTabActivationEvent = false,
   uiWindowSettings = JSON.parse(window.localStorage.uiWindowSettings || '{}'),
   recordingContextMenuItemId,
   api = {
@@ -27,7 +27,9 @@ function handleContextMenuClick(command, info, tab) {
 }
 
 function openUiWindow(_tab) {
+  currentTabId = _tab.id;
   if (!uiWindow || uiWindow.closed) {
+    skipNextTabActivationEvent = true;
     var props = "width=" + (uiWindowSettings.width || 700) + ",height=" + (uiWindowSettings.height || 500) + ",status=no,scrollbars=yes,resizable=no";
     if (uiWindowSettings.x) {
       props += ',left=' + uiWindowSettings.x;
@@ -78,8 +80,11 @@ messenger.bind(api);
 
 // track active tab
 chrome.tabs.onActivated.addListener(function (activeInfo) {
+  if (skipNextTabActivationEvent) {
+    skipNextTabActivationEvent = false;
+    return;
+  }
   currentTabId = activeInfo.tabId;
-  currentWindowId = activeInfo.windowId;
   if (uiWindow) {
     uiWindow.currentTabId = currentTabId;
   }
