@@ -176,7 +176,8 @@ function HomeController($rootScope, $scope, $window) {
       return;
     }
     chrome.tabs.sendMessage($window.currentTabId, { call: 'supportedCommands' }, (list) => {
-      list.sort((a, b) => {
+      $ctrl.supportedCommands = list || [];
+      $ctrl.supportedCommands.sort((a, b) => {
         if (a.value < b.value) {
           return -1;
         }
@@ -187,8 +188,7 @@ function HomeController($rootScope, $scope, $window) {
 
         return 0;
       });
-      $ctrl.supportedCommands = list;
-      if (list.length > 0) {
+      if ($ctrl.supportedCommands.length > 0) {
         unwatchCurrentTab();
       }
       $scope.$apply();
