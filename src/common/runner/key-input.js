@@ -1,5 +1,5 @@
 var runner = require('./../runner');
-var SeleniumKey = require('../../../node_modules/selenium-webdriver/lib/input').Key;
+var SeleniumKey = require('../selenium-webdriver-input').Key;
 var KeyCode = require('../../../node_modules/keycode-js/lib/KeyCode').default;
 
 var mapToKeyOptions = {};
