@@ -7,6 +7,7 @@ var selector = require('./common/selector');
 
 // load runner extensions
 require('./common/runner/key-input');
+require('./common/runner/mouse-input');
 require('./common/runner/commands');
 require('./common/runner/accessors');
 

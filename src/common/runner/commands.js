@@ -1,18 +1,59 @@
 var runner = require('./../runner');
 // list all commands that accept accessor input
-runner.accessorCommands.push('assert', 'verify', 'echo', 'store');
+runner.accessorCommands.push('waitForNot', 'waitFor', 'assertNot', 'assert', 'verifyNot', 'verify', 'echo', 'store');
 
 runner.commands.assert = function (command) {
-  if (!runner.assertValue(command.input || command.locator, command.value)) {
-    throw new Error("assert failed: " + (command.input || command.locator) + ' doesn\'t match ' + command.value);
+  if (!runner.assertValue(typeof (command.input) !== 'undefined' ? command.input : command.locator, command.value)) {
+    throw new Error("assert failed: " + (typeof (command.input) !== 'undefined' ? command.input : command.locator) + ' doesn\'t match ' + command.value);
+  }
+};
+runner.commands.assertNot = function (command) {
+  if (runner.assertValue(typeof (command.input) !== 'undefined' ? command.input : command.locator, command.value)) {
+    throw new Error("assert failed: " + (typeof (command.input) !== 'undefined' ? command.input : command.locator) + ' doesn\'t match ' + command.value);
+  }
+};
+runner.commands.verify = function (command) {
+  // TODO: this should terminate test
+  if (!runner.assertValue(typeof (command.input) !== 'undefined' ? command.input : command.locator, command.value)) {
+    throw new Error("verify failed: " + (typeof (command.input) !== 'undefined' ? command.input : command.locator) + ' doesn\'t match ' + command.value);
   }
 };
 
-runner.commands.verify = function (command) {
-  if (!runner.assertValue(command.input || command.locator, command.value)) {
-    throw new Error("verify failed: " + (command.input || command.locator) + ' doesn\'t match ' + command.value);
+runner.commands.verifyNot = function (command) {
+  if (runner.assertValue(typeof (command.input) !== 'undefined' ? command.input : command.locator, command.value)) {
+    throw new Error("verify failed: " + (typeof (command.input) !== 'undefined' ? command.input : command.locator) + ' doesn\'t match ' + command.value);
   }
 };
+
+runner.commands.waitFor = function (command, callback) {
+  var test = () => {
+    if (runner.assertValue(command.input, command.value)) {
+      callback(runner.STATES.DONE);
+    } else {
+      runner.waitForTimeout = setTimeout(() => {
+        command.input = command.accessor.call(runner, command); // invoke accessor again
+        runner.callWhenReady(test);
+      }, runner.waitForCheckInterval);
+    }
+  };
+  test();
+};
+runner.commands.waitFor.requiresAccessor = true; // cannot be used directly
+
+runner.commands.waitForNot = function (command, callback) {
+  var test = () => {
+    if (!runner.assertValue(command.input, command.value)) {
+      callback(runner.STATES.DONE);
+    } else {
+      runner.waitForTimeout = setTimeout(() => {
+        command.input = command.accessor.call(runner, command); // invoke accessor again
+        runner.callWhenReady(test);
+      }, runner.waitForCheckInterval);
+    }
+  };
+  test();
+};
+runner.commands.waitForNot.requiresAccessor = true; // cannot be used directly
 
 runner.commands.click = function (command) {
   var element = this.findElement(command.locator);

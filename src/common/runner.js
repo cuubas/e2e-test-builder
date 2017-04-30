@@ -4,12 +4,15 @@ var STATES = require('./runner-states');
 function Runner() {
   this.accessors = [];
   this.interval = 500;
+  this.waitForCheckInterval = 500;
   this.timeout = undefined;
+  this.waitForTimeout = undefined;
   this.commands = {};
   this.accessors = {};
   this.accessorCommands = [];
   this.variables = {};
   this.STATES = STATES;
+  this.ELEMENT_NOT_FOUND_ERROR = 'element could not be found';
 }
 
 Runner.prototype.callWhenReady = function (callback) {
@@ -19,7 +22,7 @@ Runner.prototype.callWhenReady = function (callback) {
 Runner.prototype.findElement = function (locator, parent) {
   var element = elementHelper.find(locator, parent || document.documentElement);
   if (!element) {
-    throw new Error("element could not be found");
+    throw new Error(this.ELEMENT_NOT_FOUND_ERROR);
   }
   return element;
 };
@@ -37,6 +40,8 @@ Runner.prototype.assertValue = function (input, value) {
     regex = new RegExp(value.substring(8));
   } else if (typeof (input) === 'number') {
     return String(input) === value;
+  } else if (typeof (input) === 'boolean') {
+    return input;
   } else {
     return input.toLowerCase() === value.toLowerCase();
   }
@@ -127,7 +132,7 @@ Runner.prototype.start = function (commands, index, count, changeCallback) {
   }
 
   function done(index, state) {
-    if (steps < count && index + 1 < commands.length) {
+    if (state !== self.STATES.INPROGRESS && steps < count && index + 1 < commands.length) {
       self.callWhenReady(step.bind(this, index + 1));
     }
   }
@@ -136,6 +141,7 @@ Runner.prototype.start = function (commands, index, count, changeCallback) {
 
 Runner.prototype.stop = function () {
   clearTimeout(this.timeout);
+  clearTimeout(this.waitForTimeout);
 };
 
 Runner.prototype.execute = function (command, index, changeCallback) {
@@ -156,6 +162,7 @@ Runner.prototype.execute = function (command, index, changeCallback) {
       var accessor = this.accessors[accessorName];
       if (accessor) {
         try {
+          command.accessor = accessor;
           command.input = accessor.call(this, command);
         } catch (err) {
           changeCallback(index, STATES.FAILED, accessorName + ' accessor: ' + (err.message || ''))
@@ -166,7 +173,7 @@ Runner.prototype.execute = function (command, index, changeCallback) {
     }
   }
 
-  if (typeof (cmd) === 'function') {
+  if (typeof (cmd) === 'function' && (!cmd.requiresAccessor || command.accessor)) {
     try {
       if (cmd.length > 1) { // uses callback
         cmd.call(this, command, (state, message) => {
@@ -188,7 +195,9 @@ Runner.prototype.getSupportedCommands = function () {
   var list = [];
   // expose direct commands
   Object.keys(this.commands).forEach((cmd) => {
-    list.push({ value: cmd, title: cmd.substring(0, 1).toUpperCase() + cmd.substring(1) });
+    if (!this.commands[cmd].requiresAccessor) {
+      list.push({ value: cmd, title: cmd.substring(0, 1).toUpperCase() + cmd.substring(1) });
+    }
   });
   // expose accessors
   var accessors = Object.keys(this.accessors);
