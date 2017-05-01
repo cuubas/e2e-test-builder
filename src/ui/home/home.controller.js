@@ -2,6 +2,7 @@ var messenger = require('./../../common/messenger');
 var supportedFormats = require('./../../common/supported-formats');
 var ioproxy = require('./../../common/ioproxy');
 var runnerStates = require('../../common/runner-states');
+var defaultRunnerOptions = require('../../common/runner-options');
 
 function HomeController($rootScope, $scope, $window) {
   var $ctrl = this, file, formatter, promptMessage = "Some changes are not persisted yet, are you sure?";
@@ -9,6 +10,7 @@ function HomeController($rootScope, $scope, $window) {
   $ctrl.testCase = {};
   $ctrl.supportedCommands = [];
   $ctrl.selectedIndex = 0;
+  $ctrl.settings = Object.assign({}, defaultRunnerOptions, JSON.parse($window.localStorage.settings || '{}'));
 
   $ctrl.$onInit = function () {
     $ctrl.dirty = false;
@@ -89,12 +91,19 @@ function HomeController($rootScope, $scope, $window) {
   $ctrl.run = function () {
     $ctrl.reset();
     $ctrl.running = true;
-    chrome.tabs.sendMessage($window.currentTabId, { call: 'execute', commands: $ctrl.testCase.items, index: $ctrl.selectedIndex, count: $ctrl.testCase.items.length });
+    chrome.tabs.sendMessage($window.currentTabId, { call: 'execute', commands: $ctrl.testCase.items, index: $ctrl.selectedIndex, count: $ctrl.testCase.items.length, options: $ctrl.settings });
   };
 
   $ctrl.interruptRunner = function () {
     chrome.tabs.sendMessage($window.currentTabId, { call: 'interruptRunner' });
     $ctrl.running = false;
+  };
+
+  $ctrl.toggleSettings = function (value) {
+    $ctrl.showSettings = value;
+    if (!value) {
+      $window.localStorage.settings = JSON.stringify($ctrl.settings);
+    }
   };
 
   $ctrl.onChange = function () {

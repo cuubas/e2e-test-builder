@@ -1,0 +1,31 @@
+settings {
+  h2 {
+    margin: 8px 0;
+    &:first-child {
+      margin-top: 0;
+    }
+  }
+  .fields {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    margin: 0px -8px;
+    >div {
+      flex: 1;
+      padding: 8px;
+      label {
+        span {
+          display: block;
+          margin-bottom: 2px;
+        }
+        input {
+          display: block;
+          width: 100%;
+          min-width: 200px;
+          box-sizing: border-box;
+          padding: 6px;
+        }
+      }
+    }
+  }
+}

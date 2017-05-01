@@ -5,11 +5,20 @@
   <a ng-click="$ctrl.save($event, true)" title="save as ..." class="halflings halflings-floppy-save"></a>
   <span class="separator"></span>
   <a ng-click="$ctrl.run($event)" ng-if="!$ctrl.running" title="execute commands" class="halflings halflings-play"></a>
-  <a ng-click="$ctrl.interruptRunner($event)" ng-if="$ctrl.running" title="cancels" class="halflings halflings-stop"></a>
-  <a ng-click="$ctrl.toggleRecording($event)" title="{{$ctrl.isRecordingEnabled?'stop recording':'start recording'}}" class="halflings" ng-class="{'halflings-record':$ctrl.isRecordingEnabled, 'halflings-record-empty':!$ctrl.isRecordingEnabled}"></a>
+  <a ng-click="$ctrl.interruptRunner($event)" ng-if="$ctrl.running" title="cancel runner" class="halflings halflings-stop"></a>
+  <a ng-click="$ctrl.toggleRecording($event)" title="{{$ctrl.isRecordingEnabled?'stop recording':'start recording'}}" class="halflings"
+    ng-class="{'halflings-record':$ctrl.isRecordingEnabled, 'halflings-record-empty':!$ctrl.isRecordingEnabled}"></a>
+  <a ng-click="$ctrl.toggleSettings(true)" title="open settings" class="halflings halflings-cog"></a>
 </div>
 <div class="home__content">
-  <list items="$ctrl.testCase.items" selected-index="$ctrl.selectedIndex" on-select="$ctrl.onSelect(index)" on-change="$ctrl.onChange()" recording="$ctrl.isRecordingEnabled"></list>
+  <list items="$ctrl.testCase.items" selected-index="$ctrl.selectedIndex" on-select="$ctrl.onSelect(index)" on-change="$ctrl.onChange()"
+    recording="$ctrl.isRecordingEnabled" settings="$ctrl.settings"></list>
+</div>
+<div ng-if="$ctrl.showSettings" class="modal">
+  <div class="modal__dialog">
+    <a ng-click="$ctrl.toggleSettings(false)" title="close" class="halflings halflings-remove modal__close"></a>
+    <settings test-case="$ctrl.testCase" settings="$ctrl.settings" class="modal__content"></settings>
+  </div>
 </div>
 <datalist id="commands">
   <option ng-repeat="cmd in $ctrl.supportedCommands" value="{{::cmd.value}}">{{::cmd.title}}</option>

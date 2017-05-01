@@ -5,7 +5,8 @@ module.exports = function (module) {
       items: '<',
       selectedIndex: '<',
       onSelect: '&',
-      onChange: '&'
+      onChange: '&',
+      settings: '<'
     },
     template: require('./list.partial.html'),
     controller: 'ListController'

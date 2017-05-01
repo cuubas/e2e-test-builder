@@ -8,6 +8,7 @@ var app = angular.module('E2EUI', [
 
 // source in extra components
 require('./components/list/list.component')(app);
+require('./components/settings/settings.component')(app);
 
 // routes
 require('./home/home.controller')(app);

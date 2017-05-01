@@ -28,7 +28,7 @@ var lastEventTarget = null,
       }
     },
     execute: function (request, callback) {
-      runner.start(request.commands, request.index, request.count, (index, state, message) => {
+      runner.start(request.commands, request.index, request.count, request.options, (index, state, message) => {
         messenger.send({ call: 'commandStateChange', index: index, state: state, message: message });
       });
     },

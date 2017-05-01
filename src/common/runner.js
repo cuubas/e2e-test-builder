@@ -1,10 +1,11 @@
 var elementHelper = require('./element-helper');
 var STATES = require('./runner-states');
+var defaultOptions = require('./runner-options');
 
 function Runner() {
   this.accessors = [];
-  this.interval = 500;
-  this.waitForCheckInterval = 500;
+  this.interval = defaultOptions.interval;
+  this.waitForCheckInterval = defaultOptions.waitForCheckInterval;
   this.timeout = undefined;
   this.waitForTimeout = undefined;
   this.commands = {};
@@ -106,8 +107,10 @@ Runner.prototype.injectVariables = function (str) {
   return stringResult;
 };
 
-Runner.prototype.start = function (commands, index, count, changeCallback) {
+Runner.prototype.start = function (commands, index, count, options, changeCallback) {
   this.stop();
+  this.interval = options.interval || defaultOptions.interval;
+  this.waitForCheckInterval = options.waitForCheckInterval || defaultOptions.waitForCheckInterval;
 
   if (!index) {
     index = 0;

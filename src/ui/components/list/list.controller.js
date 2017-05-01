@@ -46,7 +46,7 @@ function ListController($scope, $window, $element) {
   $ctrl.execute = function (ev, item) {
     item.message = undefined;
     item.state = undefined;
-    chrome.tabs.sendMessage($window.currentTabId, { call: 'execute', commands: $ctrl.items, index: $ctrl.items.indexOf(item), count: 1 });
+    chrome.tabs.sendMessage($window.currentTabId, { call: 'execute', commands: $ctrl.items, index: $ctrl.items.indexOf(item), count: 1, options: $ctrl.settings });
   };
 
   $ctrl.selectElement = function (ev, item) {
