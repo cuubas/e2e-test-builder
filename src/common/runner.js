@@ -38,8 +38,18 @@ Runner.prototype.assertValue = function (input, value) {
     regex = new RegExp(value.substring(7));
   } else if (value.indexOf('regexpi:') === 0) {
     regex = new RegExp(value.substring(8), 'i');
-  } else if (typeof (input) === 'number') {
-    return String(input) === value;
+  } else if (typeof (input) === 'number' || /^\d+$|^\d+\.\d*$/.test(String(input).trim())) {
+    if (value.indexOf('<=') === 0) {
+      return parseFloat(input) <= parseFloat(value.substring(2));
+    } else if (value.indexOf('>=') === 0) {
+      return parseFloat(input) >= parseFloat(value.substring(2));
+    } else if (value.indexOf('<') === 0) {
+      return parseFloat(input) < parseFloat(value.substring(1));
+    } else if (value.indexOf('>') === 0) {
+      return parseFloat(input) > parseFloat(value.substring(1));
+    } else {
+      return String(input) === value;
+    }
   } else if (typeof (input) === 'boolean') {
     return input;
   } else {
