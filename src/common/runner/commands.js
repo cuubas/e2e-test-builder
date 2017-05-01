@@ -59,6 +59,10 @@ runner.commands.open = function (command) {
   window.location.href = command.locator || command.value;
 };
 
+runner.commands.refresh = function (command) {
+  window.location.reload();
+};
+
 runner.commands.click = function (command) {
   var element = this.findElement(command.locator);
   element.scrollIntoViewIfNeeded();
