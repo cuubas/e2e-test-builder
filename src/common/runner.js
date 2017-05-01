@@ -14,6 +14,14 @@ function Runner() {
   this.variables = {};
   this.STATES = STATES;
   this.ELEMENT_NOT_FOUND_ERROR = 'element could not be found';
+
+  Object.defineProperty(this, 'options', {
+    set: (options) => {
+      this.interval = options.interval || defaultOptions.interval;
+      this.waitForCheckInterval = options.waitForCheckInterval || defaultOptions.waitForCheckInterval;
+    }
+  });
+  this.options = defaultOptions;
 }
 
 Runner.prototype.callWhenReady = function (callback) {
@@ -107,10 +115,8 @@ Runner.prototype.injectVariables = function (str) {
   return stringResult;
 };
 
-Runner.prototype.start = function (commands, index, count, options, changeCallback) {
+Runner.prototype.start = function (commands, index, count, changeCallback) {
   this.stop();
-  this.interval = options.interval || defaultOptions.interval;
-  this.waitForCheckInterval = options.waitForCheckInterval || defaultOptions.waitForCheckInterval;
 
   if (!index) {
     index = 0;
