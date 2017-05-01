@@ -22,8 +22,8 @@ var recordingEnabled = false,
     }
   };
 
-function handleContextMenuClick(command, info, tab) {
-  chrome.tabs.sendMessage(tab.id, { call: "handleContextMenuClick", command: command });
+function handleContextMenuClick(command, accessor, info, tab) {
+  chrome.tabs.sendMessage(tab.id, { call: "handleContextMenuClick", command: command, accessor: accessor });
 }
 
 function openUiWindow(_tab) {
@@ -67,12 +67,21 @@ function registerUiWindow(wnd) {
 // expose api
 window.$registerUiWindow = registerUiWindow;
 
+var contentContexts = ["page", "frame", "selection", "link", "editable", "image", "video", "audio"];
+var contentUris = ["http://*/*", "https://*/*", "file://*/*"];
 // Create a parent item and two children.
 recordingContextMenuItemId = chrome.contextMenus.create({ "title": "Record interactions", type: 'checkbox', checked: false, enabled: false, contexts: ["all"], onclick: api.toggleRecording.bind(api) });
-chrome.contextMenus.create({ type: 'separator' });
+chrome.contextMenus.create({ type: 'separator', contexts: contentContexts, documentUrlPatterns: contentUris });
 
-chrome.contextMenus.create({ "title": "Assert Text", contexts: ["all"], onclick: handleContextMenuClick.bind(this, 'assertText') });
-
+chrome.contextMenus.create({ "title": "Click", contexts: contentContexts, documentUrlPatterns: contentUris, onclick: handleContextMenuClick.bind(this, 'click', undefined) });
+// first item is the command prefix, 2nd is the prefix visible to the user
+[['assert', 'Assert'], ['waitFor', 'Wait for'], ['store', 'Store']].forEach((accessor) => {
+  chrome.contextMenus.create({ type: 'separator', contexts: contentContexts, documentUrlPatterns: contentUris });
+  // first item is the command suffix, 2nd is the suffix visible to the user
+  [['Text', 'Text'], ['Value', 'Value'], ['Visible', 'Visible'], ['ElementPresent', 'Element Present']].forEach((cmd) => {
+    chrome.contextMenus.create({ "title": accessor[1] + " " + cmd[1], contexts: contentContexts, documentUrlPatterns: contentUris, onclick: handleContextMenuClick.bind(this, accessor[0] + cmd[0], cmd[0].substring(0, 1).toLowerCase() + cmd[0].substring(1)) });
+  });
+});
 chrome.browserAction.onClicked.addListener(openUiWindow);
 
 // create link to api

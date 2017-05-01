@@ -44,9 +44,13 @@ var lastEventTarget = null,
       selector.stop();
     },
     handleContextMenuClick: function (request, callback) {
-      if (request.command === 'assertText') {
-        messenger.send({ call: 'recordCommand', command: request.command, locator: locator(lastEventTarget), value: lastEventTarget.textContent });
+      var value = '';
+      if (request.accessor === 'value') {
+        value = lastEventTarget.value;
+      } else if (request.accessor === 'text') {
+        value = lastEventTarget.textContent;
       }
+      messenger.send({ call: 'recordCommand', command: request.command, locator: locator(lastEventTarget), value: value });
     },
     supportedCommands: function (request, callback) {
       callback(runner.getSupportedCommands());
