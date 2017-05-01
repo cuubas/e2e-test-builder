@@ -55,6 +55,10 @@ runner.commands.waitForNot = function (command, callback) {
 };
 runner.commands.waitForNot.requiresAccessor = true; // cannot be used directly
 
+runner.commands.open = function (command) {
+  window.location.href = command.locator || command.value;
+};
+
 runner.commands.click = function (command) {
   var element = this.findElement(command.locator);
   element.scrollIntoViewIfNeeded();
@@ -64,7 +68,31 @@ runner.commands.click = function (command) {
 runner.commands.focus = function (command) {
   var element = this.findElement(command.locator);
   element.scrollIntoViewIfNeeded();
-  element.focus();
+  element.dispatchEvent(new FocusEvent('focus'));
+};
+
+runner.commands.select = function (command) {
+  var element = this.findElement(command.locator);
+  element.scrollIntoViewIfNeeded();
+  var parts = command.value.split('=');
+  if (parts.length === 1) {
+    parts.unshift('label');
+  }
+  if (parts[0] === 'label' || parts[0] === 'value') {
+    // go through all options
+    var option;
+    for (var i = 0, len = element.options.length; i < len; i++) {
+      option = element.options[i];
+      if (runner.assertValue(parts[0] === 'value' ? option.value : option.textContent, parts[1])) {
+        option.selected = true;
+      }
+    }
+  } else if (parts[0] === 'index') {
+    element.selectedIndex = parseInt(parts[1]);
+  } else {
+    throw new Error('unsupported strategy: ' + parts[0]);
+  }
+  element.dispatchEvent(new Event('change'));
 };
 
 runner.commands.sleep = function (command, callback) {
@@ -100,13 +128,23 @@ runner.commands.eval = function (command) {
 runner.commands.type = function (command) {
   var element = this.findElement(command.locator);
   element.scrollIntoViewIfNeeded();
+  element.dispatchEvent(new FocusEvent('focus'));
   element.value = command.value;
+  element.dispatchEvent(new Event('change'));
+};
+
+runner.commands.clear = function (command) {
+  var element = this.findElement(command.locator);
+  element.scrollIntoViewIfNeeded();
+  element.dispatchEvent(new FocusEvent('focus'));
+  element.value = '';
   element.dispatchEvent(new Event('change'));
 };
 
 runner.commands.sendKeys = function (command) {
   var element = this.findElement(command.locator);
   element.scrollIntoViewIfNeeded();
+  element.dispatchEvent(new FocusEvent('focus'));
   var chars = command.value.split('');
   chars.forEach(runner.simulateKeyInput.bind(runner, element));
 };

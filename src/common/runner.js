@@ -37,7 +37,7 @@ Runner.prototype.assertValue = function (input, value) {
   if (value.indexOf('regexp:') === 0) {
     regex = new RegExp(value.substring(7));
   } else if (value.indexOf('regexpi:') === 0) {
-    regex = new RegExp(value.substring(8));
+    regex = new RegExp(value.substring(8), 'i');
   } else if (typeof (input) === 'number') {
     return String(input) === value;
   } else if (typeof (input) === 'boolean') {
