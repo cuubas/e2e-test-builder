@@ -79,7 +79,7 @@ function ListController($scope, $window, $element) {
   $ctrl.remove = function (ev, item) {
     $ctrl.items.splice($ctrl.items.indexOf(item), 1);
     $ctrl.onChange();
-  }
+  };
 }
 
 module.exports = function (module) {

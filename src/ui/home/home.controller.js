@@ -6,20 +6,19 @@ var defaultRunnerOptions = require('../../common/runner-options');
 
 function HomeController($rootScope, $scope, $window) {
   var $ctrl = this, file, formatter, promptMessage = "Some changes are not persisted yet, are you sure?";
-  var unwatchCurrentTab;
   $ctrl.testCase = {};
   $ctrl.supportedCommands = [];
   $ctrl.selectedIndex = 0;
   $ctrl.settings = Object.assign({}, defaultRunnerOptions, JSON.parse($window.localStorage.settings || '{}'));
+  $ctrl.extensions = JSON.parse($window.localStorage.extensions || '[]');
+  if (!Array.isArray($ctrl.extensions)) {
+    $ctrl.extensions = [];
+  }
 
   $ctrl.$onInit = function () {
     $ctrl.dirty = false;
     $ctrl.running = false;
     checkRecordingStatus();
-
-    // ioproxy.about().then(function (response) {
-    //   alert(response.version);
-    // });
 
     messenger.bind({
       recordingToggled: checkRecordingStatus,
@@ -29,20 +28,23 @@ function HomeController($rootScope, $scope, $window) {
           $scope.$digest();
           // digest will be triggerred in list controller
         }
+      },
+      extensions: function (request, callback) {
+        callback($ctrl.extensions);
       }
     });
 
     $window.addEventListener('beforeunload', handleOnBeforeUnload);
+
+    $window.addEventListener('focus', updateSupportedCommands);
 
     if ($window.localStorage.lastPath) {
       $ctrl.read($window.localStorage.lastPath);
     } else {
       $ctrl.testCase = $ctrl.newTestCase();
     }
-    // when active tab changes update supported commands
-    unwatchCurrentTab = $scope.$watch(function () {
-      return $window.currentTabId;
-    }, updateSupportedCommands);
+
+    setTimeout(updateSupportedCommands, 1000);
   };
 
   $ctrl.$onDestroy = function () {
@@ -197,12 +199,10 @@ function HomeController($rootScope, $scope, $window) {
 
         return 0;
       });
-      if ($ctrl.supportedCommands.length > 0) {
-        unwatchCurrentTab();
-      }
+
       $scope.$apply();
     });
-  }
+  };
 
 }
 

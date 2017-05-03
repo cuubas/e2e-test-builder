@@ -2,7 +2,8 @@ module.exports = function (module) {
   var SettingComponent = {
     bindings: {
       testCase: '<',
-      settings: '<'
+      settings: '<',
+      extensions: '<'
     },
     template: require('./settings.partial.html'),
     controller: 'SettingsController'

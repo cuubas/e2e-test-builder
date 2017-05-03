@@ -24,14 +24,18 @@
 </div>
 <div class="row">
   <h2 class="col">Extensions</h2>
-  <div class="col actions"><a ng-click="$ctrl.addExtension()" class="halflings halflings-plus" title="add extension"></a></div>
+  <div class="col actions">
+    <a ng-click="$ctrl.reloadExtensions()" ng-if="$ctrl.extensions.length" class="halflings" ng-class="{'halflings-refresh':!$ctrl.reloadingExtensions, 'halflings-time': $ctrl.reloadingExtensions}"
+      title="reload extensions from disk"></a>
+    <a ng-click="$ctrl.addExtension()" class="halflings halflings-plus" title="add extension"></a>
+  </div>
 </div>
 <div class="extensions">
-  <ul>
-    <li ng-repeat="ext in $ctrl.settings.extensions track by $index" class="row">
+  <ul sv-root sv-on-sort="$ctrl.saveExtensions()" sv-part="$ctrl.extensions">
+    <li ng-repeat="ext in $ctrl.extensions track by $index" class="row" sv-element>
       <div class="col">{{::ext.path}}</div>
       <a class="col remove" ng-click="$ctrl.removeExtension($event, ext)"></a>
     </li>
   </ul>
-  <p ng-if="!$ctrl.settings.extensions.length">Click the plus button above to add an extension</p>
+  <p ng-if="!$ctrl.extensions.length">Click the plus button above to add an extension</p>
 </div>

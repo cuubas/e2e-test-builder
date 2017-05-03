@@ -4,6 +4,7 @@ var elementHelper = require('./common/element-helper');
 var locator = locators.css;
 var runner = require('./common/runner');
 var selector = require('./common/selector');
+var extensionEval = require('./common/extension-eval');
 
 // load runner extensions
 require('./common/runner/key-input');
@@ -76,5 +77,12 @@ document.addEventListener("blur", function (event) {
 messenger.send({ call: 'isRecordingEnabled' }, function (value) {
   api.recordingEnabled = value;
 });
-
+// get extensions and evaluate them
+messenger.send({ call: 'extensions' }, (list) => {
+  if (list) {
+    list.forEach((ext) => {
+      extensionEval({ runner: runner }, ext.data);
+    });
+  }
+});
 messenger.bind(api);

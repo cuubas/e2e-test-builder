@@ -11,8 +11,9 @@ function SettingsController($scope, $window, $element) {
     ioproxy.open($window.localStorage.lastPath)
       .then((file) => {
         if (/\.js$/.test(file.path)) {
-          $ctrl.settings.extensions.push(file);
+          $ctrl.extensions.push(file);
           $scope.$apply();
+          $ctrl.saveExtensions();
         } else {
           handleError("Please select javascript file");
         }
@@ -21,10 +22,40 @@ function SettingsController($scope, $window, $element) {
   };
 
   $ctrl.removeExtension = function (ev, ext) {
-    var index = $ctrl.settings.extensions.indexOf(ext);
+    var index = $ctrl.extensions.indexOf(ext);
     if (index >= 0) {
-      $ctrl.settings.extensions.splice(index, 1);
+      $ctrl.extensions.splice(index, 1);
+      $ctrl.saveExtensions();
     }
+  };
+
+  $ctrl.reloadExtensions = function () {
+    $ctrl.reloadingExtensions = true;
+    var index = 0;
+    var step = function () {
+      if (index >= $ctrl.extensions.length) {
+        $ctrl.saveExtensions();
+        $ctrl.reloadingExtensions = false;
+        $scope.$apply();
+        return;
+      }
+      ioproxy.read($ctrl.extensions[index].path)
+        .then((file) => {
+          $ctrl.extensions[index] = file;
+          index++;
+          step();
+        })
+        .catch((error) => {
+          $ctrl.reloadingExtensions = false;
+          $scope.$apply();
+          handleError(error);
+        });
+    };
+    step();
+  };
+
+  $ctrl.saveExtensions = function () {
+    $window.localStorage.extensions = JSON.stringify($ctrl.extensions);
   };
 
   function handleError(error) {
