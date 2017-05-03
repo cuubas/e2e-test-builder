@@ -127,28 +127,8 @@ list {
       height: 12px;
       min-width: 14px;
       color: #8e8e8e;
-      opacity: 0.5;
-      cursor: pointer;
       padding: 10px 2px 9px;
       order: 2;
-      &:hover {
-        opacity: 1;
-      }
-      &:before,
-      &:after {
-        position: absolute;
-        left: 6px;
-        content: ' ';
-        height: 12px;
-        width: 2px;
-        background-color: currentColor;
-      }
-      &:before {
-        transform: rotate(45deg);
-      }
-      &:after {
-        transform: rotate(-45deg);
-      }
     }
     .command,
     .locator,
