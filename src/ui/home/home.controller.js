@@ -10,6 +10,11 @@ function HomeController($rootScope, $scope, $window) {
   $ctrl.supportedCommands = [];
   $ctrl.selectedIndex = 0;
   $ctrl.settings = Object.assign({}, defaultRunnerOptions, JSON.parse($window.localStorage.settings || '{}'));
+  Object.keys($ctrl.settings).forEach((key)=>{
+    if ($ctrl.settings[key] === '') {
+      $ctrl.settings[key] = defaultRunnerOptions[key];
+    }
+  });
   $ctrl.extensions = JSON.parse($window.localStorage.extensions || '[]');
   if (!Array.isArray($ctrl.extensions)) {
     $ctrl.extensions = [];

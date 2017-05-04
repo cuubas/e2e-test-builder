@@ -3,6 +3,7 @@ var locators = require("./locators");
 module.exports = {
   find: find,
   findAll: findAll,
+  locators: findLocators,
   highlight: highlight
 };
 
@@ -22,6 +23,18 @@ function findAll(locator, parent) {
 function find(locator, parent) {
   var list = findAll(locator, parent) || [];
   return list[0];
+}
+
+function findLocators(target, settings) {
+  var types = (settings.locators || '').split(/\s|,/);
+  return types.map((type) => {
+    if (type && locators[type]) {
+      return locators[type](target, settings);
+    } else {
+      console.info('unknown locator %s, must be one of %s', type, Object.keys(locators).join(','));
+    }
+    return undefined;
+  }).filter((value) => !!value);
 }
 
 function highlight(element, color) {

@@ -17,8 +17,23 @@
 <div class="fields">
   <div>
     <label>
-      <span>Interval</span>
-      <input type="number" ng-model="$ctrl.settings.interval" />
+      <span>Interval (ms)</span>
+      <input type="number" ng-model="$ctrl.settings.interval" title="wait time between commands" />
+    </label>
+  </div>
+  <div>
+    <label>
+      <span>Custom attribute</span>
+      <input type="text" ng-model="$ctrl.settings.customAttribute" />
+    </label>
+  </div>
+</div>
+<h2>Locators</h2>
+<div class="fields">
+  <div>
+    <label>
+      <span>List of types (space or comma separated)</span>
+      <input type="text" ng-model="$ctrl.settings.locators" />
     </label>
   </div>
 </div>

@@ -1,6 +1,6 @@
 module.exports = CssLocator;
 
-function CssLocator(target) {
+function CssLocator(target, settings) {
   var element = target, result = [], interrupt = false;
 
   while (element.tagName !== 'BODY') {
@@ -43,7 +43,9 @@ function CssLocator(target) {
     }
     element = element.parentNode;
   }
-  return 'css=' + result.join(' ');
+  if (result.length > 0) {
+    return 'css=' + result.join(' ');
+  }
 }
 
 CssLocator.classBlacklist = [/^ng\-/];
@@ -57,7 +59,7 @@ CssLocator.attributes = [
   {
     name: 'class',
     prefix: '.',
-    format: (v, element) => v.split(' ').filter((c) => !CssLocator.classBlacklist.some((regex) => regex.test(c))).join('.')
+    format: (v, element) => v.split(/\s+/).filter((c) => c && !CssLocator.classBlacklist.some((regex) => regex.test(c))).join('.')
   },
   'type',
   'alt',

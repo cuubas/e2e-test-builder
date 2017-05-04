@@ -47,7 +47,7 @@ function openUiWindow(_tab) {
 function registerUiWindow(wnd) {
   uiWindow = wnd;
   uiWindow.currentTabId = currentTabId;
-
+  
   // can't record without ui window
   uiWindow.addEventListener('beforeunload', function () {
     // remember ui window settings
@@ -62,6 +62,8 @@ function registerUiWindow(wnd) {
     recordingEnabled = true;
     api.toggleRecording();
   });
+
+  chrome.tabs.sendMessage(currentTabId, { call: "uiWindowOpened" });
 }
 
 // expose api
