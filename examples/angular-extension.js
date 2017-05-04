@@ -9,3 +9,6 @@ runner.onBeforeExecute = function (commands, index, callback) {
   //angular.getTestability(document).whenStable(callback); 
 };
 console.info('angular');
+console.info('interval', settings.interval);
+
+locators.css.classBlacklist.push(/wrap|column|top|row/);

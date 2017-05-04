@@ -29,8 +29,14 @@ function HomeController($rootScope, $scope, $window) {
           // digest will be triggerred in list controller
         }
       },
-      extensions: function (request, callback) {
-        callback($ctrl.extensions);
+      uiState: function (request, callback) {
+        callback({
+          settings: $ctrl.settings,
+          extensions: $ctrl.extensions
+        });
+      },
+      settings: function (request, callback) {
+        callback($ctrl.settings);
       }
     });
 

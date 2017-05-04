@@ -77,11 +77,23 @@ document.addEventListener("blur", function (event) {
 messenger.send({ call: 'isRecordingEnabled' }, function (value) {
   api.recordingEnabled = value;
 });
-// get extensions and evaluate them
-messenger.send({ call: 'extensions' }, (list) => {
-  if (list) {
-    list.forEach((ext) => {
-      extensionEval({ runner: runner }, ext.data);
+// get state from ui window initially
+messenger.send({ call: 'uiState' }, (state) => {
+  // value will be undefined if ui window is not open
+  if (!state) {
+    return;
+  }
+  // evaluate extension
+  // value will be undefined if ui window is not open
+  if (state.extensions) {
+    // only these properties are available in extension scope (besides browser defaults)
+    var context = {
+      runner: runner,
+      locators: locators,
+      settings: state.settings
+    };
+    state.extensions.forEach((ext) => {
+      extensionEval(context, ext.data);
     });
   }
 });
