@@ -11,7 +11,8 @@ function ListController($scope, $window, $element) {
     messenger.bind({
       recordCommand: function (request, callback) {
         $scope.$apply(() => {
-          $ctrl.items.splice($ctrl.selectedIndex + 1, 0, { command: request.command, locator: request.locator, value: request.value, type: 'command' });
+          var indexOffset = request.indexOffset || 0;
+          $ctrl.items.splice($ctrl.selectedIndex + 1 + indexOffset, 0, { command: request.command, locator: request.locator, value: request.value, type: 'command' });
           $ctrl.notifySelect($ctrl.selectedIndex + 1);
           $ctrl.onChange();
         });

@@ -8,10 +8,15 @@ function Runner() {
   this.waitForCheckInterval = defaultOptions.waitForCheckInterval;
   this.timeout = undefined;
   this.waitForTimeout = undefined;
+  this.listeners = {
+    onStart: [],
+    onEnd: []
+  };
   this.commands = {};
   this.accessors = {};
   this.accessorCommands = [];
   this.variables = {};
+  this.dialogs = {};
   this.STATES = STATES;
   this.ELEMENT_NOT_FOUND_ERROR = 'element could not be found';
 
@@ -75,6 +80,19 @@ Runner.prototype.onAfterExecute = function (commands, index, state, message, cal
   callback();
 };
 
+Runner.prototype.onStart = function (commands, index, count, callback) {
+  this.listeners.onStart.forEach((fn) => {
+    fn.apply(this, arguments);
+  });
+  callback(true);
+};
+
+Runner.prototype.onEnd = function (commands, index, count) {
+  this.listeners.onEnd.forEach((fn) => {
+    fn.apply(this, arguments);
+  });
+}
+
 // borrowed from Selenium ide fork: https://github.com/FDIM/selenium/commit/2dbb4f2764c1e3d6f1c7c74bdbe9f896aaefafe8
 Runner.prototype.injectVariables = function (str) {
   var stringResult = str;
@@ -126,8 +144,12 @@ Runner.prototype.start = function (commands, index, count, changeCallback) {
   }
 
   var self = this, steps = 0;
+  this.onStart(commands, index, count, (shouldRun) => {
+    if (shouldRun) {
+      step(index);
+    }
+  });
 
-  step(index);
 
   function step(index) {
     if (commands[index].type === 'comment') {
@@ -153,6 +175,8 @@ Runner.prototype.start = function (commands, index, count, changeCallback) {
   function done(index, state) {
     if (state !== self.STATES.INPROGRESS && steps < count && index + 1 < commands.length) {
       self.callWhenReady(step.bind(this, index + 1));
+    } else if (state !== self.STATES.INPROGRESS && steps === count) {
+      self.onEnd(commands, index, count);
     }
   }
 

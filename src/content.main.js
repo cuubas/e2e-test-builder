@@ -9,6 +9,7 @@ var uiState = { ready: false };
 // load runner extensions
 require('./common/runner/key-input');
 require('./common/runner/mouse-input');
+require('./common/runner/dialogs');
 require('./common/runner/commands');
 require('./common/runner/accessors');
 
@@ -38,7 +39,7 @@ var lastEventTarget = null,
       runner.stop();
     },
     select: function (request) {
-      selector.start(runner.injectVariables(request.locator), (element) => {
+      selector.start(runner.injectVariables(request.locator || ''), (element) => {
         var locators = elementHelper.locators(element, uiState.settings);
         messenger.send({ call: 'elementSelected', locator: locators[0], locators: locators, index: request.index });
       });
@@ -62,6 +63,7 @@ var lastEventTarget = null,
     uiWindowOpened: init
   };
 
+// handle recording
 document.addEventListener("mousedown", function (event) {
   lastEventTarget = event.target;
   // left click, is recording enabled?
@@ -77,6 +79,27 @@ document.addEventListener("blur", function (event) {
     messenger.send({ call: 'recordCommand', command: "sendKeys", locator: locators[0], locators: locators, value: event.target.value });
   }
 }, true);
+// record native alerts
+['alert', 'confirm', 'prompt'].forEach((fn) => {
+  var orgFn = window[fn];
+  window[fn] = function (message) {
+    var res = orgFn.apply(this, arguments);
+    if (!api.recordingEnabled) {
+      return res;
+    }
+    if (fn === 'confirm' && !res) {
+      messenger.send({ call: 'recordCommand', command: 'chooseCancelOnNextConfirmation', locator: '', value: '', indexOffset: -1 });
+    } else if (fn === 'prompt') {
+      messenger.send({ call: 'recordCommand', command: 'answerOnNextPrompt', locator: '', value: res, indexOffset: -1 });
+    }
+    if (fn === 'confirm') {
+      fn = 'confirmation';
+    }
+    messenger.send({ call: 'recordCommand', command: "assert" + (fn.substr(0, 1).toUpperCase() + fn.substr(1)), locator: '', value: message });
+
+    return res;
+  };
+});
 
 // get initial state
 messenger.send({ call: 'isRecordingEnabled' }, function (value) {
