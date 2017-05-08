@@ -15,7 +15,7 @@ Convert these recorded test cases into code and use them as building blocks to m
 
 ## extensions
 
-user extension is an additional javascript file that is executed in page context and have access to entire page and a test runner object. Runner itself is built with extensions in mind and allows you to add commands/accessors and hook into execution flow rather easily.
+user extension is an additional javascript file that is executed in page context and have access to entire page and a test runner object. Runner itself is built with extensions in mind and allows you to add commands/accessors and hook into execution flow rather easily. New commands and accesors will automatically appear in suggestions list in ui window.
 
 #### Some examples:
 
@@ -34,7 +34,10 @@ runner.commands.custom = function (command) {
 runner.commands.customAsync = function (command, callback) {
   callback(runner.STATES.DONE|FAILED, 'Hello from custom command');
 };
-runner.accesors.
+// registering below accessor will enable assertAriaLabel, asertNotAriaLabel, verifyAriaLabel, verifyNotAriaLabel, waitForAriaLabel, waitForNotAriaLabel, echoAriaLabel, storeAriaLabel commands
+runner.accesors.ariaLabel = function (command) {
+  return this.findElement(command.locator).getAttribute('aria-label');
+};
 ```
 
 ## contributing
