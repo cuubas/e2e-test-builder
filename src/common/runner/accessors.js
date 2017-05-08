@@ -8,7 +8,7 @@ runner.accessors.attribute = function (command) {
   var parts = command.locator.split('@');
   command.locator = parts.shift();
   var name = parts.join('');
-  return this.findElement(command.locator).getAttribute(name);
+  return this.findElement(command.locator).getAttribute(name) || '';
 };
 
 runner.propertyAccessor = function (property, command) {
