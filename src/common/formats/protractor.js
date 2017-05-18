@@ -1,5 +1,5 @@
 var BaseFormatter = require('./base');
-var TestCaseFormatter = require('../../../node_modules/selenium-protractor/lib/test-case-formatter');
+var TestCaseFormatter = require('selenium-protractor/lib/test-case-formatter');
 
 function ProtractorFormatter() {
   BaseFormatter.apply(this, arguments);

@@ -22,7 +22,7 @@ var shouldUglify = tasks.length && tasks[0].indexOf('release') !== -1;
 var babelLoader = {
   test: /.js$/,
   loader: 'babel-loader',
-  exclude: /node_modules/,
+  exclude: /node_modules[\/\\](?!(selenium-protractor|some-other-module))/,
   query: {
     plugins: ["transform-es2015-arrow-functions", "transform-es2015-template-literals"]
   }
