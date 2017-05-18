@@ -1,35 +1,34 @@
-module.exports = {
-  name: 'html',
-  test: test,
-  parse: parse,
-  stringify: stringify
-};
+var BaseFormatter = require('./base');
 
-function test(filename) {
-  filename = filename || '';
-  return filename.indexOf('.html') === filename.length - 5;
+function HtmlFormatter() {
+  BaseFormatter.apply(this, arguments);
+  this.name = 'html';
+  this.extension = '.html';
+  this.charsMap = {
+    '<': 'lt',
+    '>': 'gt',
+    '"': 'quot',
+    '&': 'amp'
+  };
 }
 
-function escapeAttribute(value) {
+HtmlFormatter.prototype = Object.create(BaseFormatter.prototype);
+
+HtmlFormatter.prototype.escapeAttribute = function (value) {
   return (value || '').replace(/"/g, '\"');
-}
-var charsMap = {
-  '<': 'lt',
-  '>': 'gt',
-  '"': 'quot',
-  '&': 'amp'
 };
-function escapeHtml(value) {
+
+HtmlFormatter.prototype.escapeHtml = function (value) {
   if (typeof (value) === 'undefined' || value === null) {
     value = '';
   }
   value = String(value);
   return value.replace(/[<>"&]/g, (char) => {
-    return '&' + charsMap[char] + ';';
+    return '&' + this.charsMap[char] + ';';
   });
-}
+};
 
-function parse(content) {
+HtmlFormatter.prototype.parse = function (content) {
   var result = {};
   result.items = [];
 
@@ -59,15 +58,15 @@ function parse(content) {
   return result;
 }
 
-function stringify(testCase) {
+HtmlFormatter.prototype.stringify = function (testCase) {
   var content = testCase.items.map((item) => {
     if (item.type === 'comment') {
-      return `<!--${escapeHtml(item.value)}-->`;
+      return `<!--${this.escapeHtml(item.value)}-->`;
     } else {
       return '<tr>'
-        + `\n\t<td>${escapeHtml(item.command)}</td>`
-        + `\n\t<td>${escapeHtml(item.locator)}</td>`
-        + `\n\t<td>${escapeHtml(item.value)}</td>`
+        + `\n\t<td>${this.escapeHtml(item.command)}</td>`
+        + `\n\t<td>${this.escapeHtml(item.locator)}</td>`
+        + `\n\t<td>${this.escapeHtml(item.value)}</td>`
         + '\n</tr>';
     }
   }).join('\n');
@@ -76,16 +75,18 @@ function stringify(testCase) {
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head profile="http://selenium-ide.openqa.org/profiles/test-case">
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<link rel="selenium.base" href="${escapeAttribute(testCase.baseUrl)}" />
-<title>${escapeHtml(testCase.title)}</title>
+<link rel="selenium.base" href="${this.escapeAttribute(testCase.baseUrl)}" />
+<title>${this.escapeHtml(testCase.title)}</title>
 </head>
 <body>
 <table cellpadding="1" cellspacing="1" border="1">
 <thead>
-<tr><td rowspan="1" colspan="3">${escapeHtml(testCase.title)}</td></tr>
+<tr><td rowspan="1" colspan="3">${this.escapeHtml(testCase.title)}</td></tr>
 </thead><tbody>
 `;
   var suffix = "\n</tbody></table>\n\t</body>\n\t</html>\n\t";
 
   return prefix + content + suffix;
 }
+
+module.exports = new HtmlFormatter();

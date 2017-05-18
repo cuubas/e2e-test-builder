@@ -9,8 +9,10 @@ function HomeController($rootScope, $scope, $window) {
   $ctrl.testCase = {};
   $ctrl.supportedCommands = [];
   $ctrl.selectedIndex = 0;
+  $ctrl.supportedFormats = supportedFormats;
   $ctrl.settings = Object.assign({}, defaultRunnerOptions, JSON.parse($window.localStorage.settings || '{}'));
-  Object.keys($ctrl.settings).forEach((key)=>{
+
+  Object.keys($ctrl.settings).forEach((key) => {
     if ($ctrl.settings[key] === '') {
       $ctrl.settings[key] = defaultRunnerOptions[key];
     }
@@ -134,11 +136,15 @@ function HomeController($rootScope, $scope, $window) {
     $ctrl.selectedIndex = index;
   };
 
-  $ctrl.save = function (ev, saveAs) {
+  $ctrl.save = function (ev, saveAs, format) {
+    if (format) {
+      formatter = format;
+    }
     if (!formatter) {
       formatter = supportedFormats[0];
     }
-    ioproxy.write(!saveAs && file ? file.path : undefined, formatter.stringify($ctrl.testCase), $window.localStorage.lastPath)
+
+    ioproxy.write(!saveAs && file ? file.path : undefined, formatter.stringify($ctrl.testCase), replaceExtension($window.localStorage.lastPath || '', formatter.extension))
       .then((response) => {
         file = response;
         if (response.path) {
@@ -181,6 +187,13 @@ function HomeController($rootScope, $scope, $window) {
       $ctrl.isRecordingEnabled = value;
       $scope.$digest();
     });
+  }
+
+  function replaceExtension(path, extension) {
+    if (!path) {
+      path = 'test-case.ext';
+    }
+    return path.replace(/([^/\/])\.(.*)$/, '$1' + extension);
   }
 
   function handleError(error) {
