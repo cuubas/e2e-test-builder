@@ -81,7 +81,7 @@ function HomeController($rootScope, $scope, $window) {
       return;
     }
     $ctrl.testCase = $ctrl.newTestCase();
-    $ctrl.save(null, true);
+    $ctrl.save(null, true, $ctrl.supportedFormats[0]);
   };
 
   $ctrl.read = function (path) {
