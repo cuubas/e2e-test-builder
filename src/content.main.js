@@ -124,8 +124,10 @@ function init() {
     // evaluate extension
     // value will be undefined if ui window is not open
     if (state.extensions) {
-      // only these properties are available in extension scope (besides browser defaults)
+      // only these properties are available in extension scope
       var context = {
+        window: window,
+        document: document,
         runner: runner,
         locators: locators,
         settings: state.settings
