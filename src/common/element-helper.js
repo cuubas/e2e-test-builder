@@ -12,7 +12,8 @@ function findAll(locator, parent) {
   if (index) {
     try {
       var type = locator.substr(0, index);
-      return locators[type] && locators[type].find(locator.substr(index + 1), parent);
+      var selector = locator.substr(index + 1).replace(/(.*)@[^/\\'"><\]\[]*$/,'$1'); // remove anything after @ as it may be used to specify attribute name
+      return locators[type] && locators[type].find(selector, parent);
     } catch (er) {
       console.error(er);
     }
