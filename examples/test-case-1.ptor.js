@@ -28,7 +28,7 @@ var TEST_CASE = {
       "type": "command",
       "command": "eval",
       "locator": "css=p:nth-child(7) .keyword:nth-child(2)",
-      "value": "element.innerHTML = '<select><option value=\"1\">value 1</option><option value=\"2\">value 2</option><option value=\"3\">Foo 3</option></select>';"
+      "value": "element.innerHTML = '<span e2e-tag=\"foo\"><select><option value=\"1\">value 1</option><option value=\"2\">value 2</option><option value=\"3\">Foo 3</option></select></span>';"
     },
     {
       "type": "command",
@@ -39,13 +39,13 @@ var TEST_CASE = {
     {
       "type": "command",
       "command": "select",
-      "locator": "css=select",
+      "locator": "css=[e2e-tag=\"foo\"] select",
       "value": "label=regexpi:foo"
     },
     {
       "type": "command",
       "command": "select",
-      "locator": "css=select",
+      "locator": "css=[e2e-tag=\"foo\"] select",
       "value": "index=0"
     },
     {
@@ -244,10 +244,10 @@ module.exports = (function(config, data) {
             element(by.css(`.toc li a`)).click().then(function(){},function(err){fail(err+"\ncommand: "+`click|css=.toc li a|`);});
 
             browser.executeScript(`var element = arguments[0];`,element(by.xpath(` 'test-id';`)).getWebElement());
-            browser.executeScript(`var element = arguments[0];element.innerHTML = '<select><option value="1">value 1</option><option value="2">value 2</option><option value="3">Foo 3</option></select>';`,element(by.css(`p:nth-child(7) .keyword:nth-child(2)`)).getWebElement());
+            browser.executeScript(`var element = arguments[0];element.innerHTML = '<span e2e-tag="foo"><select><option value="1">value 1</option><option value="2">value 2</option><option value="3">Foo 3</option></select></span>';`,element(by.css(`p:nth-child(7) .keyword:nth-child(2)`)).getWebElement());
             browser.executeScript(`var element = arguments[0];element.style.border='1px solid red';`,element(by.id(`test-id`)).getWebElement());
-            element(by.css(`select`)).element(by.cssContainingText('option',`regexpi:foo`)).click();
-            element(by.css(`select`)).element(by.css(`option:nth-child(1)`)).click();
+            element(by.css(`[e2e-tag="foo"] select`)).element(by.cssContainingText('option',`regexpi:foo`)).click();
+            element(by.css(`[e2e-tag="foo"] select`)).element(by.css(`option:nth-child(1)`)).click();
             browser.executeScript(`var element = arguments[0];`,element(by.xpath(` 'none'},1000);`)).getWebElement());
             browser.wait(protractor.ExpectedConditions.invisibilityOf(element(by.css(`h1`))), 5000,`waitForNotVisible|css=h1|5000`);
             fail('command mouseDownAt is not supported');

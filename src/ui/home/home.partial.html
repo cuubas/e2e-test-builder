@@ -1,5 +1,14 @@
 <div class="toolbar home__toolbar">
-  <a ng-click="$ctrl.create($event)" title="create new test case" class="home__toolbar-item halflings halflings-file"></a>
+  <span class="home__toolbar-item home__toolbar-item--dropdown">
+    <span class="halflings halflings-file"></span>
+    <span class="dropdown home__toolbar-dropdown">
+      <span class="dropdown__label">New test case format:</span>
+      <a class="dropdown__item" ng-repeat="format in $ctrl.supportedFormats" ng-click="$ctrl.create($event, format)">
+        <span class="home__toolbar-dropdown-name">{{::format.name}}</span>
+        <span class="home__toolbar-dropdown-ext">{{::format.extension}}</span>
+      </a>
+    </span>
+  </span>
   <a ng-click="$ctrl.open($event)" title="open existing test case" class="home__toolbar-item halflings halflings-folder-open"></a>
   <a ng-click="$ctrl.save($event)" title="save" class="home__toolbar-item halflings halflings-floppy-disk"></a>
   <span class="home__toolbar-item home__toolbar-item--dropdown">

@@ -76,12 +76,12 @@ function HomeController($rootScope, $scope, $window) {
     return res;
   }
 
-  $ctrl.create = function () {
+  $ctrl.create = function (ev, format) {
     if ($ctrl.dirty && !confirm(promptMessage)) {
       return;
     }
     $ctrl.testCase = $ctrl.newTestCase();
-    $ctrl.save(null, true, $ctrl.supportedFormats[0]);
+    $ctrl.save(null, true, format || $ctrl.supportedFormats[0]);
   };
 
   $ctrl.read = function (path) {
