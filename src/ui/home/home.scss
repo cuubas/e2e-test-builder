@@ -5,6 +5,7 @@
       cursor: pointer;
       font-size: 16px;
       padding: 4px;
+      height: 16px;
       color: $link-color;
       &--dropdown {
         position: relative;
@@ -12,6 +13,8 @@
       &:hover,
       &:focus {
         color: $link-color-hover;
+        background: #f3f3f3;
+        border-radius: 4px;
         .home__toolbar-dropdown {
           display: block;
         }
@@ -20,7 +23,7 @@
     &-dropdown {
       display: none;
       position: absolute;
-      top: 100%;
+      top: 125%;
       left: 0px;
       z-index: 2;
       width: 150px;
