@@ -5,7 +5,7 @@ var runner = require('./common/runner');
 var selector = require('./common/selector');
 var extensionEval = require('./common/extension-eval');
 var uiState = { ready: false };
-
+var supportedCommands;
 // load runner extensions
 require('./common/runner/key-input');
 require('./common/runner/mouse-input');
@@ -58,7 +58,14 @@ var lastEventTarget = null,
       messenger.send({ call: 'recordCommand', command: request.command, locator: locators[0], locators: locators, value: value });
     },
     supportedCommands: function (request, callback) {
-      callback(runner.getSupportedCommands());
+      if (!supportedCommands) {
+        supportedCommands = runner.getSupportedCommands();
+      }
+      if (supportedCommands.length === request.count) {
+        callback({ noChange: true });
+      } else {
+        callback(supportedCommands);
+      }
     },
     uiWindowOpened: init
   };

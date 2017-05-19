@@ -210,7 +210,10 @@ function HomeController($rootScope, $scope, $window) {
     if (!$window.currentTabId) {
       return;
     }
-    chrome.tabs.sendMessage($window.currentTabId, { call: 'supportedCommands' }, (list) => {
+    chrome.tabs.sendMessage($window.currentTabId, { call: 'supportedCommands', count: $ctrl.supportedCommands.length }, (list) => {
+      if (list.noChange) {
+        return;
+      }
       $ctrl.supportedCommands = list || [];
       $ctrl.supportedCommands.sort((a, b) => {
         if (a.value < b.value) {
