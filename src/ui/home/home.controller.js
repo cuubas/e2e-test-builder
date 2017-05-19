@@ -143,7 +143,7 @@ function HomeController($rootScope, $scope, $window) {
     if (!formatter) {
       formatter = supportedFormats[0];
     }
-
+    $ctrl.reset(); // reset uii state before saving
     ioproxy.write(!saveAs && file ? file.path : undefined, formatter.stringify($ctrl.testCase), replaceExtension($window.localStorage.lastPath || '', formatter.extension))
       .then((response) => {
         file = response;

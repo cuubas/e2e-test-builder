@@ -28,8 +28,7 @@ var TEST_CASE = {
       "type": "command",
       "command": "eval",
       "locator": "css=p:nth-child(7) .keyword:nth-child(2)",
-      "value": "element.innerHTML = '<span e2e-tag=\"foo\"><select class=\"test\"><option value=\"1\">value 1</option><option value=\"2\">value 2</option><option value=\"3\">Foo 3</option></select></span>';",
-      "state": "done"
+      "value": "element.innerHTML = '<span e2e-tag=\"foo\"><select class=\"test\"><option value=\"1\">value 1</option><option value=\"2\">value 2</option><option value=\"3\">Foo 3</option></select></span>';"
     },
     {
       "type": "command",
@@ -41,21 +40,18 @@ var TEST_CASE = {
       "type": "command",
       "command": "select",
       "locator": "css=[e2e-tag=\"foo\"] select",
-      "value": "label=regexpi:foo",
-      "state": "done"
+      "value": "label=regexpi:foo"
     },
     {
       "type": "command",
       "command": "select",
       "locator": "css=[e2e-tag=\"foo\"] select",
-      "value": "index=0",
-      "state": "done"
+      "value": "index=0"
     },
     {
       "type": "command",
       "command": "assertAttribute",
       "locator": "css=[e2e-tag=\"foo\"] select@class",
-      "state": "done",
       "value": "test"
     },
     {
