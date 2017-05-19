@@ -36,6 +36,8 @@ gulp.task('build-manifest', () => {
   var pack = JSON.parse(fs.readFileSync('./package.json'));
   return gulp.src('src/manifest.json')
     .pipe(replace('{{package.version}}', pack.version))
+    .pipe(replace('{{defaultIcon}}', 'assets/icon-c@32.png'))
+    .pipe(replace('"{{icons}}"', '{ ' + [16, 32, 48, 128, 256, 512].map((size) => `"${size}" : "assets/icon-c@${size}.png"`).join(', ') + ' }'))
     .pipe(gulp.dest('build/'));
 });
 

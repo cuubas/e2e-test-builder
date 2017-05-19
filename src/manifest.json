@@ -4,8 +4,9 @@
   "description": "An extension which allows you to record interaction and perform various assertions. Compatible with Selenium IDE test cases.",
   "version": "{{package.version}}",
   "browser_action": {
-    "default_icon": "assets/icon.png"
+    "default_icon": "{{defaultIcon}}"
   },
+  "icons": "{{icons}}",
   "background": {
     "scripts": ["background.js"]
   },

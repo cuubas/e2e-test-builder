@@ -12,7 +12,7 @@ var recordingEnabled = false,
     },
     toggleRecording: function () {
       recordingEnabled = !recordingEnabled;
-      chrome.browserAction.setIcon({ path: recordingEnabled ? "assets/icon-recording.png" : "assets/icon.png" });
+      chrome.browserAction.setIcon({ path: recordingEnabled ? "assets/icon-c@32.png" : "assets/icon-c@32.png" });
       // notify self and anyone who is listening
       messenger.send({ call: 'recordingToggled', value: recordingEnabled });
 
