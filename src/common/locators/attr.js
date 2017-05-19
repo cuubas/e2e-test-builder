@@ -15,6 +15,8 @@ function CustomAttributeLocator(target, settings) {
         suffix += ':nth-child(' + (index + 1) + ')';
       }
       result.unshift(prefix + value.replace(/"/g, '\"') + suffix);
+    } else if (element === target && CustomAttributeLocator.tagsWhitelist.indexOf(target.tagName) !== -1) {
+      result.push(target.tagName.toLowerCase());
     }
     element = element.parentNode;
   }
@@ -22,3 +24,5 @@ function CustomAttributeLocator(target, settings) {
     return 'css=' + result.join(' ');
   }
 }
+
+CustomAttributeLocator.tagsWhitelist = ['INPUT', 'SELECT', 'TEXTAREA'];
