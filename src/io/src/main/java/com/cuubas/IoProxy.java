@@ -9,7 +9,7 @@ import com.google.gson.Gson;
 import com.google.gson.internal.LinkedTreeMap;
 
 public class IoProxy extends Application {
-  public static int VERSION = 1;
+  public static int VERSION = 2;
 
   public void start(Stage stage) throws Exception {
     try {
@@ -59,7 +59,10 @@ public class IoProxy extends Application {
       FileChooser fileChooser = new FileChooser();
       String name = (String) options.get("lastPath");
       if (name != null && !name.isEmpty()) {
-        fileChooser.setInitialDirectory(new File(name).getParentFile());
+        File dir = new File(name).getParentFile();
+        if (Files.isDirectory(dir.toPath())) {
+          fileChooser.setInitialDirectory(dir);
+        }
         fileChooser.setInitialFileName(new File(name).getName());
       }
       file = fileChooser.showSaveDialog(stage);
