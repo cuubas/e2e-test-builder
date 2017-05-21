@@ -132,6 +132,20 @@ Runner.prototype.injectVariables = function (str) {
   }
   return stringResult;
 };
+// helper method to flat out an object to variables
+Runner.prototype.exposeObjectAsVariables = function (object, prefix) {
+  if (!prefix) {
+    prefix = 'config';
+  }
+  Object.keys(object).forEach((key) => {
+    var value = object[key];
+    if (typeof (value) === 'object') {
+      this.exposeObjectAsVariables(value, prefix + '.' + key);
+    } else {
+      this.variables[prefix + '.' + key] = value;
+    }
+  });
+};
 
 Runner.prototype.start = function (commands, index, count, changeCallback) {
   this.stop();
