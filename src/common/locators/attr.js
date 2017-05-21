@@ -3,7 +3,7 @@ module.exports = CustomAttributeLocator;
 function CustomAttributeLocator(target, settings) {
   var element = target, result = [];
 
-  while (element.tagName !== 'BODY') {
+  while (element !== document.documentElement) {
     var value = element.getAttribute(settings.customAttribute);
     if (value) {
       var index,

@@ -3,7 +3,7 @@ module.exports = CssLocator;
 function CssLocator(target, settings) {
   var element = target, result = [], interrupt = false;
 
-  while (element.tagName !== 'BODY') {
+  while (element !== document.documentElement) {
     // go through known attributes (in order) and create css selector
     for (var i = 0; i < CssLocator.attributes.length; i++) {
       var attr = CssLocator.attributes[i], value, prefix = '', suffix = '', index;
