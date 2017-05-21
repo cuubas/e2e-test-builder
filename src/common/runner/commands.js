@@ -125,7 +125,7 @@ runner.commands.eval = function (command) {
     element = this.findElement(command.locator);
     return eval(command.value);
   } catch (err) {
-    eval(command.locator);
+    eval(command.value);
   }
 };
 
