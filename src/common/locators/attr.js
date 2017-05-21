@@ -15,12 +15,14 @@ function CustomAttributeLocator(target, settings) {
         suffix += ':nth-child(' + (index + 1) + ')';
       }
       result.unshift(prefix + value.replace(/"/g, '\"') + suffix);
-    } else if (element === target && CustomAttributeLocator.tagsWhitelist.indexOf(target.tagName) !== -1) {
-      result.push(target.tagName.toLowerCase());
     }
     element = element.parentNode;
   }
   if (result.length > 0) {
+    // append whitelisted tag name in case target doesn't have custom attribute
+    if (CustomAttributeLocator.tagsWhitelist.indexOf(target.tagName) !== -1 && !target.getAttribute(settings.customAttribute)) {
+      result.push(target.tagName.toLowerCase());
+    }
     return 'css=' + result.join(' ');
   }
 }
