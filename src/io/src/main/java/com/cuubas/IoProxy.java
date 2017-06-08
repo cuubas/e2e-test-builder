@@ -27,7 +27,7 @@ public class IoProxy extends Application {
         write(new StatusMessage("unknown op:" + op, StatusMessage.ERROR));
       }
     } catch (Exception ex) {
-      write(new StatusMessage("exception:" + ex.toString(), StatusMessage.ERROR));
+      write(new StatusMessage(ex, StatusMessage.ERROR));
     }
     System.exit(0);
   }
