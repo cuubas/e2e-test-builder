@@ -211,7 +211,7 @@ function HomeController($rootScope, $scope, $window) {
       return;
     }
     chrome.tabs.sendMessage($window.currentTabId, { call: 'supportedCommands', count: $ctrl.supportedCommands.length }, (list) => {
-      if (list.noChange) {
+      if (list && list.noChange) {
         return;
       }
       $ctrl.supportedCommands = list || [];
