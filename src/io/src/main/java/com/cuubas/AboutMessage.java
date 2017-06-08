@@ -1,10 +1,10 @@
 package com.cuubas;
 
-public class AboutMessage {
+public class AboutMessage extends StatusMessage {
   private int version;
-  private int code = StatusMessage.OK;
   
   public AboutMessage(int version) {
+    super(OK);
     this.version = version;
   }
 }

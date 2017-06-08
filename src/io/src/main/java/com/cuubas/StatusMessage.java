@@ -8,6 +8,10 @@ public class StatusMessage {
   private String[] stacktrace;
   private int code;
 
+  public StatusMessage(int code) {
+    this.code = code;
+  }
+
   public StatusMessage(String msg, int code) {
     this.message = msg;
     this.code = code;
@@ -16,7 +20,7 @@ public class StatusMessage {
   public StatusMessage(Exception exception, int code) {
     this.message = "exception:" + exception.toString();
     this.code = code;
-    
+
     this.stacktrace = new String[exception.getStackTrace().length];
     int i = 0;
     for (StackTraceElement e : exception.getStackTrace()) {

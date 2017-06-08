@@ -9,7 +9,7 @@ public class FileMessage extends StatusMessage {
   private String data;
 
   public FileMessage(File file, boolean sendData) throws IOException {
-    super(null, OK);
+    super(OK);
     this.path = file.getAbsolutePath();
     if (sendData) {
       this.data = new String(Files.readAllBytes(file.toPath()));
