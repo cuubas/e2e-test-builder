@@ -110,6 +110,7 @@ gulp.task('build-io-proxy', (done) => {
     }
     gulp.src("src/io/target/ioproxy-1.0.jar").pipe(gulp.dest("host"));
     gulp.src("src/io/target/ioproxy-1.0.jar").pipe(gulp.dest("host-win"));
+    done();
   });
 });
 
