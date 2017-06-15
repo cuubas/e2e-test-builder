@@ -73,7 +73,7 @@ Runner.prototype.assertValue = function (input, value) {
 };
 
 Runner.prototype.onBeforeExecute = function (commands, index, callback) {
-  callback(true);
+  callback(!commands[index].$skip);
 };
 
 Runner.prototype.onAfterExecute = function (commands, index, state, message, callback) {
@@ -172,7 +172,7 @@ Runner.prototype.start = function (commands, index, count, changeCallback) {
       self.onBeforeExecute(commands, index, function (shouldContinue) {
         steps++;
         if (shouldContinue) {
-          self.execute(commands[index], index, (index, state, message) => {
+          self.execute(commands, index, (index, state, message) => {
             changeCallback(index, state, message);
 
             self.onAfterExecute(commands, index, state, message, function () {
@@ -201,7 +201,8 @@ Runner.prototype.stop = function () {
   clearTimeout(this.waitForTimeout);
 };
 
-Runner.prototype.execute = function (command, index, changeCallback) {
+Runner.prototype.execute = function (commands, index, changeCallback) {
+  var command = commands[index];
   changeCallback(index, STATES.INPROGRESS);
 
   // handle variables
@@ -232,7 +233,11 @@ Runner.prototype.execute = function (command, index, changeCallback) {
 
   if (typeof (cmd) === 'function' && (!cmd.requiresAccessor || command.accessor)) {
     try {
-      if (cmd.length > 1) { // uses callback
+      if (cmd.length > 2) { // uses commands list, an index and callback
+        cmd.call(this, commands, index, (state, message) => {
+          changeCallback(index, state, message);
+        });
+      } else if (cmd.length > 1) { // uses callback
         cmd.call(this, command, (state, message) => {
           changeCallback(index, state, message);
         });

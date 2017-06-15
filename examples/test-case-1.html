@@ -173,9 +173,25 @@
 	<td></td>
 </tr>
 <tr>
+	<td>storeCssCount</td>
+	<td>css=input</td>
+	<td>data.count</td>
+</tr>
+<tr>
 	<td>assertCssCount</td>
 	<td>css=input</td>
 	<td>6</td>
+</tr>
+<tr>
+	<td>echo</td>
+	<td>${data.count}</td>
+	<td></td>
+</tr>
+<!--should skip commands until next comment if there are more than 6 fields-->
+<tr>
+	<td>breakIf</td>
+	<td>${data.count}</td>
+	<td>&gt;6</td>
 </tr>
 <tr>
 	<td>click</td>
@@ -191,6 +207,33 @@
 	<td>sendKeys</td>
 	<td>css=.sketching .email input[name=&quot;fields[email]&quot;]</td>
 	<td>test@example.com${KEY_ENTER}</td>
+</tr>
+<!--should run commands until next comment (and after) if there are less than 6 or 6 fields-->
+<tr>
+	<td>continueIf</td>
+	<td>${data.count}</td>
+	<td>&lt;=6</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>css=.sketching</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>css=.sketching .email input[name=&quot;fields[email]&quot;]</td>
+	<td>test@example.com</td>
+</tr>
+<!--should work with legacy format continueIf/breakIf format-->
+<tr>
+	<td>continueIf</td>
+	<td></td>
+	<td>data.count &gt; 5</td>
+</tr>
+<tr>
+	<td>echo</td>
+	<td>${data.count}</td>
+	<td></td>
 </tr>
 </tbody></table>
 	</body>

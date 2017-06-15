@@ -1,6 +1,6 @@
 var runner = require('./../runner');
 // list all commands that accept accessor input
-runner.accessorCommands.push('waitForNot', 'waitFor', 'assertNot', 'assert', 'verifyNot', 'verify', 'echo', 'store');
+runner.accessorCommands.push('waitForNot', 'waitFor', 'assertNot', 'assert', 'verifyNot', 'verify', 'echo', 'store', 'breakIf', 'continueIf');
 
 runner.commands.assert = function (command) {
   if (!runner.assertValue(typeof (command.input) !== 'undefined' ? command.input : command.locator, command.value)) {
@@ -152,3 +152,39 @@ runner.commands.sendKeys = function (command) {
   var chars = command.value.split('');
   chars.forEach(runner.simulateKeyInput.bind(runner, element));
 };
+
+// flow control
+runner.commands.continueIf = skipNextBlockIfNeeded.bind(runner, false);
+runner.commands.breakIf = skipNextBlockIfNeeded.bind(runner, true);
+
+function skipNextBlockIfNeeded(negate, commands, index, callback) {
+  var command = commands[index];
+  var result;
+  // support legacy format when expression was in value e.g. data.size > 5 or foo=='e' or baz>=5 || !baz
+  if (!command.locator && command.value) {
+    var expr = command.value.replace(/(^|[^'"])([a-zA-Z\.]+)([^'"]|$)/g,'$1runner.variables[\'$2\']')
+    if (expr.indexOf('runner.variables[') === -1) {
+      callback(runner.STATES.FAILED, 'condition doesn\'t include a variable');
+      return;
+    }
+    result = eval(expr);
+  } else {
+    result = runner.assertValue(typeof (command.input) !== 'undefined' ? command.input : command.locator, command.value);
+  }
+  if (negate) {
+    result = !result;
+  }
+  if (!result) {
+    // skip all commands till comment or end
+    for (var i = index + 1; i < commands.length; i++) {
+      if (commands[i].type === 'comment') {
+        break;
+      }
+      commands[i].$skip = true;
+    }
+  }
+  callback(runner.STATES.DONE);
+};
+// protractor specific commands to enable/disable waiting for angular
+runner.commands.enableSynchronization = function () { };
+runner.commands.disableSynchronization = function () { };
