@@ -125,7 +125,7 @@ runner.commands.eval = function (command) {
     element = this.findElement(command.locator);
     return eval(command.value);
   } catch (err) {
-    eval(command.value);
+    eval(command.value || command.locator);
   }
 };
 
@@ -162,7 +162,7 @@ function skipNextBlockIfNeeded(negate, commands, index, callback) {
   var result;
   // support legacy format when expression was in value e.g. data.size > 5 or foo=='e' or baz>=5 || !baz
   if (!command.locator && command.value) {
-    var expr = command.value.replace(/(^|[^'"])([a-zA-Z\.]+)([^'"]|$)/g,'$1runner.variables[\'$2\']')
+    var expr = command.value.replace(/(^|[^'"])([a-zA-Z\.]+)([^'"]|$)/g, '$1runner.variables[\'$2\']')
     if (expr.indexOf('runner.variables[') === -1) {
       callback(runner.STATES.FAILED, 'condition doesn\'t include a variable');
       return;
@@ -185,6 +185,3 @@ function skipNextBlockIfNeeded(negate, commands, index, callback) {
   }
   callback(runner.STATES.DONE);
 };
-// protractor specific commands to enable/disable waiting for angular
-runner.commands.enableSynchronization = function () { };
-runner.commands.disableSynchronization = function () { };

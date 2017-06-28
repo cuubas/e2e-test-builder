@@ -26,7 +26,7 @@ runner.accessors.eval = function (command) {
 };
 
 runner.accessors.location = function (command) {
-  return document.location;
+  return document.location.href;
 };
 
 runner.accessors.title = function (command) {

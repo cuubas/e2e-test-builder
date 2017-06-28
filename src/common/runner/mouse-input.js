@@ -8,15 +8,16 @@ runner.createMouseEvent = function (type, options) {
 runner.fireMouseEvent = function (type, button, command) {
   var el = this.findElement(command.locator);
   var coords = command.value.split(',');
+  var rect = el.getBoundingClientRect();
   if (coords.length === 2) {
     coords = [parseInt(coords[0]), parseInt(coords[1])];
   } else {
-    coords = [];
+    coords = [rect.width / 2, rect.height / 2];
   }
   el.dispatchEvent(this.createMouseEvent(type, {
     button: button,
-    clientX: coords[0],
-    clientY: coords[1]
+    clientX: rect.left + coords[0],
+    clientY: rect.top + coords[1]
   }));
 };
 

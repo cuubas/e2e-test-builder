@@ -12,6 +12,7 @@ require('./common/runner/mouse-input');
 require('./common/runner/dialogs');
 require('./common/runner/commands');
 require('./common/runner/accessors');
+require('./common/runner/protractor');
 
 //content script
 var lastEventTarget = null,
