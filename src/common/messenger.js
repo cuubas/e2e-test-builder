@@ -3,7 +3,8 @@ module.exports = {
   send: send
 };
 var extensionId = chrome.runtime.id;
-function bind(target, returnOnly) {
+
+function bind(target) {
   // create link to target
   chrome.runtime.onMessage.addListener(messageHandler);
   
