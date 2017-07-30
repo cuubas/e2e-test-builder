@@ -1,3 +1,4 @@
+var pageProxy = require('./common/page-proxy');
 var messenger = require('./common/messenger');
 var locators = require('./common/locators');
 var elementHelper = require('./common/element-helper');
@@ -89,24 +90,29 @@ document.addEventListener("blur", function (event) {
 }, true);
 // record native alerts
 ['alert', 'confirm', 'prompt'].forEach((fn) => {
-  var orgFn = window[fn];
-  window[fn] = function (message) {
-    var res = orgFn.apply(this, arguments);
-    if (!api.recordingEnabled) {
+  // first function is executed in page context and the callback in extension
+  pageProxy.run(function (fn, callback) {
+    var orgFn = window[fn];
+    window[fn] = function (message) {
+      var res = orgFn.apply(this, arguments);
+      callback(message, res);
       return res;
+    };
+  }, fn, function (message, res) {
+    if (!api.recordingEnabled) {
+      return;
     }
     if (fn === 'confirm' && !res) {
-      messenger.send({ call: 'recordCommand', command: 'chooseCancelOnNextConfirmation', locator: '', value: '', indexOffset: -1 });
+      messenger.send({ call: 'recordCommand', command: 'chooseCancelOnNextConfirmation', locator: '', value: '' });
     } else if (fn === 'prompt') {
-      messenger.send({ call: 'recordCommand', command: 'answerOnNextPrompt', locator: '', value: res, indexOffset: -1 });
+      messenger.send({ call: 'recordCommand', command: 'answerOnNextPrompt', locator: '', value: res });
     }
     if (fn === 'confirm') {
       fn = 'confirmation';
     }
     messenger.send({ call: 'recordCommand', command: "assert" + (fn.substr(0, 1).toUpperCase() + fn.substr(1)), locator: '', value: message });
 
-    return res;
-  };
+  });
 });
 
 // get initial state
@@ -138,7 +144,8 @@ function init() {
         document: document,
         runner: runner,
         locators: locators,
-        settings: state.settings
+        settings: state.settings,
+        pageProxy: pageProxy
       };
       state.extensions.forEach((ext) => {
         extensionEval(context, ext.data);
