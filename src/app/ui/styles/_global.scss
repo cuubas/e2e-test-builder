@@ -1,0 +1,63 @@
+html,
+body {
+  height: 100vh;
+}
+
+body {
+  background: #fff;
+  margin: 0;
+  overflow: hidden;
+}
+
+app-root {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+.toolbar {
+  margin: 4px;
+  display: flex;
+  flex-direction: row;
+  flex-shrink: 0;
+  flex-wrap: wrap;
+  button {
+    flex: 1;
+    flex-basis: auto;
+    flex-shrink: 0;
+    flex-grow: 0;
+    margin: 4px;
+  }
+  .separator {
+    flex: 1;
+  }
+}
+.remove {
+  position: relative;
+  max-width: 14px;
+  display: block;
+  width: 14px;
+  height: 12px;
+  min-width: 14px;
+  color: #8e8e8e;
+  opacity: 0.5;
+  cursor: pointer;
+  &:hover {
+    opacity: 1;
+  }
+  &:before,
+  &:after {
+    position: absolute;
+    left: 6px;
+    content: ' ';
+    height: 12px;
+    width: 2px;
+    background-color: currentColor;
+  }
+  &:before {
+    transform: rotate(45deg);
+  }
+  &:after {
+    transform: rotate(-45deg);
+  }
+}
