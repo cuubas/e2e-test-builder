@@ -13,7 +13,11 @@ export class AppComponent implements OnInit {
 
   public ngOnInit(): void {
     let path = parseInt(window.localStorage.nativeClientVersion) === RequiredNativeClientVersion ? 'home' : 'install';
-    this.router.navigateByUrl(path)
+    this.router.navigateByUrl(path);
+    // register this window with background page (in case window is reloaded)
+    chrome.runtime.getBackgroundPage((page) => {
+      page.$registerUiWindow(window);
+    });
   }
 
 }

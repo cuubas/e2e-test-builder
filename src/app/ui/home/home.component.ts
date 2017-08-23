@@ -1,238 +1,265 @@
-var messenger = require('./../../common/messenger');
-var supportedFormats = require('./../../common/supported-formats');
-var ioproxy = require('./../../common/ioproxy');
-var runnerStates = require('../../common/runner-states');
-var defaultRunnerOptions = require('../../common/runner-options');
+import { Component, OnInit, OnDestroy, ViewEncapsulation, NgZone } from '@angular/core';
+import { Title } from '@angular/platform-browser';
+import IoProxy from 'app/common/ioproxy';
+import * as messenger from './../../common/messenger';
+import * as supportedFormats from './../../common/supported-formats';
+import * as runnerStates from '../../common/runner-states';
+import * as defaultRunnerOptions from '../../common/runner-options';
 
-function HomeController($rootScope, $scope, $window) {
-  var $ctrl = this, file, formatter, promptMessage = "Some changes are not persisted yet, are you sure?";
-  $ctrl.testCase = {};
-  $ctrl.supportedCommands = [];
-  $ctrl.selectedIndex = 0;
-  $ctrl.supportedFormats = supportedFormats;
-  $ctrl.settings = Object.assign({}, defaultRunnerOptions, JSON.parse($window.localStorage.settings || '{}'));
+@Component({
+  selector: 'app-home',
+  templateUrl: './home.component.html',
+  styleUrls: ['./home.component.scss'],
+  encapsulation: ViewEncapsulation.None,
+})
+export class HomeComponent implements OnInit, OnDestroy {
 
-  Object.keys($ctrl.settings).forEach((key) => {
-    if ($ctrl.settings[key] === '') {
-      $ctrl.settings[key] = defaultRunnerOptions[key];
-    }
-  });
-  $ctrl.extensions = JSON.parse($window.localStorage.extensions || '[]');
-  if (!Array.isArray($ctrl.extensions)) {
-    $ctrl.extensions = [];
-  }
+  public dirty: boolean;
+  public running: boolean;
+  public isRecordingEnabled: boolean;
+  public showSettings: boolean;
+  public testCase = { items: [] };
+  public supportedCommands: any[] = [];
+  public extensions: any[];
+  public selectedIndex = 0;
+  public supportedFormats;
+  public settings;
+  private file;
+  private formatter;
+  private promptMessage = 'Some changes are not persisted yet, are you sure?'
 
-  $ctrl.$onInit = function () {
-    $ctrl.dirty = false;
-    $ctrl.running = false;
-    checkRecordingStatus();
+  public constructor(
+    private titleService: Title,
+    private ngZone: NgZone
+  ) {
+    this.supportedFormats = supportedFormats;
+    this.settings = Object.assign({}, defaultRunnerOptions, JSON.parse(window.localStorage.settings || '{}'));
 
-    messenger.bind({
-      recordingToggled: checkRecordingStatus,
-      commandStateChange: function (request, callback) {
-        if ($ctrl.running && request.index === $ctrl.testCase.items.length - 1 && (request.state === runnerStates.DONE || request.state === runnerStates.FAILED)) {
-          $ctrl.running = false;
-          $scope.$digest();
-          // digest will be triggerred in list controller
-        }
-      },
-      uiState: function (request, callback) {
-        callback({
-          settings: $ctrl.settings,
-          extensions: $ctrl.extensions
-        });
-      },
-      settings: function (request, callback) {
-        callback($ctrl.settings);
+    Object.keys(this.settings).forEach((key) => {
+      if (this.settings[key] === '') {
+        this.settings[key] = defaultRunnerOptions[key];
       }
     });
 
-    $window.addEventListener('beforeunload', handleOnBeforeUnload);
-
-    $window.addEventListener('focus', updateSupportedCommands);
-
-    if ($window.localStorage.lastPath) {
-      $ctrl.read($window.localStorage.lastPath);
-    } else {
-      $ctrl.testCase = $ctrl.newTestCase();
+    this.extensions = JSON.parse(window.localStorage.extensions || '[]');
+    if (!Array.isArray(this.extensions)) {
+      this.extensions = [];
     }
 
-    setTimeout(updateSupportedCommands, 1000);
-  };
+    // maintain context for select methods
+    this.checkRecordingStatus = this.checkRecordingStatus.bind(this);
+    this.handleOnBeforeUnload = this.handleOnBeforeUnload.bind(this);
+    this.updateSupportedCommands = this.updateSupportedCommands.bind(this);
+  }
 
-  $ctrl.$onDestroy = function () {
-    $window.removeEventListener('beforeunload', handleOnBeforeUnload);
-  };
+  public ngOnInit() {
 
-  $ctrl.toggleRecording = function () {
+    this.dirty = false;
+    this.running = false;
+    this.checkRecordingStatus();
+
+    messenger.bind({
+      recordingToggled: this.checkRecordingStatus,
+      commandStateChange: (request, callback) => {
+        this.ngZone.run(() => {
+          if (this.running && request.index === this.testCase.items.length - 1 && (request.state === runnerStates.DONE || request.state === runnerStates.FAILED)) {
+            this.running = false;
+          }
+        });
+      },
+      uiState: (request, callback) => {
+        callback({
+          settings: this.settings,
+          extensions: this.extensions
+        });
+      },
+      settings: (request, callback) => {
+        callback(this.settings);
+      }
+    });
+
+    window.addEventListener('beforeunload', this.handleOnBeforeUnload);
+
+    window.addEventListener('focus', this.updateSupportedCommands);
+
+    if (window.localStorage.lastPath) {
+      this.read(window.localStorage.lastPath);
+    } else {
+      this.testCase = this.newTestCase();
+    }
+
+    setTimeout(this.updateSupportedCommands, 1000);
+  }
+
+  ngOnDestroy(): void {
+    window.removeEventListener('beforeunload', this.handleOnBeforeUnload);
+  }
+
+  toggleRecording(): void {
     messenger.send({ call: 'toggleRecording' });
   };
 
-  $ctrl.newTestCase = function () {
-    var res = {};
+  newTestCase() {
+    var res = {} as any;
     res.baseUrl = '/';
     res.title = 'test case';
     res.items = [{ type: 'command' }];
     return res;
   }
 
-  $ctrl.create = function (ev, format) {
-    if ($ctrl.dirty && !confirm(promptMessage)) {
+  create(ev, format) {
+    if (this.dirty && !confirm(this.promptMessage)) {
       return;
     }
-    $ctrl.testCase = $ctrl.newTestCase();
-    $ctrl.save(null, true, format || $ctrl.supportedFormats[0]);
+    this.testCase = this.newTestCase();
+    this.save(null, true, format || this.supportedFormats[0]);
   };
 
-  $ctrl.read = function (path) {
-    ioproxy.read(path)
-      .then(processFile)
-      .catch(handleError);
+  read(path) {
+    IoProxy.read(path)
+      .then(this.processFile.bind(this))
+      .catch(this.handleError);
   };
 
-  $ctrl.open = function () {
-    ioproxy.open($window.localStorage.lastPath)
-      .then(processFile)
-      .catch(handleError);
+  open() {
+    IoProxy.open(window.localStorage.lastPath)
+      .then(this.processFile.bind(this))
+      .catch(this.handleError);
   };
 
-  $ctrl.reset = function () {
-    $ctrl.testCase.items.forEach((item) => {
+  reset() {
+    this.testCase.items.forEach((item) => {
       item.state = undefined;
       item.message = undefined;
     });
   };
 
-  $ctrl.run = function () {
-    $ctrl.reset();
-    $ctrl.running = true;
-    chrome.tabs.sendMessage($window.currentTabId, { call: 'execute', commands: $ctrl.testCase.items, index: $ctrl.selectedIndex, count: $ctrl.testCase.items.length, options: $ctrl.settings });
+  run() {
+    this.reset();
+    this.running = true;
+    chrome.tabs.sendMessage(window.currentTabId, { call: 'execute', commands: this.testCase.items, index: this.selectedIndex, count: this.testCase.items.length, options: this.settings });
   };
 
-  $ctrl.interruptRunner = function () {
-    chrome.tabs.sendMessage($window.currentTabId, { call: 'interruptRunner' });
-    $ctrl.running = false;
+  interruptRunner() {
+    chrome.tabs.sendMessage(window.currentTabId, { call: 'interruptRunner' });
+    this.running = false;
   };
 
-  $ctrl.toggleSettings = function (value) {
-    $ctrl.showSettings = value;
+  toggleSettings(value) {
+    this.showSettings = value;
     if (!value) {
-      $window.localStorage.settings = JSON.stringify($ctrl.settings);
+      window.localStorage.settings = JSON.stringify(this.settings);
     }
   };
 
-  $ctrl.onChange = function () {
-    $ctrl.dirty = true;
-    if ($ctrl.testCase.items.length === 0) {
-      $ctrl.testCase.items.push({ type: 'command' });
+  onChange() {
+    this.dirty = true;
+    if (this.testCase.items.length === 0) {
+      this.testCase.items.push({ type: 'command' });
     }
-    if ($ctrl.selectedIndex >= $ctrl.testCase.items.length) {
-      $ctrl.selectedIndex = $ctrl.testCase.items.length - 1;
+    if (this.selectedIndex >= this.testCase.items.length) {
+      this.selectedIndex = this.testCase.items.length - 1;
     }
-    updateTitle();
+    this.updateTitle();
   };
 
-  $ctrl.onSelect = function (index) {
-    $ctrl.selectedIndex = index;
+  onSelect(index) {
+    this.selectedIndex = index;
   };
 
-  $ctrl.save = function (ev, saveAs, format) {
+  save(ev, saveAs, format) {
     if (format) {
-      formatter = format;
+      this.formatter = format;
     }
-    if (!formatter) {
-      formatter = supportedFormats[0];
+    if (!this.formatter) {
+      this.formatter = supportedFormats[0];
     }
-    $ctrl.reset(); // reset uii state before saving
-    ioproxy.write(!saveAs && file ? file.path : undefined, formatter.stringify($ctrl.testCase), replaceExtension($window.localStorage.lastPath || '', formatter.extension))
+    this.reset(); // reset uii state before saving
+    IoProxy.write(!saveAs && this.file ? this.file.path : undefined, this.formatter.stringify(this.testCase), this.replaceExtension(window.localStorage.lastPath || '', this.formatter.extension))
       .then((response) => {
-        file = response;
-        if (response.path) {
-          $window.localStorage.lastPath = response.path;
-          $ctrl.dirty = false;
-          updateTitle();
-          $scope.$apply();
-        }
+        this.ngZone.run(() => {
+          this.file = response;
+          if (response.path) {
+            window.localStorage.lastPath = response.path;
+            this.dirty = false;
+            this.updateTitle();
+          }
+        });
       })
-      .catch(handleError);
+      .catch(this.handleError);
   };
 
-  $ctrl.$onInit();
-
-  function updateTitle() {
-    $rootScope.pageTitle = file.path + ($ctrl.dirty ? ' *' : '');
+  updateTitle() {
+    this.titleService.setTitle(this.file.path + (this.dirty ? ' *' : ''));
   }
 
-  function processFile(_file) {
-    file = _file;
-    if (file.path) {
-      $window.localStorage.lastPath = file.path;
-      updateTitle();
-    }
-    formatter = supportedFormats.filter((f) => f.test(file.path))[0];
-    if (formatter) {
-      $ctrl.testCase = formatter.parse(file.data);
-      if (!$ctrl.testCase.items.length) {
-        $ctrl.testCase.items.push({ type: 'command' });
+  processFile(_file) {
+    this.ngZone.run(() => {
+      this.file = _file;
+      if (this.file.path) {
+        window.localStorage.lastPath = this.file.path;
+        this.updateTitle();
       }
-      $scope.$apply();
-    } else {
-      throw new Error('unsupported file format');
-    }
+      this.formatter = supportedFormats.filter((f: any) => f.test(this.file.path))[0];
+      if (this.formatter) {
+        this.testCase = this.formatter.parse(this.file.data);
+        if (!this.testCase.items.length) {
+          this.testCase.items.push({ type: 'command' });
+        }
+      } else {
+        throw new Error('unsupported file format');
+      }
+    });
   };
 
-  function checkRecordingStatus() {
+  checkRecordingStatus() {
     // get initial state
-    messenger.send({ call: 'isRecordingEnabled' }, function (value) {
-      $ctrl.isRecordingEnabled = value;
-      $scope.$digest();
+    messenger.send({ call: 'isRecordingEnabled' }, (value) => {
+      this.ngZone.run(() => {
+        this.isRecordingEnabled = value;
+      });
     });
   }
 
-  function replaceExtension(path, extension) {
+  replaceExtension(path, extension) {
     if (!path) {
       path = 'test-case.ext';
     }
     return path.replace(/([^/\/])\.(.*)$/, '$1' + extension);
   }
 
-  function handleError(error) {
+  handleError(error) {
     alert(error);
   }
 
-  function handleOnBeforeUnload(ev) {
-    if ($ctrl.dirty) {
-      ev.returnValue = promptMessage;
+  handleOnBeforeUnload(ev) {
+    if (this.dirty) {
+      ev.returnValue = this.promptMessage;
     }
   }
 
-  function updateSupportedCommands() {
-    if (!$window.currentTabId) {
+  updateSupportedCommands() {
+    if (!window.currentTabId) {
       return;
     }
-    chrome.tabs.sendMessage($window.currentTabId, { call: 'supportedCommands', count: $ctrl.supportedCommands.length }, (list) => {
+    chrome.tabs.sendMessage(window.currentTabId, { call: 'supportedCommands', count: this.supportedCommands.length }, (list) => {
       if (list && list.noChange) {
         return;
       }
-      $ctrl.supportedCommands = list || [];
-      $ctrl.supportedCommands.sort((a, b) => {
-        if (a.value < b.value) {
-          return -1;
-        }
+      this.ngZone.run(() => {
+        this.supportedCommands = list || [];
+        this.supportedCommands.sort((a, b) => {
+          if (a.value < b.value) {
+            return -1;
+          }
 
-        if (a.value > b.value) {
-          return 1;
-        }
+          if (a.value > b.value) {
+            return 1;
+          }
 
-        return 0;
+          return 0;
+        });
       });
-
-      $scope.$apply();
     });
   };
-
-}
-
-module.exports = function (module) {
-  module.controller('HomeController', HomeController);
 }

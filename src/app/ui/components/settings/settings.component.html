@@ -3,13 +3,13 @@
   <div>
     <label>
       <span>Title</span>
-      <input type="text" ng-model="$ctrl.testCase.title" />
+      <input type="text" [(ngModel)]="testCase.title" />
     </label>
   </div>
   <div>
     <label>
       <span>Base Url</span>
-      <input type="text" ng-model="$ctrl.testCase.baseUrl" />
+      <input type="text" [(ngModel)]="testCase.baseUrl" />
     </label>
   </div>
 </div>
@@ -18,13 +18,13 @@
   <div>
     <label>
       <span>Interval (ms)</span>
-      <input type="number" ng-model="$ctrl.settings.interval" title="wait time between commands" />
+      <input type="number" [(ngModel)]="settings.interval" title="wait time between commands" />
     </label>
   </div>
   <div>
     <label>
       <span>Custom attribute</span>
-      <input type="text" ng-model="$ctrl.settings.customAttribute" />
+      <input type="text" [(ngModel)]="settings.customAttribute" />
     </label>
   </div>
 </div>
@@ -33,24 +33,24 @@
   <div>
     <label>
       <span>List of types (space or comma separated)</span>
-      <input type="text" ng-model="$ctrl.settings.locators" />
+      <input type="text" [(ngModel)]="settings.locators" />
     </label>
   </div>
 </div>
 <div class="row">
   <h2 class="col">Extensions</h2>
   <div class="col actions">
-    <a ng-click="$ctrl.reloadExtensions()" ng-if="$ctrl.extensions.length" class="halflings" ng-class="{'halflings-refresh':!$ctrl.reloadingExtensions, 'halflings-time': $ctrl.reloadingExtensions}"
+    <a ng-click="reloadExtensions()" *ngIf="extensions.length" class="halflings" [ngClass]="{'halflings-refresh':!reloadingExtensions, 'halflings-time': reloadingExtensions}"
       title="reload extensions from disk"></a>
-    <a ng-click="$ctrl.addExtension()" class="halflings halflings-plus" title="add extension"></a>
+    <a ng-click="addExtension()" class="halflings halflings-plus" title="add extension"></a>
   </div>
 </div>
 <div class="extensions">
-  <ul sv-root sv-on-sort="$ctrl.saveExtensions()" sv-part="$ctrl.extensions">
-    <li ng-repeat="ext in $ctrl.extensions track by $index" class="row" sv-element>
-      <div class="col">{{::ext.path}}</div>
-      <a class="col remove" ng-click="$ctrl.removeExtension($event, ext)"></a>
+  <ul sv-root sv-on-sort="saveExtensions()" sv-part="extensions">
+    <li *ngFor="let ext of extensions" class="row" sv-element>
+      <div class="col">{{ext.path}}</div>
+      <a class="col remove" ng-click="removeExtension($event, ext)"></a>
     </li>
   </ul>
-  <p ng-if="!$ctrl.extensions.length">Click the plus button above to add an extension</p>
+  <p *ngIf="!extensions.length">Click the plus button above to add an extension</p>
 </div>

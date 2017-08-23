@@ -1,7 +1,7 @@
 import { Component, Input, OnInit, ViewEncapsulation } from '@angular/core';
-import { RequiredNativeClientVersion } from './../config';
+import { RequiredNativeClientVersion } from '../config';
 import { Router } from "@angular/router";
-import IoProxy from './../../common/ioproxy';
+import IoProxy from 'app/common/ioproxy';
 
 @Component({
   selector: 'app-install',
@@ -11,17 +11,18 @@ import IoProxy from './../../common/ioproxy';
 })
 export class InstallComponent implements OnInit {
   public hostLink: string;
+  public executable: string;
   public nativeClientVersion: number;
 
   constructor(private router: Router) { }
 
   public ngOnInit() {
     let name = 'host.zip';
-    let executable = 'register.sh';
+    this.executable = 'register.sh';
 
     if (window.navigator.platform === 'Win32') {
       name = 'host-win.zip';
-      executable = 'register.bat';
+      this.executable = 'register.bat';
     }
     this.nativeClientVersion = window.localStorage.nativeClientVersion;
     this.hostLink = 'https://github.com/Cuubas/e2e-test-builder/releases/download/v1.0.0/' + name;

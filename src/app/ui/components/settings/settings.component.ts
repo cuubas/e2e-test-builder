@@ -1,68 +1,73 @@
 var ioproxy = require('../../../common/ioproxy');
 
-function SettingsController($scope, $window, $element) {
-  var $ctrl = this;
+import { Component, OnInit, ViewEncapsulation, Input } from '@angular/core';
 
-  $ctrl.$onInit = function () {
+@Component({
+  selector: 'app-settings',
+  templateUrl: './settings.component.html',
+  styleUrls: ['./settings.component.scss'],
+  encapsulation: ViewEncapsulation.None
+})
+export class SettingsComponent implements OnInit {
+  @Input() public extensions: {}[];
+  @Input() public testCase;
+  @Input() public settings;
 
-  };
+  public reloadingExtensions: boolean;
+  constructor() { }
 
-  $ctrl.addExtension = function (ev) {
-    ioproxy.open($window.localStorage.lastPath)
+  ngOnInit() {
+
+  }
+  addExtension(ev) {
+    ioproxy.open(window.localStorage.lastPath)
       .then((file) => {
         if (/\.js$/.test(file.path)) {
-          $ctrl.extensions.push(file);
-          $scope.$apply();
-          $ctrl.saveExtensions();
+          this.extensions.push(file);
+          this.saveExtensions();
         } else {
-          handleError("Please select javascript file");
+          this.handleError("Please select javascript file");
         }
       })
-      .catch(handleError);
+      .catch(this.handleError);
   };
 
-  $ctrl.removeExtension = function (ev, ext) {
-    var index = $ctrl.extensions.indexOf(ext);
+  removeExtension(ev, ext) {
+    var index = this.extensions.indexOf(ext);
     if (index >= 0) {
-      $ctrl.extensions.splice(index, 1);
-      $ctrl.saveExtensions();
+      this.extensions.splice(index, 1);
+      this.saveExtensions();
     }
   };
 
-  $ctrl.reloadExtensions = function () {
-    $ctrl.reloadingExtensions = true;
+  reloadExtensions() {
+    this.reloadingExtensions = true;
     var index = 0;
     var step = function () {
-      if (index >= $ctrl.extensions.length) {
-        $ctrl.saveExtensions();
-        $ctrl.reloadingExtensions = false;
-        $scope.$apply();
+      if (index >= this.extensions.length) {
+        this.saveExtensions();
+        this.reloadingExtensions = false;
         return;
       }
-      ioproxy.read($ctrl.extensions[index].path)
+      ioproxy.read(this.extensions[index].path)
         .then((file) => {
-          $ctrl.extensions[index] = file;
+          this.extensions[index] = file;
           index++;
           step();
         })
         .catch((error) => {
-          $ctrl.reloadingExtensions = false;
-          $scope.$apply();
-          handleError(error);
+          this.reloadingExtensions = false;
+          this.handleError(error);
         });
     };
     step();
   };
 
-  $ctrl.saveExtensions = function () {
-    $window.localStorage.extensions = JSON.stringify($ctrl.extensions);
+  saveExtensions() {
+    window.localStorage.extensions = JSON.stringify(this.extensions);
   };
 
-  function handleError(error) {
+  handleError(error) {
     alert(error);
   }
-}
-
-module.exports = function (module) {
-  module.controller('SettingsController', SettingsController);
 }

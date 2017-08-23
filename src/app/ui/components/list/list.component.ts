@@ -1,89 +1,109 @@
-var messenger = require('./../../../common/messenger');
-var elementHelper = require('./../../../common/element-helper');
-var positiveColor = '#c2f6c8';
-var negativeColor = '#ffd3d3';
+import { Component, OnInit, ViewEncapsulation, Input, Output, EventEmitter, ElementRef, NgZone } from '@angular/core';
+import * as STATES from 'app/common/runner-states';
+import * as messenger from 'app/common/messenger';
+import * as elementHelper from 'app/common/element-helper';
 
-function ListController($scope, $window, $element) {
-  var $ctrl = this;
-  $ctrl.STATES = require('../../../common/runner-states');
+const positiveColor = '#c2f6c8';
+const negativeColor = '#ffd3d3';
 
-  $ctrl.$onInit = function () {
+@Component({
+  selector: 'app-list',
+  templateUrl: './list.component.html',
+  styleUrls: ['./list.component.scss'],
+  encapsulation: ViewEncapsulation.None
+})
+export class ListComponent implements OnInit {
+  @Input() public items: any[];
+  @Input() public selectedIndex: number;
+  @Input() public recording: boolean;
+  @Input() public settings: any;
+  @Output() onChange = new EventEmitter();
+  @Output() onSelect = new EventEmitter();
+
+  public STATES;
+
+  constructor(
+    private element: ElementRef,
+    private ngZone: NgZone
+  ) {
+    this.STATES = STATES;
+  }
+
+  ngOnInit() {
     messenger.bind({
-      recordCommand: function (request, callback) {
-        $scope.$apply(() => {
+      recordCommand: (request, callback) => {
+        this.ngZone.run(() => {
           var indexOffset = request.indexOffset || 0;
-          $ctrl.items.splice($ctrl.selectedIndex + 1 + indexOffset, 0, { command: request.command, locator: request.locator, value: request.value, type: 'command' });
-          $ctrl.notifySelect($ctrl.selectedIndex + 1);
-          $ctrl.onChange();
+          this.items.splice(this.selectedIndex + 1 + indexOffset, 0, { command: request.command, locator: request.locator, value: request.value, type: 'command' });
+          this.notifySelect(this.selectedIndex + 1);
+          this.onChange.emit();
         });
       },
-      commandStateChange: function (request, callback) {
-        $scope.$apply(() => {
-          $ctrl.items[request.index].state = request.state;
+      commandStateChange: (request, callback) => {
+        this.ngZone.run(() => {
+          this.items[request.index].state = request.state;
           if (request.message) {
-            $ctrl.items[request.index].message = request.message;
+            this.items[request.index].message = request.message;
           }
         });
       },
-      elementSelected: function (request) {
-        $scope.$apply(() => {
-          $ctrl.items[request.index].locator = request.locator;
+      elementSelected: (request) => {
+        this.ngZone.run(() => {
+          this.items[request.index].locator = request.locator;
         });
       }
     });
 
   };
 
-  $ctrl.notifySelect = function (index) {
-    $ctrl.onSelect({ index: index });
+  notifySelect(index) {
+    this.onSelect.emit({ index: index });
   };
 
-  $ctrl.highlight = function (ev, item) {
-    chrome.tabs.sendMessage($window.currentTabId, { call: 'highlight', locator: item.locator }, function (highlighted) {
+  highlight(ev, item) {
+    chrome.tabs.sendMessage(window.currentTabId, { call: 'highlight', locator: item.locator }, function (highlighted) {
       elementHelper.highlight(ev.target.parentNode, highlighted ? positiveColor : negativeColor);
     });
   };
 
-  $ctrl.execute = function (ev, item) {
+  execute(ev, item) {
     ev.target.blur();
     item.message = undefined;
     item.state = undefined;
-    chrome.tabs.sendMessage($window.currentTabId, { call: 'execute', commands: $ctrl.items, index: $ctrl.items.indexOf(item), count: 1, options: $ctrl.settings });
+    chrome.tabs.sendMessage(window.currentTabId, { call: 'execute', commands: this.items, index: this.items.indexOf(item), count: 1, options: this.settings });
   };
 
-  $ctrl.selectElement = function (ev, item) {
+  selectElement(ev, item) {
     if (item.selecting) {
       delete item.selecting;
-      chrome.tabs.sendMessage($window.currentTabId, { call: 'cancelSelect' });
+      chrome.tabs.sendMessage(window.currentTabId, { call: 'cancelSelect' });
       return;
     }
-    $ctrl.items.forEach(function (item) {
+    this.items.forEach(function (item) {
       delete item.selecting;
     });
     item.selecting = true;
-    chrome.tabs.sendMessage($window.currentTabId, { call: 'select', locator: item.locator, index: $ctrl.items.indexOf(item) });
+    chrome.tabs.sendMessage(window.currentTabId, { call: 'select', locator: item.locator, index: this.items.indexOf(item) });
   };
 
-  $ctrl.onSort = function (indexFrom, indexTo) {
-    $ctrl.notifySelect(indexTo);
-    $ctrl.onChange();
+  onSort(indexFrom, indexTo) {
+    this.notifySelect(indexTo);
+    this.onChange.emit();
   };
 
-  $ctrl.add = function (type, index) {
-    $ctrl.items.splice(index, 0, { type: type });
+  add(type, index) {
+    this.items.splice(index, 0, { type: type });
 
     // give new input field focus
-    $scope.$$postDigest(() => {
-      $element[0].querySelector('.item-wrapper:nth-child(' + (index + 1) + ') .focus input').focus();
-    });
+    this.element.nativeElement.querySelector('.item-wrapper:nth-child(' + (index + 1) + ') .focus input').focus();
   };
 
-  $ctrl.remove = function (ev, item) {
-    $ctrl.items.splice($ctrl.items.indexOf(item), 1);
-    $ctrl.onChange();
+  remove(ev, item) {
+    this.items.splice(this.items.indexOf(item), 1);
+    this.onChange.emit();
   };
-}
 
-module.exports = function (module) {
-  module.controller('ListController', ListController);
+  trackByIndex(index: number, obj: any): any {
+    return index;
+  }
 }
