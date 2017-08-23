@@ -8,6 +8,7 @@
   "path": "com-cuubas-ioproxy.bat",
   "type": "stdio",
   "allowed_origins": [
-    "chrome-extension://pamfkepooglpdkepmlopejpmcpggaobo/"
+    "chrome-extension://pamfkepooglpdkepmlopejpmcpggaobo/",
+    "chrome-extension://nnkpleefbianffpaollhabneagoicgjh/"
   ]
 }
