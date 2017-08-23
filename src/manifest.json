@@ -8,13 +8,13 @@
   },
   "icons": "{{icons}}",
   "background": {
-    "scripts": ["background.js"]
+    "scripts": ["background/inline.bundle.js", "background/main.bundle.js"]
   },
   "content_scripts": [
     {
       "matches": ["http://*/*", "https://*/*"],
       "run_at": "document_start",
-      "js": ["content.js"],
+      "js": ["content/inline.bundle.js", "content/main.bundle.js"],
       "all_frames()": true
     }
   ],

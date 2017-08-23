@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { run } from './background.main';
 
 @Injectable()
 export class BackgroundService {
@@ -6,7 +7,7 @@ export class BackgroundService {
   constructor() { }
 
   public init(): void {
-    console.info('background init');
+    run();
   }
 
 }

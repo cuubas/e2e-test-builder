@@ -9,8 +9,7 @@ import { ContentService } from './content.service';
   ],
   declarations: [],
   providers: [
-    ContentService,
-    { provide: Window, useValue: window }
+    ContentService
   ]
 })
 export class ContentModule {
