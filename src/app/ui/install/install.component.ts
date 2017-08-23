@@ -1,36 +1,43 @@
-var ioproxy = require('./../../common/ioproxy');
+import { Component, Input, OnInit, ViewEncapsulation } from '@angular/core';
+import { RequiredNativeClientVersion } from './../config';
+import { Router } from "@angular/router";
+import IoProxy from './../../common/ioproxy';
 
-function InstallController($window, $scope, RequiredNativeClientVersion, $location) {
-  var $ctrl = this;
+@Component({
+  selector: 'app-install',
+  templateUrl: './install.component.html',
+  styleUrls: ['./install.component.scss'],
+  encapsulation: ViewEncapsulation.None
+})
+export class InstallComponent implements OnInit {
+  public hostLink: string;
+  public nativeClientVersion: number;
 
-  var name = 'host.zip';
+  constructor(private router: Router) { }
 
-  $ctrl.executable = 'register.sh';
+  public ngOnInit() {
+    let name = 'host.zip';
+    let executable = 'register.sh';
 
-  if ($window.navigator.platform === 'Win32') {
-    name = 'host-win.zip';
-    $ctrl.executable = 'register.bat';
+    if (window.navigator.platform === 'Win32') {
+      name = 'host-win.zip';
+      executable = 'register.bat';
+    }
+    this.nativeClientVersion = window.localStorage.nativeClientVersion;
+    this.hostLink = 'https://github.com/Cuubas/e2e-test-builder/releases/download/v1.0.0/' + name;
   }
-  $ctrl.nativeClientVersion = $window.localStorage.nativeClientVersion;
-  $ctrl.hostLink = 'https://github.com/Cuubas/e2e-test-builder/releases/download/v1.0.0/' + name;
-  $ctrl.verify = verify;
 
-  function verify() {
-    ioproxy.about().then((about) => {
+  public verify(ev: Event) {
+    ev.preventDefault();
+    IoProxy.about().then((about) => {
       if (about.version === RequiredNativeClientVersion) {
-        $window.localStorage.nativeClientVersion = String(about.version);
-        $scope.$apply(() => {
-          $location.path('/home');
-        });
+        window.localStorage.nativeClientVersion = String(about.version);
+        this.router.navigateByUrl('home');
       } else {
         alert("Version " + RequiredNativeClientVersion + " is required, found version " + about.version + ".");
       }
     }).catch((error) => {
       alert(error);
-    })
+    });
   }
-}
-
-module.exports = function (module) {
-  module.controller('InstallController', InstallController);
 }
