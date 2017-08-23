@@ -1,3 +1,5 @@
+declare var chrome;
+
 function IoProxy() {
   this.packageName = 'com.cuubas.ioproxy';
 }
@@ -63,4 +65,4 @@ IoProxy.prototype.write = function (path, data, lastPath) {
   });
 };
 
-module.exports = new IoProxy();
+export default new IoProxy();

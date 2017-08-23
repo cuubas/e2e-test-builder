@@ -1,16 +1,19 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Router } from "@angular/router";
+import { RequiredNativeClientVersion } from './config';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss'],
   encapsulation: ViewEncapsulation.None
 })
 export class AppComponent implements OnInit {
 
-  constructor() { }
+  constructor(private router: Router) { }
 
-  ngOnInit() {
+  public ngOnInit(): void {
+    let path = parseInt(window.localStorage.nativeClientVersion) === RequiredNativeClientVersion ? 'home' : 'install';
+    this.router.navigateByUrl(path)
   }
 
 }
