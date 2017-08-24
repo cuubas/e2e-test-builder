@@ -1,6 +1,7 @@
 import { Component, OnInit, OnDestroy, ViewEncapsulation, NgZone } from '@angular/core';
 import { Title } from '@angular/platform-browser';
-import IoProxy from 'app/common/ioproxy';
+import { IoProxy, FileResult } from 'app/common/ioproxy';
+import { PageTitle, PageTitleSeparator} from 'app/ui/config';
 import * as messenger from './../../common/messenger';
 import * as supportedFormats from './../../common/supported-formats';
 import * as runnerStates from '../../common/runner-states';
@@ -24,13 +25,14 @@ export class HomeComponent implements OnInit, OnDestroy {
   public selectedIndex = 0;
   public supportedFormats;
   public settings;
-  private file;
+  private file: FileResult;
   private formatter;
   private promptMessage = 'Some changes are not persisted yet, are you sure?'
 
   public constructor(
     private titleService: Title,
-    private ngZone: NgZone
+    private ngZone: NgZone,
+    private ioProxy: IoProxy
   ) {
     this.supportedFormats = supportedFormats;
     this.settings = Object.assign({}, defaultRunnerOptions, JSON.parse(window.localStorage.settings || '{}'));
@@ -116,13 +118,13 @@ export class HomeComponent implements OnInit, OnDestroy {
   };
 
   read(path) {
-    IoProxy.read(path)
+    this.ioProxy.read(path)
       .then(this.processFile.bind(this))
       .catch(this.handleError);
   };
 
   open() {
-    IoProxy.open(window.localStorage.lastPath)
+    this.ioProxy.open(window.localStorage.lastPath)
       .then(this.processFile.bind(this))
       .catch(this.handleError);
   };
@@ -175,41 +177,37 @@ export class HomeComponent implements OnInit, OnDestroy {
       this.formatter = supportedFormats[0];
     }
     this.reset(); // reset uii state before saving
-    IoProxy.write(!saveAs && this.file ? this.file.path : undefined, this.formatter.stringify(this.testCase), this.replaceExtension(window.localStorage.lastPath || '', this.formatter.extension))
+    this.ioProxy.write(!saveAs && this.file ? this.file.path : undefined, this.formatter.stringify(this.testCase), this.replaceExtension(window.localStorage.lastPath || '', this.formatter.extension))
       .then((response) => {
-        this.ngZone.run(() => {
-          this.file = response;
-          if (response.path) {
-            window.localStorage.lastPath = response.path;
-            this.dirty = false;
-            this.updateTitle();
-          }
-        });
+        this.file = response;
+        if (response.path) {
+          window.localStorage.lastPath = response.path;
+          this.dirty = false;
+          this.updateTitle();
+        }
       })
       .catch(this.handleError);
   };
 
   updateTitle() {
-    this.titleService.setTitle(this.file.path + (this.dirty ? ' *' : ''));
+    this.titleService.setTitle(PageTitle + PageTitleSeparator +this.file.path + (this.dirty ? ' *' : ''));
   }
 
-  processFile(_file) {
-    this.ngZone.run(() => {
-      this.file = _file;
-      if (this.file.path) {
-        window.localStorage.lastPath = this.file.path;
-        this.updateTitle();
+  processFile(_file: FileResult) {
+    this.file = _file;
+    if (this.file.path) {
+      window.localStorage.lastPath = this.file.path;
+      this.updateTitle();
+    }
+    this.formatter = supportedFormats.filter((f: any) => f.test(this.file.path))[0];
+    if (this.formatter) {
+      this.testCase = this.formatter.parse(this.file.data);
+      if (!this.testCase.items.length) {
+        this.testCase.items.push({ type: 'command' });
       }
-      this.formatter = supportedFormats.filter((f: any) => f.test(this.file.path))[0];
-      if (this.formatter) {
-        this.testCase = this.formatter.parse(this.file.data);
-        if (!this.testCase.items.length) {
-          this.testCase.items.push({ type: 'command' });
-        }
-      } else {
-        throw new Error('unsupported file format');
-      }
-    });
+    } else {
+      throw new Error('unsupported file format');
+    }
   };
 
   checkRecordingStatus() {

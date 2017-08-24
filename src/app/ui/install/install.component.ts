@@ -1,7 +1,7 @@
 import { Component, Input, OnInit, ViewEncapsulation } from '@angular/core';
 import { RequiredNativeClientVersion } from '../config';
 import { Router } from "@angular/router";
-import IoProxy from 'app/common/ioproxy';
+import { IoProxy } from 'app/common/ioproxy';
 
 @Component({
   selector: 'app-install',
@@ -14,7 +14,10 @@ export class InstallComponent implements OnInit {
   public executable: string;
   public nativeClientVersion: number;
 
-  constructor(private router: Router) { }
+  constructor(
+    private router: Router,
+    private ioProxy: IoProxy
+  ) { }
 
   public ngOnInit() {
     let name = 'host.zip';
@@ -30,7 +33,7 @@ export class InstallComponent implements OnInit {
 
   public verify(ev: Event) {
     ev.preventDefault();
-    IoProxy.about().then((about) => {
+    this.ioProxy.about().then((about) => {
       if (about.version === RequiredNativeClientVersion) {
         window.localStorage.nativeClientVersion = String(about.version);
         this.router.navigateByUrl('home');

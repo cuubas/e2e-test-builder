@@ -1,68 +1,81 @@
-declare var chrome;
+import { Injectable, NgZone } from '@angular/core';
 
-function IoProxy() {
-  this.packageName = 'com.cuubas.ioproxy';
-}
+@Injectable()
+export class IoProxy {
+  private packageName = 'com.cuubas.ioproxy';
 
-function genericCallback(resolve, reject, response) {
-  if (response && response.code > 0) {
-    resolve(response);
-  } else {
-    if (response && response.stacktrace) {
-      console.warn(response.message, response.stacktrace);
-    }
-    reject((chrome.runtime.lastError && chrome.runtime.lastError.message) || (response && response.message) || "unknown error");
+  public constructor(private ngZone: NgZone) {
+
+  }
+
+  public about(): Promise<AboutResult> {
+    return new Promise((resolve, reject) => {
+      chrome.runtime.sendNativeMessage(this.packageName,
+        {
+          op: "about"
+        },
+        this.genericCallback.bind(this, resolve, reject)
+      );
+    });
+  };
+
+  public open(lastPath): Promise<FileResult> {
+    return new Promise((resolve, reject) => {
+      chrome.runtime.sendNativeMessage(this.packageName,
+        {
+          op: "open",
+          lastPath: lastPath
+        },
+        this.genericCallback.bind(this, resolve, reject)
+      );
+    });
+  };
+
+  public read(path): Promise<FileResult> {
+    return new Promise((resolve, reject) => {
+      chrome.runtime.sendNativeMessage(this.packageName,
+        {
+          op: "read",
+          path: path
+        },
+        this.genericCallback.bind(this, resolve, reject)
+      );
+    });
+  };
+
+  public write(path, data, lastPath): Promise<FileResult> {
+    return new Promise((resolve, reject) => {
+      chrome.runtime.sendNativeMessage(this.packageName,
+        {
+          op: "write",
+          path: path,
+          data: data,
+          lastPath: lastPath
+        },
+        this.genericCallback.bind(this, resolve, reject)
+      );
+    });
+  };
+
+  private genericCallback(resolve, reject, response) {
+    this.ngZone.run(() => {
+      if (response && response.code > 0) {
+        resolve(response);
+      } else {
+        if (response && response.stacktrace) {
+          console.warn(response.message, response.stacktrace);
+        }
+        reject((chrome.runtime.lastError && chrome.runtime.lastError.message) || (response && response.message) || "unknown error");
+      }
+    });
   }
 }
 
-IoProxy.prototype.about = function () {
-  var self = this;
-  return new Promise((resolve, reject) => {
-    chrome.runtime.sendNativeMessage(this.packageName,
-      {
-        op: "about"
-      },
-      genericCallback.bind(this, resolve, reject)
-    );
-  });
-};
+export class FileResult {
+  public path: string;
+  public data: string;
+}
 
-IoProxy.prototype.open = function (lastPath) {
-  return new Promise((resolve, reject) => {
-    chrome.runtime.sendNativeMessage(this.packageName,
-      {
-        op: "open",
-        lastPath: lastPath
-      },
-      genericCallback.bind(this, resolve, reject)
-    );
-  });
-};
-
-IoProxy.prototype.read = function (path) {
-  return new Promise((resolve, reject) => {
-    chrome.runtime.sendNativeMessage(this.packageName,
-      {
-        op: "read",
-        path: path
-      },
-      genericCallback.bind(this, resolve, reject)
-    );
-  });
-};
-
-IoProxy.prototype.write = function (path, data, lastPath) {
-  return new Promise((resolve, reject) => {
-    chrome.runtime.sendNativeMessage(this.packageName,
-      {
-        op: "write",
-        path: path,
-        data: data,
-        lastPath: lastPath
-      },
-      genericCallback.bind(this, resolve, reject)
-    );
-  });
-};
-
-export default new IoProxy();
+export class AboutResult {
+  public version: number;
+}
