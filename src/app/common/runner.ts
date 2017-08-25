@@ -258,7 +258,7 @@ export class Runner {
     }
   }
 
-  public getSupportedCommands() {
+  public getSupportedCommands(): SupportedCommand[] {
     var list = [];
     // expose direct commands
     Object.keys(this.commands).forEach((cmd) => {
@@ -282,6 +282,11 @@ export class Runner {
   public createMouseEvent: (type: any, options: any) => MouseEvent;
   public fireMouseEvent: (type: any, button: any, command: any) => void;
   public propertyAccessor: (property: any, command: any) => any;
+}
+
+export interface SupportedCommand {
+  value: string;
+  title: string
 }
 
 export interface RunnableCommand {

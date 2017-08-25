@@ -44,7 +44,7 @@ export class PageProxy {
     }
   }
 
-  public static run(fn) {
+  public static run(fn, ...args) {
     if (typeof (fn) !== 'function') {
       throw new Error('type error, 1st argument must be a functon');
     }

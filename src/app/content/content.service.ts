@@ -1,164 +1,194 @@
-var PageProxy = require('../common/page-proxy').PageProxy;
-var messenger = require('../common/messenger').Messenger;
-var locators = require('../common/locators').SupportedLocators;
-var elementHelper = require('../common/element-helper');
-var runner = require('../common/runner').runner;
-var Selector = require('../common/selector').Selector;
-var safeEval = require('../common/safe-eval').safeEval;
-var uiState = { ready: false };
-var supportedCommands;
+import { Injectable, Inject } from '@angular/core';
+
+import { PageProxy } from 'app/common/page-proxy';
+import { Messenger } from 'app/common/messenger';
+import { SupportedLocators } from 'app/common/locators';
+import { find, findLocators, highlight } from 'app/common/element-helper';
+import { runner, SupportedCommand } from 'app/common/runner';
+import { IOptions, Options } from 'app/common/runner/options';
+import { Selector } from 'app/common/selector';
+import { safeEval } from 'app/common/safe-eval';
+
 // load runner extensions
-require('../common/runner/key-input');
-require('../common/runner/mouse-input');
-require('../common/runner/dialogs');
-require('../common/runner/commands');
-require('../common/runner/accessors');
-require('../common/runner/protractor');
+import 'app/common/runner/key-input';
+import 'app/common/runner/mouse-input';
+import 'app/common/runner/dialogs';
+import 'app/common/runner/commands';
+import 'app/common/runner/accessors';
+import 'app/common/runner/protractor';
 
-export function run() {
-  // init page proxy (will add another script and setup messaging)
-  PageProxy.init();
+@Injectable()
+export class ContentService {
+  private uiState: { ready: boolean, settings: IOptions } = { ready: false, settings: Options };
+  private supportedCommands: SupportedCommand[];
+  private lastEventTarget: HTMLElement;
+  private api;
+  private selector: Selector;
 
-  //content script
-  var selector;
-  var lastEventTarget = null,
-    api = {
+  constructor() {
+    this.initUiState = this.initUiState.bind(this);
+  }
+
+  public init(): void {
+    this.api = this.createAPI();
+
+    // init page proxy (will add another script and setup messaging)
+    PageProxy.init();
+
+    // record native alerts
+    this.initPrompts();
+
+    // handle recording
+    this.initRecording();
+
+    // get initial state
+    Messenger.send({ call: 'isRecordingEnabled' }, (value) => {
+      this.api.recordingEnabled = value;
+    });
+
+    // expose methods for background page and ui window to interact with content script
+    Messenger.bind(this.api);
+
+    // request initial ui state (settings and extension)
+    this.initUiState();
+  }
+
+  public createAPI() {
+    return {
       recordingEnabled: false,
-      toggleRecording: function (request, callback) {
-        this.recordingEnabled = request.value;
+      toggleRecording: (request, callback) => {
+        this.api.recordingEnabled = request.value;
       },
-      highlight: function (request, callback) {
-        var element = elementHelper.find(runner.injectVariables(request.locator), document)
+      highlight: (request, callback) => {
+        let element = find(runner.injectVariables(request.locator), document)
         if (element) {
-          elementHelper.highlight(element);
+          highlight(element);
           callback(true);
         } else {
           callback(false);
         }
       },
-      execute: function (request, callback) {
+      execute: (request, callback) => {
         runner.options = request.options;
         runner.start(request.commands, request.index, request.count, (index, state, message) => {
-          messenger.send({ call: 'commandStateChange', index: index, state: state, message: message });
+          Messenger.send({ call: 'commandStateChange', index: index, state: state, message: message });
         });
       },
-      interruptRunner: function () {
+      interruptRunner: () => {
         runner.stop();
       },
-      select: function (request) {
-        selector = new Selector(runner.injectVariables(request.locator || ''), (element) => {
-          var locators = elementHelper.locators(element, uiState.settings);
-          messenger.send({ call: 'elementSelected', locator: locators[0], locators: locators, index: request.index });
+      select: (request) => {
+        this.selector = new Selector(runner.injectVariables(request.locator || ''), (element) => {
+          let matchingLocators = findLocators(element, this.uiState.settings);
+          Messenger.send({ call: 'elementSelected', locator: matchingLocators[0], locators: matchingLocators, index: request.index });
         });
-        selector.start();
+        this.selector.start();
       },
-      cancelSelect: function () {
-        selector.stop();
-        selector = null;
+      cancelSelect: () => {
+        this.selector.stop();
+        this.selector = null;
       },
-      handleContextMenuClick: function (request, callback) {
-        var value = '';
+      handleContextMenuClick: (request, callback) => {
+        let value = '';
         if (request.accessor === 'value') {
-          value = lastEventTarget.value;
+          value = (<any>this.lastEventTarget).value;
         } else if (request.accessor === 'text') {
-          value = lastEventTarget.textContent;
+          value = this.lastEventTarget.textContent;
         }
-        var locators = elementHelper.locators(lastEventTarget, uiState.settings);
-        messenger.send({ call: 'recordCommand', command: request.command, locator: locators[0], locators: locators, value: value });
+        let matchingLocators = findLocators(this.lastEventTarget as HTMLElement, this.uiState.settings);
+        Messenger.send({ call: 'recordCommand', command: request.command, locator: matchingLocators[0], locators: matchingLocators, value: value });
       },
       supportedCommands: function (request, callback) {
-        if (!supportedCommands) {
-          supportedCommands = runner.getSupportedCommands();
+        if (!this.supportedCommands) {
+          this.supportedCommands = runner.getSupportedCommands();
         }
-        if (supportedCommands.length === request.count) {
+        if (this.supportedCommands.length === request.count) {
           callback({ noChange: true });
         } else {
-          callback(supportedCommands);
+          callback(this.supportedCommands);
         }
       },
-      uiWindowOpened: init
+      uiWindowOpened: this.initUiState
     };
+  }
 
-  // handle recording
-  document.addEventListener("mousedown", function (event) {
-    lastEventTarget = event.target;
-    // left click, is recording enabled?
-    if (event.button === 0 && api.recordingEnabled) {
-      var locators = elementHelper.locators(lastEventTarget, uiState.settings);
-      messenger.send({ call: 'recordCommand', command: "click", locator: locators[0], locators: locators });
-    }
-  }, true);
-
-  document.addEventListener("blur", function (event) {
-    if (api.recordingEnabled && (event.target.tagName === 'INPUT' || event.target.tagName === 'TEXTAREA')) {
-      var locators = elementHelper.locators(event.target, uiState.settings);
-      messenger.send({ call: 'recordCommand', command: "sendKeys", locator: locators[0], locators: locators, value: event.target.value });
-    }
-  }, true);
-  // record native alerts
-  ['alert', 'confirm', 'prompt'].forEach((fn) => {
-    // first function is executed in page context and the callback in extension
-    PageProxy.run(function (fn, callback) {
-      var orgFn = window[fn];
-      window[fn] = function (message) {
-        var res = orgFn.apply(this, arguments);
-        callback(message, res);
-        return res;
-      };
-    }, fn, function (message, res) {
-      if (!api.recordingEnabled) {
-        return;
-      }
-      if (fn === 'confirm' && !res) {
-        messenger.send({ call: 'recordCommand', command: 'chooseCancelOnNextConfirmation', locator: '', value: '' });
-      } else if (fn === 'prompt') {
-        messenger.send({ call: 'recordCommand', command: 'answerOnNextPrompt', locator: '', value: res });
-      }
-      if (fn === 'confirm') {
-        fn = 'confirmation';
-      }
-      messenger.send({ call: 'recordCommand', command: "assert" + (fn.substr(0, 1).toUpperCase() + fn.substr(1)), locator: '', value: message });
-
-    });
-  });
-
-  // get initial state
-  messenger.send({ call: 'isRecordingEnabled' }, function (value) {
-    api.recordingEnabled = value;
-  });
-
-  messenger.bind(api);
-  init();
-
-  function init() {
-    if (uiState.ready) {
+  public initUiState() {
+    if (this.uiState.ready) {
       return;
     }
     // get state from ui window initially
-    messenger.send({ call: 'uiState' }, (state) => {
+    Messenger.send({ call: 'uiState' }, (state) => {
       // value will be undefined if ui window is not open
       if (!state) {
         return;
       }
-      uiState = state;
-      uiState.ready = true;
+      this.uiState = state;
+      this.uiState.ready = true;
       // evaluate extension
       // value will be undefined if ui window is not open
       if (state.extensions) {
         // only these properties are available in extension scope
-        var context = {
+        let context = {
           window: window,
           document: document,
           runner: runner,
-          locators: locators,
+          locators: SupportedLocators,
           settings: state.settings,
           PageProxy: PageProxy
         };
-        
+
         state.extensions.forEach(function (ext) {
           safeEval(context, ext.data);
         });
       }
+    });
+  }
+
+  public initRecording() {
+
+    document.addEventListener("mousedown", (event: MouseEvent) => {
+      this.lastEventTarget = event.target as HTMLElement;
+      // left click, is recording enabled?
+      if (event.button === 0 && this.api.recordingEnabled) {
+        let matchingLocators = findLocators(this.lastEventTarget, this.uiState.settings);
+        Messenger.send({ call: 'recordCommand', command: "click", locator: matchingLocators[0], locators: matchingLocators });
+      }
+    }, true);
+
+    document.addEventListener("blur", (event: Event) => {
+      let input = event.target as HTMLInputElement;
+      if (this.api.recordingEnabled && (input.tagName === 'INPUT' || input.tagName === 'TEXTAREA')) {
+        let matchingLocators = findLocators(input, this.uiState.settings);
+        Messenger.send({ call: 'recordCommand', command: "sendKeys", locator: matchingLocators[0], locators: matchingLocators, value: input.value });
+      }
+    }, true);
+  }
+
+  public initPrompts() {
+    ['alert', 'confirm', 'prompt'].forEach((fn) => {
+      // first function is executed in page context and the callback in extension
+      PageProxy.run((fn, callback) => {
+        let orgFn = window[fn];
+        window[fn] = function (message) {
+          let res = orgFn.apply(this, arguments);
+          callback(message, res);
+          return res;
+        };
+      }, fn, (message, res) => {
+        if (!this.api.recordingEnabled) {
+          return;
+        }
+        if (fn === 'confirm' && !res) {
+          Messenger.send({ call: 'recordCommand', command: 'chooseCancelOnNextConfirmation', locator: '', value: '' });
+        } else if (fn === 'prompt') {
+          Messenger.send({ call: 'recordCommand', command: 'answerOnNextPrompt', locator: '', value: res });
+        }
+        if (fn === 'confirm') {
+          fn = 'confirmation';
+        }
+        Messenger.send({ call: 'recordCommand', command: "assert" + (fn.substr(0, 1).toUpperCase() + fn.substr(1)), locator: '', value: message });
+
+      });
     });
   }
 }

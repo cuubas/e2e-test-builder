@@ -1,6 +1,6 @@
 import { SupportedLocators } from './locators';
 
-export function findAll(locator: string, parent: HTMLElement) {
+export function findAll(locator: string, parent: HTMLElement | Document) {
   var index = locator && locator.indexOf('=');
   if (index) {
     try {
@@ -14,12 +14,12 @@ export function findAll(locator: string, parent: HTMLElement) {
   return null;
 }
 
-export function find(locator: string, parent: HTMLElement) {
+export function find(locator: string, parent: HTMLElement | Document) {
   var list = findAll(locator, parent) || [];
   return list[0];
 }
 
-export function locators(target: HTMLElement, settings) {
+export function findLocators(target: HTMLElement, settings) {
   var types = (settings.locators || '').split(/\s|,/);
   return types.map((type) => {
     if (type && SupportedLocators[type]) {
