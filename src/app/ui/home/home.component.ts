@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy, ViewEncapsulation, NgZone } from '@angular/core';
 import { Title } from '@angular/platform-browser';
 import { IoProxy, FileResult } from 'app/common/ioproxy';
-import { PageTitle, PageTitleSeparator} from 'app/ui/config';
+import { PageTitle, PageTitleSeparator } from 'app/ui/config';
 import * as messenger from './../../common/messenger';
 import * as supportedFormats from './../../common/supported-formats';
 import * as runnerStates from '../../common/runner-states';
@@ -119,14 +119,12 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   read(path) {
     this.ioProxy.read(path)
-      .then(this.processFile.bind(this))
-      .catch(this.handleError);
+      .subscribe(this.processFile.bind(this), this.handleError);
   };
 
   open() {
     this.ioProxy.open(window.localStorage.lastPath)
-      .then(this.processFile.bind(this))
-      .catch(this.handleError);
+      .subscribe(this.processFile.bind(this), this.handleError);
   };
 
   reset() {
@@ -178,19 +176,18 @@ export class HomeComponent implements OnInit, OnDestroy {
     }
     this.reset(); // reset uii state before saving
     this.ioProxy.write(!saveAs && this.file ? this.file.path : undefined, this.formatter.stringify(this.testCase), this.replaceExtension(window.localStorage.lastPath || '', this.formatter.extension))
-      .then((response) => {
+      .subscribe((response) => {
         this.file = response;
         if (response.path) {
           window.localStorage.lastPath = response.path;
           this.dirty = false;
           this.updateTitle();
         }
-      })
-      .catch(this.handleError);
+      }, this.handleError);
   };
 
   updateTitle() {
-    this.titleService.setTitle(PageTitle + PageTitleSeparator +this.file.path + (this.dirty ? ' *' : ''));
+    this.titleService.setTitle(PageTitle + PageTitleSeparator + this.file.path + (this.dirty ? ' *' : ''));
   }
 
   processFile(_file: FileResult) {

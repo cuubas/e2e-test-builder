@@ -1,4 +1,5 @@
 import { Injectable, NgZone } from '@angular/core';
+import { Observable, Observer } from 'rxjs';
 
 @Injectable()
 export class IoProxy {
@@ -8,43 +9,43 @@ export class IoProxy {
 
   }
 
-  public about(): Promise<AboutResult> {
-    return new Promise((resolve, reject) => {
+  public about(): Observable<AboutResult> {
+    return Observable.create((observer: Observer<AboutResult>) => {
       chrome.runtime.sendNativeMessage(this.packageName,
         {
           op: "about"
         },
-        this.genericCallback.bind(this, resolve, reject)
+        this.genericCallback.bind(this, observer)
       );
     });
   };
 
-  public open(lastPath): Promise<FileResult> {
-    return new Promise((resolve, reject) => {
+  public open(lastPath): Observable<FileResult> {
+    return Observable.create((observer: Observer<FileResult>) => {
       chrome.runtime.sendNativeMessage(this.packageName,
         {
           op: "open",
           lastPath: lastPath
         },
-        this.genericCallback.bind(this, resolve, reject)
+        this.genericCallback.bind(this, observer)
       );
     });
   };
 
-  public read(path): Promise<FileResult> {
-    return new Promise((resolve, reject) => {
+  public read(path): Observable<FileResult> {
+    return Observable.create((observer: Observer<FileResult>) => {
       chrome.runtime.sendNativeMessage(this.packageName,
         {
           op: "read",
           path: path
         },
-        this.genericCallback.bind(this, resolve, reject)
+        this.genericCallback.bind(this, observer)
       );
     });
   };
 
-  public write(path, data, lastPath): Promise<FileResult> {
-    return new Promise((resolve, reject) => {
+  public write(path, data, lastPath): Observable<FileResult> {
+    return Observable.create((observer: Observer<FileResult>) => {
       chrome.runtime.sendNativeMessage(this.packageName,
         {
           op: "write",
@@ -52,20 +53,21 @@ export class IoProxy {
           data: data,
           lastPath: lastPath
         },
-        this.genericCallback.bind(this, resolve, reject)
+        this.genericCallback.bind(this, observer)
       );
     });
   };
 
-  private genericCallback(resolve, reject, response) {
+  private genericCallback(observer: Observer<any>, response) {
     this.ngZone.run(() => {
       if (response && response.code > 0) {
-        resolve(response);
+        observer.next(response);
+        observer.complete();
       } else {
         if (response && response.stacktrace) {
           console.warn(response.message, response.stacktrace);
         }
-        reject((chrome.runtime.lastError && chrome.runtime.lastError.message) || (response && response.message) || "unknown error");
+        observer.error((chrome.runtime.lastError && chrome.runtime.lastError.message) || (response && response.message) || "unknown error");
       }
     });
   }

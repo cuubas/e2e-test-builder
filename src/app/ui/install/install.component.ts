@@ -33,14 +33,14 @@ export class InstallComponent implements OnInit {
 
   public verify(ev: Event) {
     ev.preventDefault();
-    this.ioProxy.about().then((about) => {
+    this.ioProxy.about().subscribe((about) => {
       if (about.version === RequiredNativeClientVersion) {
         window.localStorage.nativeClientVersion = String(about.version);
         this.router.navigateByUrl('home');
       } else {
         alert("Version " + RequiredNativeClientVersion + " is required, found version " + about.version + ".");
       }
-    }).catch((error) => {
+    }, (error) => {
       alert(error);
     });
   }
