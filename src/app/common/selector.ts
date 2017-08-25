@@ -1,34 +1,36 @@
-var elementHelper = require('./element-helper');
 
-function Selector() {
+import { highlight } from './element-helper';
 
-}
+export class Selector {
 
+  public constructor(
+    private locator: string,
+    private callback: (Element) => void
+  ) {
+    this.tracker = this.tracker.bind(this);
+    this.handler = this.handler.bind(this);
+  }
 
-Selector.prototype.start = function (locator, callback) {
-  this.stop();
+  private tracker(ev: Event) {
+    highlight(ev.target as HTMLElement);
+  }
 
-  this.tracker = function (ev) {
-    elementHelper.highlight(ev.target);
-  };
-
-  this.handler = function (ev) {
+  private handler(ev) {
     ev.preventDefault();
     ev.stopPropagation();
     ev.stopImmediatePropagation();
-    callback(ev.target);
+    this.callback(ev.target);
     return false;
-  };
+  }
 
-  document.body.addEventListener('mousemove', this.tracker, true);
-  document.body.addEventListener('click', this.handler, true);
-};
+  public start() {
+    this.stop();
+    document.body.addEventListener('mousemove', this.tracker, true);
+    document.body.addEventListener('click', this.handler, true);
+  }
 
-Selector.prototype.stop = function () {
-  document.body.removeEventListener('mousemove', this.tracker, true);
-  document.body.removeEventListener('click', this.handler, true);
-  this.handler = undefined;
-  this.tracker = undefined;
-};
-
-module.exports = new Selector();
+  public stop() {
+    document.body.removeEventListener('mousemove', this.tracker, true);
+    document.body.removeEventListener('click', this.handler, true);
+  }
+}

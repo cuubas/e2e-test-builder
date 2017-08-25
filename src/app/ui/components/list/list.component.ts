@@ -1,7 +1,8 @@
 import { Component, OnInit, ViewEncapsulation, Input, Output, EventEmitter, ElementRef, NgZone } from '@angular/core';
+import { highlight } from 'app/common/element-helper';
+
 import * as STATES from 'app/common/runner-states';
 import * as messenger from 'app/common/messenger';
-import * as elementHelper from 'app/common/element-helper';
 
 const positiveColor = '#c2f6c8';
 const negativeColor = '#ffd3d3';
@@ -62,7 +63,7 @@ export class ListComponent implements OnInit {
 
   highlight(ev, item) {
     chrome.tabs.sendMessage(window.currentTabId, { call: 'highlight', locator: item.locator }, function (highlighted) {
-      elementHelper.highlight(ev.target.parentNode, highlighted ? positiveColor : negativeColor);
+      highlight(ev.target.parentNode, highlighted ? positiveColor : negativeColor);
     });
   };
 

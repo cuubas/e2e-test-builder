@@ -3,7 +3,7 @@ var messenger = require('../common/messenger');
 var locators = require('../common/locators').SupportedLocators;
 var elementHelper = require('../common/element-helper');
 var runner = require('../common/runner');
-var selector = require('../common/selector');
+var Selector = require('../common/selector').Selector;
 var extensionEval = require('../common/extension-eval');
 var uiState = { ready: false };
 var supportedCommands;
@@ -17,6 +17,7 @@ require('../common/runner/protractor');
 
 export function run() {
   //content script
+  var selector;
   var lastEventTarget = null,
     api = {
       recordingEnabled: false,
@@ -42,13 +43,15 @@ export function run() {
         runner.stop();
       },
       select: function (request) {
-        selector.start(runner.injectVariables(request.locator || ''), (element) => {
+        selector = new Selector(runner.injectVariables(request.locator || ''), (element) => {
           var locators = elementHelper.locators(element, uiState.settings);
           messenger.send({ call: 'elementSelected', locator: locators[0], locators: locators, index: request.index });
         });
+        selector.start();
       },
       cancelSelect: function () {
         selector.stop();
+        selector = null;
       },
       handleContextMenuClick: function (request, callback) {
         var value = '';

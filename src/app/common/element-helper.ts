@@ -1,19 +1,12 @@
-var locators = require("./locators").SupportedLocators;
+import { SupportedLocators } from './locators';
 
-module.exports = {
-  find: find,
-  findAll: findAll,
-  locators: findLocators,
-  highlight: highlight
-};
-
-function findAll(locator, parent) {
+export function findAll(locator: string, parent: HTMLElement) {
   var index = locator && locator.indexOf('=');
   if (index) {
     try {
       var type = locator.substr(0, index);
-      var selector = locator.substr(index + 1).replace(/(.*)@[^/\\'"><\]\[]*$/,'$1'); // remove anything after @ as it may be used to specify attribute name
-      return locators[type] && locators[type].find(selector, parent);
+      var selector = locator.substr(index + 1).replace(/(.*)@[^/\\'"><\]\[]*$/, '$1'); // remove anything after @ as it may be used to specify attribute name
+      return SupportedLocators[type] && SupportedLocators[type].find(selector, parent);
     } catch (er) {
       console.error(er);
     }
@@ -21,24 +14,24 @@ function findAll(locator, parent) {
   return null;
 }
 
-function find(locator, parent) {
+export function find(locator: string, parent: HTMLElement) {
   var list = findAll(locator, parent) || [];
   return list[0];
 }
 
-function findLocators(target, settings) {
+export function locators(target: HTMLElement, settings) {
   var types = (settings.locators || '').split(/\s|,/);
   return types.map((type) => {
-    if (type && locators[type]) {
-      return locators[type].create(target, settings);
+    if (type && SupportedLocators[type]) {
+      return SupportedLocators[type].create(target, settings);
     } else {
-      console.info('unknown locator %s, must be one of %s', type, Object.keys(locators).join(','));
+      console.info('unknown locator %s, must be one of %s', type, Object.keys(SupportedLocators).join(','));
     }
     return undefined;
   }).filter((value) => !!value);
 }
 
-function highlight(element, color) {
+export function highlight(element: HTMLElement, color?: string) {
   // ignore if element is highlighted now
   if (element.dataset._highlighted === '1') {
     return;
@@ -60,7 +53,7 @@ function highlight(element, color) {
     delete element.dataset._highlighted;
   };
 
-  element.scrollIntoViewIfNeeded();
+  (<any>element).scrollIntoViewIfNeeded(); // this is chrome specific
   element.style.transition = "background-color 0.3s ease-in";
   element.style.backgroundColor = color || '#ffe004';
 
