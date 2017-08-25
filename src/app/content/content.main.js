@@ -1,5 +1,5 @@
 var pageProxy = require('../common/page-proxy');
-var messenger = require('../common/messenger');
+var messenger = require('../common/messenger').Messenger;
 var locators = require('../common/locators').SupportedLocators;
 var elementHelper = require('../common/element-helper');
 var runner = require('../common/runner');

@@ -2,7 +2,7 @@ import { Component, OnInit, ViewEncapsulation, Input, Output, EventEmitter, Elem
 import { highlight } from 'app/common/element-helper';
 
 import * as STATES from 'app/common/runner-states';
-import * as messenger from 'app/common/messenger';
+import { Messenger } from 'app/common/messenger';
 
 const positiveColor = '#c2f6c8';
 const negativeColor = '#ffd3d3';
@@ -31,7 +31,7 @@ export class ListComponent implements OnInit {
   }
 
   ngOnInit() {
-    messenger.bind({
+    Messenger.bind({
       recordCommand: (request, callback) => {
         this.ngZone.run(() => {
           var indexOffset = request.indexOffset || 0;

@@ -3,7 +3,7 @@ import { Title } from '@angular/platform-browser';
 import { IoProxy, FileResult } from 'app/common/ioproxy';
 import { PageTitle, PageTitleSeparator } from 'app/ui/config';
 import { TestCase, TestCaseItem } from 'app/common/model';
-import * as messenger from 'app/common/messenger';
+import { Messenger } from 'app/common/messenger';
 import { BaseFormatter, SupportedFormats } from 'app/common/formats';
 import * as runnerStates from 'app/common/runner-states';
 import * as defaultRunnerOptions from 'app/common/runner-options';
@@ -60,7 +60,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.running = false;
     this.checkRecordingStatus();
 
-    messenger.bind({
+    Messenger.bind({
       recordingToggled: this.checkRecordingStatus,
       commandStateChange: (request, callback) => {
         this.ngZone.run(() => {
@@ -98,7 +98,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   toggleRecording(): void {
-    messenger.send({ call: 'toggleRecording' });
+    Messenger.send({ call: 'toggleRecording' });
   };
 
   private newTestCase(): TestCase {
@@ -210,7 +210,7 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   private checkRecordingStatus(): void {
     // get initial state
-    messenger.send({ call: 'isRecordingEnabled' }, (value) => {
+    Messenger.send({ call: 'isRecordingEnabled' }, (value) => {
       this.ngZone.run(() => {
         this.isRecordingEnabled = value;
       });
