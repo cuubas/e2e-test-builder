@@ -1,4 +1,4 @@
-var pageProxy = require('../common/page-proxy');
+var PageProxy = require('../common/page-proxy').PageProxy;
 var messenger = require('../common/messenger').Messenger;
 var locators = require('../common/locators').SupportedLocators;
 var elementHelper = require('../common/element-helper');
@@ -16,6 +16,9 @@ require('../common/runner/accessors');
 require('../common/runner/protractor');
 
 export function run() {
+  // init page proxy (will add another script and setup messaging)
+  PageProxy.init();
+
   //content script
   var selector;
   var lastEventTarget = null,
@@ -95,7 +98,7 @@ export function run() {
   // record native alerts
   ['alert', 'confirm', 'prompt'].forEach((fn) => {
     // first function is executed in page context and the callback in extension
-    pageProxy.run(function (fn, callback) {
+    PageProxy.run(function (fn, callback) {
       var orgFn = window[fn];
       window[fn] = function (message) {
         var res = orgFn.apply(this, arguments);
@@ -149,7 +152,7 @@ export function run() {
           runner: runner,
           locators: locators,
           settings: state.settings,
-          pageProxy: pageProxy
+          PageProxy: PageProxy
         };
         state.extensions.forEach((ext) => {
           extensionEval(context, ext.data);
