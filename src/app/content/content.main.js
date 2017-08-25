@@ -2,8 +2,9 @@ var PageProxy = require('../common/page-proxy').PageProxy;
 var messenger = require('../common/messenger').Messenger;
 var locators = require('../common/locators').SupportedLocators;
 var elementHelper = require('../common/element-helper');
-var runner = require('../common/runner');
+var runner = require('../common/runner').runner;
 var Selector = require('../common/selector').Selector;
+var safeEval = require('../common/safe-eval').safeEval;
 var uiState = { ready: false };
 var supportedCommands;
 // load runner extensions
@@ -153,8 +154,9 @@ export function run() {
           settings: state.settings,
           PageProxy: PageProxy
         };
-        state.extensions.forEach((ext) => {
-          eval('with(context){var module = undefined;' + ext.data + '}');
+        
+        state.extensions.forEach(function (ext) {
+          safeEval(context, ext.data);
         });
       }
     });

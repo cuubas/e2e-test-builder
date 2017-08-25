@@ -1,4 +1,5 @@
-var runner = require('./../runner');
+
+import { runner } from 'app/common/runner';
 
 runner.createMouseEvent = function (type, options) {
   var ev = new MouseEvent(type, options);

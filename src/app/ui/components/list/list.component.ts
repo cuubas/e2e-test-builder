@@ -1,7 +1,6 @@
 import { Component, OnInit, ViewEncapsulation, Input, Output, EventEmitter, ElementRef, NgZone } from '@angular/core';
 import { highlight } from 'app/common/element-helper';
-
-import * as STATES from 'app/common/runner-states';
+import { COMMAND_STATE } from 'app/common/runner/states';
 import { Messenger } from 'app/common/messenger';
 
 const positiveColor = '#c2f6c8';
@@ -21,13 +20,11 @@ export class ListComponent implements OnInit {
   @Output() onChange = new EventEmitter();
   @Output() onSelect = new EventEmitter();
 
-  public STATES;
-
+  public STATES = COMMAND_STATE;
   constructor(
     private element: ElementRef,
     private ngZone: NgZone
   ) {
-    this.STATES = STATES;
   }
 
   ngOnInit() {

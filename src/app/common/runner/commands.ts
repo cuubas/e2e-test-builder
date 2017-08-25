@@ -1,4 +1,5 @@
-var runner = require('./../runner');
+import { runner } from 'app/common/runner';
+import { safeEval } from 'app/common/safe-eval';
 // list all commands that accept accessor input
 runner.accessorCommands.push('waitForNot', 'waitFor', 'assertNot', 'assert', 'verifyNot', 'verify', 'echo', 'store', 'breakIf', 'continueIf');
 
@@ -116,16 +117,16 @@ runner.commands.store = function (command) {
 };
 
 runner.commands.echo = function (command, callback) {
-  callback(this.STATES.DONE, command.input !== undefined ? command.input : command.locator || command.value);
+  callback(this.STATES.DONE, (command.input !== undefined ? command.input : (command.locator || command.value)) as string);
 };
 
 runner.commands.eval = function (command) {
   var element;
   try {
     element = this.findElement(command.locator);
-    return eval(command.value);
+    return safeEval({ element: element }, command.value);
   } catch (err) {
-    eval(command.value || command.locator);
+    safeEval({}, command.value || command.locator);
   }
 };
 
@@ -162,12 +163,12 @@ function skipNextBlockIfNeeded(negate, commands, index, callback) {
   var result;
   // support legacy format when expression was in value e.g. data.size > 5 or foo=='e' or baz>=5 || !baz
   if (!command.locator && command.value) {
-    var expr = command.value.replace(/(^|[^'"])([a-zA-Z\.]+)([^'"]|$)/g, '$1runner.variables[\'$2\']')
-    if (expr.indexOf('runner.variables[') === -1) {
+    var expr = command.value.replace(/(^|[^'"])([a-zA-Z\.]+)([^'"]|$)/g, '$1variables[\'$2\']')
+    if (expr.indexOf('variables[') === -1) {
       callback(runner.STATES.FAILED, 'condition doesn\'t include a variable');
       return;
     }
-    result = eval(expr);
+    result = safeEval({ variables: runner.variables }, expr);
   } else {
     result = runner.assertValue(typeof (command.input) !== 'undefined' ? command.input : command.locator, command.value);
   }

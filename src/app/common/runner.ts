@@ -1,275 +1,298 @@
-var elementHelper = require('./element-helper');
-var STATES = require('./runner-states');
-var defaultOptions = require('./runner-options');
+import { find, findAll } from './element-helper';
+import { COMMAND_STATE } from './runner/states';
+import { TestCaseItem } from 'app/common/model';
+import { Options } from './runner/options';
 
-function Runner() {
-  this.accessors = [];
-  this.interval = defaultOptions.interval;
-  this.waitForCheckInterval = defaultOptions.waitForCheckInterval;
-  this.timeout = undefined;
-  this.waitForTimeout = undefined;
-  this.listeners = {
+export class Runner {
+  public commands: { [index: string]: RunnableCommand } = {};
+  public accessors: { [index: string]: (command: RunnerCommand) => any } = {}
+  public accessorCommands: string[] = [];
+  public variables: { [index: string]: any } = {};
+  public dialogs: { [index: string]: any } = {};
+  public interval = Options.interval;
+  public waitForCheckInterval = Options.waitForCheckInterval;
+  public timeout;
+  public waitForTimeout;
+  public listeners: {
+    onStart: ((shouldRun: boolean) => void)[],
+    onEnd: (() => void)[]
+  } = {
     onStart: [],
     onEnd: []
-  };
-  this.commands = {};
-  this.accessors = {};
-  this.accessorCommands = [];
-  this.variables = {};
-  this.dialogs = {};
-  this.STATES = STATES;
-  this.ELEMENT_NOT_FOUND_ERROR = 'element could not be found';
-
-  Object.defineProperty(this, 'options', {
-    set: (options) => {
-      this.interval = options.interval || defaultOptions.interval;
-      this.waitForCheckInterval = options.waitForCheckInterval || defaultOptions.waitForCheckInterval;
-    }
-  });
-  this.options = defaultOptions;
-}
-
-Runner.prototype.callWhenReady = function (callback) {
-  this.timeout = setTimeout(callback, this.interval);
-};
-
-Runner.prototype.findElement = function (locator, parent) {
-  var element = elementHelper.find(locator, parent || document.documentElement);
-  if (!element) {
-    throw new Error(this.ELEMENT_NOT_FOUND_ERROR);
   }
-  return element;
-};
+  public STATES = COMMAND_STATE;
+  public ELEMENT_NOT_FOUND_ERROR = 'element could not be found';
 
-Runner.prototype.findElements = function (locator, parent) {
-  return elementHelper.findAll(locator, parent || document.documentElement);
-};
+  public get options() {
+    return Options;
+  }
 
-Runner.prototype.assertValue = function (input, value) {
-  var regex;
-  value = String(value || '');
-  if (value.indexOf('regexp:') === 0) {
-    regex = new RegExp(value.substring(7));
-  } else if (value.indexOf('regexpi:') === 0) {
-    regex = new RegExp(value.substring(8), 'i');
-  } else if (typeof (input) === 'number' || /^\d+$|^\d+\.\d*$/.test(String(input).trim())) {
-    if (value.indexOf('<=') === 0) {
-      return parseFloat(input) <= parseFloat(value.substring(2));
-    } else if (value.indexOf('>=') === 0) {
-      return parseFloat(input) >= parseFloat(value.substring(2));
-    } else if (value.indexOf('<') === 0) {
-      return parseFloat(input) < parseFloat(value.substring(1));
-    } else if (value.indexOf('>') === 0) {
-      return parseFloat(input) > parseFloat(value.substring(1));
+  public set options(options) {
+    this.interval = options.interval || Options.interval;
+    this.waitForCheckInterval = options.waitForCheckInterval || Options.waitForCheckInterval;
+  }
+
+  public callWhenReady(callback) {
+    this.timeout = setTimeout(callback, this.interval);
+  }
+
+  public findElement(locator, parent) {
+    var element = find(locator, parent || document.documentElement);
+    if (!element) {
+      throw new Error(this.ELEMENT_NOT_FOUND_ERROR);
+    }
+    return element;
+  }
+
+  public findElements(locator, parent) {
+    return findAll(locator, parent || document.documentElement);
+  }
+
+  public assertValue(input, value) {
+    var regex;
+    value = String(value || '');
+    if (value.indexOf('regexp:') === 0) {
+      regex = new RegExp(value.substring(7));
+    } else if (value.indexOf('regexpi:') === 0) {
+      regex = new RegExp(value.substring(8), 'i');
+    } else if (typeof (input) === 'number' || /^\d+$|^\d+\.\d*$/.test(String(input).trim())) {
+      if (value.indexOf('<=') === 0) {
+        return parseFloat(input) <= parseFloat(value.substring(2));
+      } else if (value.indexOf('>=') === 0) {
+        return parseFloat(input) >= parseFloat(value.substring(2));
+      } else if (value.indexOf('<') === 0) {
+        return parseFloat(input) < parseFloat(value.substring(1));
+      } else if (value.indexOf('>') === 0) {
+        return parseFloat(input) > parseFloat(value.substring(1));
+      } else {
+        return String(input) === value;
+      }
+    } else if (typeof (input) === 'boolean') {
+      return input;
     } else {
-      return String(input) === value;
+      return input.toLowerCase() === value.toLowerCase();
     }
-  } else if (typeof (input) === 'boolean') {
-    return input;
-  } else {
-    return input.toLowerCase() === value.toLowerCase();
+    return regex.test(input);
   }
-  return regex.test(input);
-};
 
-Runner.prototype.onBeforeExecute = function (commands, index, callback) {
-  callback(!commands[index].$skip);
-};
+  public onBeforeExecute(commands: RunnerCommand[], index: number, callback: (shouldContinue: boolean) => void) {
+    callback(!commands[index].$skip);
+  }
 
-Runner.prototype.onAfterExecute = function (commands, index, state, message, callback) {
-  callback();
-};
+  public onAfterExecute(commands: RunnerCommand[], index: number, state: COMMAND_STATE, message: string, callback: () => void) {
+    callback();
+  }
 
-Runner.prototype.onStart = function (commands, index, count, callback) {
-  this.listeners.onStart.forEach((fn) => {
-    fn.apply(this, arguments);
-  });
-  callback(true);
-};
+  public onStart(commands: RunnerCommand[], index: number, count: number, callback: (shouldRun: boolean) => void) {
+    let args = arguments;
+    this.listeners.onStart.forEach((fn) => {
+      fn.apply(this, args);
+    });
+    callback(true);
+  }
 
-Runner.prototype.onEnd = function (commands, index, count) {
-  this.listeners.onEnd.forEach((fn) => {
-    fn.apply(this, arguments);
-  });
-}
+  public onEnd(commands, index, count) {
+    let args = arguments;
+    this.listeners.onEnd.forEach((fn) => {
+      fn.apply(this, args);
+    });
+  }
 
-// borrowed from Selenium ide fork: https://github.com/FDIM/selenium/commit/2dbb4f2764c1e3d6f1c7c74bdbe9f896aaefafe8
-Runner.prototype.injectVariables = function (str) {
-  var stringResult = str;
+  // borrowed from Selenium ide fork: https://github.com/FDIM/selenium/commit/2dbb4f2764c1e3d6f1c7c74bdbe9f896aaefafe8
+  public injectVariables(str) {
+    var stringResult = str;
 
-  // Find all of the matching variable references
-  ///////// only change is here to support . (dot) in variables
-  var match = stringResult.match(/\$\{[^\}]+\}/g);
-  if (!match) {
+    // Find all of the matching variable references
+    ///////// only change is here to support . (dot) in variables
+    var match = stringResult.match(/\$\{[^\}]+\}/g);
+    if (!match) {
+      return stringResult;
+    }
+
+    // For each match, lookup the variable value, and replace if found
+    for (var i = 0; match && i < match.length; i++) {
+      var variable = match[i]; // The replacement variable, with ${}
+      var name = variable.substring(2, variable.length - 1); // The replacement variable without ${}
+      // extension for default values support
+      var defaultValue;
+      if (name.indexOf('||') !== -1) {
+        var parts = name.split('||');
+        name = parts[0].trim();
+        defaultValue = parts[1].trim();
+      }
+      var replacement = this.variables[name];
+      if (!replacement && defaultValue) {
+        if (/^["'].*["']$/.test(defaultValue)) {
+          replacement = defaultValue.substring(1, defaultValue.length - 1);
+        } else {
+          replacement = this.variables[defaultValue];
+        }
+      }
+      if (replacement && typeof (replacement) === 'string' && replacement.indexOf('$') != -1) {
+        replacement = replacement.replace(/\$/g, '$$$$'); //double up on $'s because of the special meaning these have in 'replace'
+      }
+      if (replacement != undefined) {
+        stringResult = stringResult.replace(variable, replacement);
+      }
+    }
     return stringResult;
   }
-
-  // For each match, lookup the variable value, and replace if found
-  for (var i = 0; match && i < match.length; i++) {
-    var variable = match[i]; // The replacement variable, with ${}
-    var name = variable.substring(2, variable.length - 1); // The replacement variable without ${}
-    // extension for default values support
-    var defaultValue = false;
-    if (name.indexOf('||') !== -1) {
-      var parts = name.split('||');
-      name = parts[0].trim();
-      defaultValue = parts[1].trim();
+  // helper method to flat out an object to variables
+  public exposeObjectAsVariables(object, prefix) {
+    if (!prefix) {
+      prefix = 'config';
     }
-    var replacement = this.variables[name];
-    if (!replacement && defaultValue) {
-      if (/^["'].*["']$/.test(defaultValue)) {
-        replacement = defaultValue.substring(1, defaultValue.length - 1);
+    Object.keys(object).forEach((key) => {
+      var value = object[key];
+      if (typeof (value) === 'object') {
+        this.exposeObjectAsVariables(value, prefix + '.' + key);
       } else {
-        replacement = this.variables[defaultValue];
+        this.variables[prefix + '.' + key] = value;
+      }
+    });
+  }
+
+  public start(commands, index, count, changeCallback) {
+    this.stop();
+
+    if (!index) {
+      index = 0;
+    }
+    if (!count) {
+      count = commands.length - index;
+    }
+
+    var self = this, steps = 0;
+    this.onStart(commands, index, count, (shouldRun) => {
+      if (shouldRun) {
+        step(index);
+      }
+    });
+
+
+    function step(index) {
+      if (commands[index].type === 'comment') {
+        self.callWhenReady(step.bind(this, index + 1));
+      } else {
+        self.onBeforeExecute(commands, index, function (shouldContinue) {
+          steps++;
+          if (shouldContinue) {
+            self.execute(commands, index, (index, state, message) => {
+              changeCallback(index, state, message);
+
+              self.onAfterExecute(commands, index, state, message, function () {
+                done(index, state);
+              });
+            });
+          } else {
+            done(index);
+          }
+        });
       }
     }
-    if (replacement && typeof (replacement) === 'string' && replacement.indexOf('$') != -1) {
-      replacement = replacement.replace(/\$/g, '$$$$'); //double up on $'s because of the special meaning these have in 'replace'
-    }
-    if (replacement != undefined) {
-      stringResult = stringResult.replace(variable, replacement);
-    }
-  }
-  return stringResult;
-};
-// helper method to flat out an object to variables
-Runner.prototype.exposeObjectAsVariables = function (object, prefix) {
-  if (!prefix) {
-    prefix = 'config';
-  }
-  Object.keys(object).forEach((key) => {
-    var value = object[key];
-    if (typeof (value) === 'object') {
-      this.exposeObjectAsVariables(value, prefix + '.' + key);
-    } else {
-      this.variables[prefix + '.' + key] = value;
-    }
-  });
-};
 
-Runner.prototype.start = function (commands, index, count, changeCallback) {
-  this.stop();
+    function done(index: number, state?: COMMAND_STATE) {
+      if (state !== self.STATES.INPROGRESS && steps < count && index + 1 < commands.length) {
+        self.callWhenReady(step.bind(this, index + 1));
+      } else if (state !== self.STATES.INPROGRESS && steps === count) {
+        self.onEnd(commands, index, count);
+      }
+    }
 
-  if (!index) {
-    index = 0;
-  }
-  if (!count) {
-    count = commands.length - index;
   }
 
-  var self = this, steps = 0;
-  this.onStart(commands, index, count, (shouldRun) => {
-    if (shouldRun) {
-      step(index);
+  public stop() {
+    clearTimeout(this.timeout);
+    clearTimeout(this.waitForTimeout);
+  }
+
+  public execute(commands, index, changeCallback) {
+    var command = commands[index];
+    changeCallback(index, COMMAND_STATE.INPROGRESS);
+
+    // handle variables
+    command.command = this.injectVariables(command.command || '');
+    command.locator = this.injectVariables(command.locator || '');
+    command.value = this.injectVariables(command.value || '');
+
+    var cmd = this.commands[command.command];
+    // try accessorCommands if exact command is not available
+    if (!cmd) {
+      var prefix = this.accessorCommands.filter((c) => command.command.indexOf(c) === 0)[0];
+      if (prefix) {
+        var accessorName = command.command.substring(prefix.length);
+        accessorName = accessorName.substring(0, 1).toLowerCase() + accessorName.substring(1);
+        var accessor = this.accessors[accessorName];
+        if (accessor) {
+          try {
+            command.accessor = accessor;
+            command.input = accessor.call(this, command);
+          } catch (err) {
+            changeCallback(index, COMMAND_STATE.FAILED, accessorName + ' accessor: ' + (err.message || ''))
+            return;
+          }
+          cmd = this.commands[prefix];
+        }
+      }
     }
-  });
 
-
-  function step(index) {
-    if (commands[index].type === 'comment') {
-      self.callWhenReady(step.bind(this, index + 1));
-    } else {
-      self.onBeforeExecute(commands, index, function (shouldContinue) {
-        steps++;
-        if (shouldContinue) {
-          self.execute(commands, index, (index, state, message) => {
+    if (typeof (cmd) === 'function' && (!cmd.requiresAccessor || command.accessor)) {
+      try {
+        if (cmd.length > 2) { // uses commands list, an index and callback
+          cmd.call(this, commands, index, (state, message) => {
             changeCallback(index, state, message);
-
-            self.onAfterExecute(commands, index, state, message, function () {
-              done(index, state);
-            });
+          });
+        } else if (cmd.length > 1) { // uses callback
+          cmd.call(this, command, (state, message) => {
+            changeCallback(index, state, message);
           });
         } else {
-          done(index);
+          cmd.call(this, command);
+          changeCallback(index, COMMAND_STATE.DONE);
         }
+      } catch (err) {
+        changeCallback(index, COMMAND_STATE.FAILED, err.message || "an error occured");
+      }
+    } else {
+      changeCallback(index, COMMAND_STATE.FAILED, "unknown command");
+    }
+  }
+
+  public getSupportedCommands() {
+    var list = [];
+    // expose direct commands
+    Object.keys(this.commands).forEach((cmd) => {
+      if (!this.commands[cmd].requiresAccessor) {
+        list.push({ value: cmd, title: cmd.substring(0, 1).toUpperCase() + cmd.substring(1) });
+      }
+    });
+    // expose accessors
+    var accessors = Object.keys(this.accessors);
+    this.accessorCommands.forEach((prefix) => {
+      accessors.forEach((cmd) => {
+        cmd = cmd.substring(0, 1).toUpperCase() + cmd.substring(1);
+        list.push({ value: prefix + cmd, title: prefix.substring(0, 1).toUpperCase() + prefix.substring(1) + ' ' + cmd });
       });
-    }
+    });
+    return list;
   }
-
-  function done(index, state) {
-    if (state !== self.STATES.INPROGRESS && steps < count && index + 1 < commands.length) {
-      self.callWhenReady(step.bind(this, index + 1));
-    } else if (state !== self.STATES.INPROGRESS && steps === count) {
-      self.onEnd(commands, index, count);
-    }
-  }
-
-};
-
-Runner.prototype.stop = function () {
-  clearTimeout(this.timeout);
-  clearTimeout(this.waitForTimeout);
-};
-
-Runner.prototype.execute = function (commands, index, changeCallback) {
-  var command = commands[index];
-  changeCallback(index, STATES.INPROGRESS);
-
-  // handle variables
-  command.command = this.injectVariables(command.command || '');
-  command.locator = this.injectVariables(command.locator || '');
-  command.value = this.injectVariables(command.value || '');
-
-  var cmd = this.commands[command.command];
-  // try accessorCommands if exact command is not available
-  if (!cmd) {
-    var prefix = this.accessorCommands.filter((c) => command.command.indexOf(c) === 0)[0];
-    if (prefix) {
-      var accessorName = command.command.substring(prefix.length);
-      accessorName = accessorName.substring(0, 1).toLowerCase() + accessorName.substring(1);
-      var accessor = this.accessors[accessorName];
-      if (accessor) {
-        try {
-          command.accessor = accessor;
-          command.input = accessor.call(this, command);
-        } catch (err) {
-          changeCallback(index, STATES.FAILED, accessorName + ' accessor: ' + (err.message || ''))
-          return;
-        }
-        cmd = this.commands[prefix];
-      }
-    }
-  }
-
-  if (typeof (cmd) === 'function' && (!cmd.requiresAccessor || command.accessor)) {
-    try {
-      if (cmd.length > 2) { // uses commands list, an index and callback
-        cmd.call(this, commands, index, (state, message) => {
-          changeCallback(index, state, message);
-        });
-      } else if (cmd.length > 1) { // uses callback
-        cmd.call(this, command, (state, message) => {
-          changeCallback(index, state, message);
-        });
-      } else {
-        cmd.call(this, command);
-        changeCallback(index, STATES.DONE);
-      }
-    } catch (err) {
-      changeCallback(index, STATES.FAILED, err.message || "an error occured");
-    }
-  } else {
-    changeCallback(index, STATES.FAILED, "unknown command");
-  }
+  // extra methods defined in other files
+  public simulateKeyInput: (target: any, char: any) => void;
+  public createKeyEvent: (type: any, options: any) => KeyboardEvent;
+  public createMouseEvent: (type: any, options: any) => MouseEvent;
+  public fireMouseEvent: (type: any, button: any, command: any) => void;
+  public propertyAccessor: (property: any, command: any) => any;
 }
 
-Runner.prototype.getSupportedCommands = function () {
-  var list = [];
-  // expose direct commands
-  Object.keys(this.commands).forEach((cmd) => {
-    if (!this.commands[cmd].requiresAccessor) {
-      list.push({ value: cmd, title: cmd.substring(0, 1).toUpperCase() + cmd.substring(1) });
-    }
-  });
-  // expose accessors
-  var accessors = Object.keys(this.accessors);
-  this.accessorCommands.forEach((prefix) => {
-    accessors.forEach((cmd) => {
-      cmd = cmd.substring(0, 1).toUpperCase() + cmd.substring(1);
-      list.push({ value: prefix + cmd, title: prefix.substring(0, 1).toUpperCase() + prefix.substring(1) + ' ' + cmd });
-    });
-  });
-  return list;
-};
+export interface RunnableCommand {
+  (command: RunnerCommand, callback?: (state: COMMAND_STATE, message?: string) => void),
+  requiresAccessor?: boolean
+}
 
-module.exports = new Runner();
+export class RunnerCommand extends TestCaseItem {
+  public $skip?: boolean;
+  public input?: boolean;
+  public accessor: (command: RunnerCommand) => any
+}
+
+export const runner = new Runner();

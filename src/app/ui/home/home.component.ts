@@ -5,8 +5,8 @@ import { PageTitle, PageTitleSeparator } from 'app/ui/config';
 import { TestCase, TestCaseItem } from 'app/common/model';
 import { Messenger } from 'app/common/messenger';
 import { BaseFormatter, SupportedFormats } from 'app/common/formats';
-import * as runnerStates from 'app/common/runner-states';
-import * as defaultRunnerOptions from 'app/common/runner-options';
+import { COMMAND_STATE } from 'app/common/runner/states';
+import { Options as RunnerOptions, IOptions as IRunnerOptions } from 'app/common/runner/options';
 
 @Component({
   selector: 'app-home',
@@ -25,7 +25,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   public extensions: FileResult[];
   public selectedIndex = 0;
   public supportedFormats = SupportedFormats;
-  public settings;
+  public settings: IRunnerOptions;
   private file: FileResult;
   private formatter: BaseFormatter;
   private promptMessage = 'Some changes are not persisted yet, are you sure?'
@@ -35,11 +35,11 @@ export class HomeComponent implements OnInit, OnDestroy {
     private ngZone: NgZone,
     private ioProxy: IoProxy
   ) {
-    this.settings = Object.assign({}, defaultRunnerOptions, JSON.parse(window.localStorage.settings || '{}'));
+    this.settings = Object.assign({}, RunnerOptions, JSON.parse(window.localStorage.settings || '{}'));
 
     Object.keys(this.settings).forEach((key) => {
       if (this.settings[key] === '') {
-        this.settings[key] = defaultRunnerOptions[key];
+        this.settings[key] = RunnerOptions[key];
       }
     });
 
@@ -64,7 +64,7 @@ export class HomeComponent implements OnInit, OnDestroy {
       recordingToggled: this.checkRecordingStatus,
       commandStateChange: (request, callback) => {
         this.ngZone.run(() => {
-          if (this.running && request.index === this.testCase.items.length - 1 && (request.state === runnerStates.DONE || request.state === runnerStates.FAILED)) {
+          if (this.running && request.index === this.testCase.items.length - 1 && (request.state === COMMAND_STATE.DONE || request.state === COMMAND_STATE.FAILED)) {
             this.running = false;
           }
         });

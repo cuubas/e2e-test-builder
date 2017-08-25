@@ -1,6 +1,6 @@
-var runner = require('./../runner');
-var SeleniumKey = require('../selenium-webdriver-input').Key;
-var KeyCode = require('../../../../node_modules/keycode-js/lib/KeyCode').default;
+import { runner } from 'app/common/runner';
+import { Key as SeleniumKey } from '../selenium-webdriver-input';
+import { default as KeyCode } from '../../../../node_modules/keycode-js/lib/KeyCode';
 
 var mapToKeyOptions = {};
 // expose all keys as variables

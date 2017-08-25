@@ -1,4 +1,4 @@
-var runner = require('./../runner');
+import { runner } from 'app/common/runner';
 // protractor specific commands
 runner.commands.enableSynchronization = function () { };
 runner.commands.disableSynchronization = function () { };

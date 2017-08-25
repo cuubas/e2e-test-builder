@@ -45,7 +45,7 @@
     "protractor": "~5.1.2",
     "ts-node": "~3.2.0",
     "tslint": "~5.3.2",
-    "typescript": "~2.3.3",
+    "typescript": "~2.4.2",
     "gulp": "^3.9.1",
     "gulp-replace": "^0.5.4",
     "gulp-zip": "^4.0.0",

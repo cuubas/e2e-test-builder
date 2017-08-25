@@ -1,4 +1,4 @@
-var runner = require('./../runner');
+import { runner } from 'app/common/runner';
 
 ['alert', 'prompt', 'confirm'].forEach((fn) => {
   var orgFn, accessor = fn === 'confirm' ? 'confirmation' : fn;

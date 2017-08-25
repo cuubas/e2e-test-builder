@@ -1,7 +1,6 @@
-export function run() {
+var messenger = require('../common/messenger').Messenger;
 
- 
-  var messenger = require('../common/messenger').Messenger;
+export function run() {
 
   var recordingEnabled = false,
     currentTabId,

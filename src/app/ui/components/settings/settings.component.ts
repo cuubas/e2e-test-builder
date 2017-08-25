@@ -1,6 +1,7 @@
 import { Component, OnInit, ViewEncapsulation, Input } from '@angular/core';
 import { IoProxy, FileResult } from 'app/common/ioproxy';
 import { TestCase } from 'app/common/model';
+import { IOptions as IRunnerOptions } from 'app/common/runner/options';
 
 @Component({
   selector: 'app-settings',
@@ -11,10 +12,10 @@ import { TestCase } from 'app/common/model';
 export class SettingsComponent implements OnInit {
   @Input() public extensions: FileResult[];
   @Input() public testCase: TestCase;
-  @Input() public settings;
+  @Input() public settings: IRunnerOptions;
 
   public reloadingExtensions: boolean;
-  constructor(private ioProxy: IoProxy) {   }
+  constructor(private ioProxy: IoProxy) { }
 
   ngOnInit() {
 

@@ -1,4 +1,4 @@
-var runner = require('./../runner');
+import { runner } from 'app/common/runner';
 
 runner.accessors.attribute = function (command) {
   var index = command.locator.indexOf('@');
