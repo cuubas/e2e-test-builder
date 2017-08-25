@@ -61,7 +61,11 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.checkRecordingStatus();
 
     Messenger.bind({
-      recordingToggled: this.checkRecordingStatus,
+      recordingToggled: (request) => {
+        this.ngZone.run(() => {
+          this.isRecordingEnabled = request.value;
+        });
+      },
       commandStateChange: (request, callback) => {
         this.ngZone.run(() => {
           if (this.running && request.index === this.testCase.items.length - 1 && (request.state === COMMAND_STATE.DONE || request.state === COMMAND_STATE.FAILED)) {
