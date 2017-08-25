@@ -1,4 +1,4 @@
-var locators = require("./locators");
+var locators = require("./locators").SupportedLocators;
 
 module.exports = {
   find: find,
@@ -30,7 +30,7 @@ function findLocators(target, settings) {
   var types = (settings.locators || '').split(/\s|,/);
   return types.map((type) => {
     if (type && locators[type]) {
-      return locators[type](target, settings);
+      return locators[type].create(target, settings);
     } else {
       console.info('unknown locator %s, must be one of %s', type, Object.keys(locators).join(','));
     }

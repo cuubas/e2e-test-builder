@@ -1,11 +1,11 @@
-module.exports = IdLocator;
-
-function IdLocator(target, settings) {
-  if (target.id) {
-    return 'id=' + target.id
+export class IdLocator {
+  public create(target: Element, settings: any): string {
+    if (target.id) {
+      return 'id=' + target.id
+    }
   }
-}
 
-IdLocator.find = function (locator, parent) {
-  return parent.querySelectorAll('#' + locator);
-};
+  public find(locator: string, parent: Element): NodeListOf<Element> {
+    return parent.querySelectorAll('#' + locator);
+  };
+}
