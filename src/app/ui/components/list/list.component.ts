@@ -57,24 +57,24 @@ export class ListComponent implements OnInit {
 
   };
 
-  notifySelect(index) {
+  public notifySelect(index) {
     this.onSelect.emit({ index: index });
   };
 
-  highlight(ev, item) {
+  public highlight(ev, item) {
     chrome.tabs.sendMessage(window.currentTabId, { call: 'highlight', locator: item.locator }, function (highlighted) {
       highlight(ev.target.parentNode, highlighted ? positiveColor : negativeColor);
     });
   };
 
-  execute(ev, item) {
+  public execute(ev, item) {
     ev.target.blur();
     item.message = undefined;
     item.state = undefined;
     chrome.tabs.sendMessage(window.currentTabId, { call: 'execute', commands: this.items, index: this.items.indexOf(item), count: 1, options: this.settings });
   };
 
-  selectElement(ev, item) {
+  public selectElement(ev, item) {
     if (item.selecting) {
       delete item.selecting;
       chrome.tabs.sendMessage(window.currentTabId, { call: 'cancelSelect' });
@@ -87,24 +87,24 @@ export class ListComponent implements OnInit {
     chrome.tabs.sendMessage(window.currentTabId, { call: 'select', locator: item.locator, index: this.items.indexOf(item) });
   };
 
-  onSort(indexFrom, indexTo) {
+  public onSort(indexFrom, indexTo) {
     this.notifySelect(indexTo);
     this.onChange.emit();
   };
 
-  add(type, index) {
+  public add(type, index) {
     this.items.splice(index, 0, { type: type });
 
     // give new input field focus
     this.element.nativeElement.querySelector('.item-wrapper:nth-child(' + (index + 1) + ') .focus input').focus();
   };
 
-  remove(ev, item) {
+  public remove(ev, item) {
     this.items.splice(this.items.indexOf(item), 1);
     this.onChange.emit();
   };
 
-  trackByIndex(index: number, obj: any): any {
+  public trackByIndex(index: number, obj: any): any {
     return index;
   }
 }

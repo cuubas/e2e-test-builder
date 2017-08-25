@@ -14,12 +14,13 @@ export class SettingsComponent implements OnInit {
   @Input() public settings;
 
   public reloadingExtensions: boolean;
-  constructor(private ioProxy: IoProxy) { }
+  constructor(private ioProxy: IoProxy) {   }
 
   ngOnInit() {
 
   }
-  addExtension(ev) {
+
+  public addExtension(ev) {
     this.ioProxy.open(window.localStorage.lastPath)
       .subscribe((file) => {
         if (/\.js$/.test(file.path)) {
@@ -31,7 +32,7 @@ export class SettingsComponent implements OnInit {
       }, this.handleError);
   };
 
-  removeExtension(ev, ext) {
+  public removeExtension(ev, ext) {
     var index = this.extensions.indexOf(ext);
     if (index >= 0) {
       this.extensions.splice(index, 1);
@@ -39,7 +40,7 @@ export class SettingsComponent implements OnInit {
     }
   };
 
-  reloadExtensions() {
+  public reloadExtensions() {
     this.reloadingExtensions = true;
     var index = 0;
     var step = () => {
@@ -61,11 +62,11 @@ export class SettingsComponent implements OnInit {
     step();
   };
 
-  saveExtensions() {
+  public saveExtensions() {
     window.localStorage.extensions = JSON.stringify(this.extensions);
   };
 
-  handleError(error) {
+  private handleError(error) {
     alert(error);
   }
 }
