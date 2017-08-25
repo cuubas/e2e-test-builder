@@ -1,6 +1,6 @@
-var ioproxy = require('../../../common/ioproxy');
-
 import { Component, OnInit, ViewEncapsulation, Input } from '@angular/core';
+import { IoProxy, FileResult } from 'app/common/ioproxy';
+import { TestCase } from 'app/common/model';
 
 @Component({
   selector: 'app-settings',
@@ -9,27 +9,26 @@ import { Component, OnInit, ViewEncapsulation, Input } from '@angular/core';
   encapsulation: ViewEncapsulation.None
 })
 export class SettingsComponent implements OnInit {
-  @Input() public extensions: {}[];
-  @Input() public testCase;
+  @Input() public extensions: FileResult[];
+  @Input() public testCase: TestCase;
   @Input() public settings;
 
   public reloadingExtensions: boolean;
-  constructor() { }
+  constructor(private ioProxy: IoProxy) { }
 
   ngOnInit() {
 
   }
   addExtension(ev) {
-    ioproxy.open(window.localStorage.lastPath)
-      .then((file) => {
+    this.ioProxy.open(window.localStorage.lastPath)
+      .subscribe((file) => {
         if (/\.js$/.test(file.path)) {
           this.extensions.push(file);
           this.saveExtensions();
         } else {
           this.handleError("Please select javascript file");
         }
-      })
-      .catch(this.handleError);
+      }, this.handleError);
   };
 
   removeExtension(ev, ext) {
@@ -43,19 +42,18 @@ export class SettingsComponent implements OnInit {
   reloadExtensions() {
     this.reloadingExtensions = true;
     var index = 0;
-    var step = function () {
+    var step = () => {
       if (index >= this.extensions.length) {
         this.saveExtensions();
         this.reloadingExtensions = false;
         return;
       }
-      ioproxy.read(this.extensions[index].path)
-        .then((file) => {
+      this.ioProxy.read(this.extensions[index].path)
+        .subscribe((file) => {
           this.extensions[index] = file;
           index++;
           step();
-        })
-        .catch((error) => {
+        }, (error) => {
           this.reloadingExtensions = false;
           this.handleError(error);
         });
