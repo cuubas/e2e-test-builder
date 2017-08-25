@@ -1,5 +1,5 @@
 import { runner } from 'app/common/runner';
-import { Key as SeleniumKey } from '../selenium-webdriver-input';
+import { Key as SeleniumKey } from 'app/common/selenium-webdriver-input';
 import { default as KeyCode } from '../../../../node_modules/keycode-js/lib/KeyCode';
 
 var mapToKeyOptions = {};

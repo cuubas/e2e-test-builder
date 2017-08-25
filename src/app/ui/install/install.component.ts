@@ -1,5 +1,5 @@
 import { Component, Input, OnInit, ViewEncapsulation } from '@angular/core';
-import { RequiredNativeClientVersion } from '../config';
+import { RequiredNativeClientVersion } from 'app/ui/config';
 import { Router } from "@angular/router";
 import { IoProxy } from 'app/common/ioproxy';
 

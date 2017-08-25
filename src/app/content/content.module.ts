@@ -1,4 +1,4 @@
-import '../../polyfills';
+import 'polyfills';
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { ContentService } from './content.service';

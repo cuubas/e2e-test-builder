@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Messenger } from '../common/messenger';
+import { Messenger } from 'app/common/messenger';
 
 @Injectable()
 export class BackgroundService {

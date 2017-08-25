@@ -1,4 +1,4 @@
-import '../../polyfills';
+import 'polyfills';
 import { BackgroundService } from './background.service';
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
