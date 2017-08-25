@@ -17,6 +17,14 @@
     top: -8px;
     left: 8px;
   }
+  &:after{
+    position: absolute;
+    top:-8px;
+    left: 0;
+    right: 0;
+    height: 8px;
+    content: ' ';
+  }
   &__item {
     display: block;
     padding: 8px;
