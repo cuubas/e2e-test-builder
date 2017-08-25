@@ -4,7 +4,6 @@ var locators = require('../common/locators').SupportedLocators;
 var elementHelper = require('../common/element-helper');
 var runner = require('../common/runner');
 var Selector = require('../common/selector').Selector;
-var extensionEval = require('../common/extension-eval');
 var uiState = { ready: false };
 var supportedCommands;
 // load runner extensions
@@ -155,7 +154,7 @@ export function run() {
           PageProxy: PageProxy
         };
         state.extensions.forEach((ext) => {
-          extensionEval(context, ext.data);
+          eval('with(context){var module = undefined;' + ext.data + '}');
         });
       }
     });
