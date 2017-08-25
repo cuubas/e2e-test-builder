@@ -1,6 +1,4 @@
 
-const extensionId = chrome.runtime.id;
-
 export class Messenger {
 
   public static bind(target: { [index: string]: any }): () => void {
@@ -11,7 +9,7 @@ export class Messenger {
       chrome.runtime.onMessage.removeListener(messageHandler);
     }
 
-    function messageHandler(request, sender, sendResponse) {
+    function messageHandler(request, sender, sendResponse: (response: any) => void) {
       if (!request) {
         return;
       }
@@ -22,6 +20,7 @@ export class Messenger {
         sendResponse(target[request.get]);
       } else if (request.set && typeof (target[request.set]) !== 'function') {
         target[request.set] = request.value;
+        sendResponse(undefined);
       }
     }
   }
@@ -30,9 +29,9 @@ export class Messenger {
   public static send(message: SetAction, callback?: (response: any) => void)
   public static send(message: CallAction | GetAction | SetAction, callback?: (response: any) => void) {
     if (typeof callback === 'function') {
-      chrome.runtime.sendMessage(extensionId, message, {}, callback);
+      chrome.runtime.sendMessage(chrome.runtime.id, message, {}, callback);
     } else {
-      chrome.runtime.sendMessage(extensionId, message);
+      chrome.runtime.sendMessage(chrome.runtime.id, message);
     }
   }
 }
