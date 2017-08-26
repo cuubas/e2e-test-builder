@@ -72,7 +72,7 @@ export class BackgroundService {
       },
       toggleRecording: () => {
         this.isRecordingEnabled = !this.isRecordingEnabled;
-        chrome.browserAction.setIcon({ path: this.isRecordingEnabled ? "assets/icon-c@32.png" : "assets/icon-c@32.png" });
+        chrome.browserAction.setIcon({ path: this.isRecordingEnabled ? "assets/icon-p@32.png" : "assets/icon-c@32.png" });
         // notify self and anyone who is listening
         Messenger.send({ call: 'recordingToggled', value: this.isRecordingEnabled });
 
