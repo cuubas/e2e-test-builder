@@ -1,6 +1,6 @@
 import { Component, Input, OnInit, ViewEncapsulation } from '@angular/core';
 import { RequiredNativeClientVersion } from 'app/ui/config';
-import { Router } from "@angular/router";
+import { Router } from '@angular/router';
 import { IoProxy } from 'app/common/ioproxy';
 
 @Component({
@@ -38,7 +38,7 @@ export class InstallComponent implements OnInit {
         window.localStorage.nativeClientVersion = String(about.version);
         this.router.navigateByUrl('home');
       } else {
-        alert("Version " + RequiredNativeClientVersion + " is required, found version " + about.version + ".");
+        alert('Version ' + RequiredNativeClientVersion + ' is required, found version ' + about.version + '.');
       }
     }, (error) => {
       alert(error);

@@ -13,4 +13,4 @@ export {
   HtmlFormatter,
   ProtractorFormatter,
   SupportedFormats
-}
+};

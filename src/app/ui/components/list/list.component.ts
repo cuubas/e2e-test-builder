@@ -30,9 +30,15 @@ export class ListComponent implements OnInit {
   ngOnInit() {
     Messenger.bind({
       recordCommand: (request, callback) => {
+
         this.ngZone.run(() => {
-          var indexOffset = request.indexOffset || 0;
-          this.items.splice(this.selectedIndex + 1 + indexOffset, 0, { command: request.command, locator: request.locator, value: request.value, type: 'command' });
+          const indexOffset = request.indexOffset || 0;
+          this.items.splice(this.selectedIndex + 1 + indexOffset, 0, {
+            command: request.command,
+            locator: request.locator,
+            value: request.value,
+            type: 'command'
+          });
           this.notifySelect(this.selectedIndex + 1);
           this.onChange.emit();
         });
@@ -52,24 +58,31 @@ export class ListComponent implements OnInit {
       }
     });
 
-  };
+  }
 
   public notifySelect(index) {
     this.onSelect.emit(index);
-  };
+  }
 
   public highlight(ev, item) {
     chrome.tabs.sendMessage(window.currentTabId, { call: 'highlight', locator: item.locator }, function (highlighted) {
       highlight(ev.target.parentNode, highlighted ? positiveColor : negativeColor);
     });
-  };
+  }
 
   public execute(ev, item) {
     ev.target.blur();
     item.message = undefined;
     item.state = undefined;
-    chrome.tabs.sendMessage(window.currentTabId, { call: 'execute', commands: this.items, index: this.items.indexOf(item), count: 1, options: this.settings });
-  };
+
+    chrome.tabs.sendMessage(window.currentTabId, {
+      call: 'execute',
+      commands: this.items,
+      index: this.items.indexOf(item),
+      count: 1,
+      options: this.settings
+    });
+  }
 
   public selectElement(ev, item) {
     if (item.selecting) {
@@ -77,29 +90,29 @@ export class ListComponent implements OnInit {
       chrome.tabs.sendMessage(window.currentTabId, { call: 'cancelSelect' });
       return;
     }
-    this.items.forEach(function (item) {
-      delete item.selecting;
+    this.items.forEach(function (it) {
+      delete it.selecting;
     });
     item.selecting = true;
     chrome.tabs.sendMessage(window.currentTabId, { call: 'select', locator: item.locator, index: this.items.indexOf(item) });
-  };
+  }
 
   public onSort(indexFrom, indexTo) {
     this.notifySelect(indexTo);
     this.onChange.emit();
-  };
+  }
 
   public add(type, index) {
     this.items.splice(index, 0, { type: type });
 
     // give new input field focus
     this.element.nativeElement.querySelector('.item-wrapper:nth-child(' + (index + 1) + ') .focus input').focus();
-  };
+  }
 
   public remove(ev, item) {
     this.items.splice(this.items.indexOf(item), 1);
     this.onChange.emit();
-  };
+  }
 
   public trackByIndex(index: number, obj: any): any {
     return index;

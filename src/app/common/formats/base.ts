@@ -5,8 +5,8 @@ export abstract class BaseFormatter {
   public extension: string;
 
   public constructor() {
-    this.name = "unknown";
-    this.extension = "unknown";
+    this.name = 'unknown';
+    this.extension = 'unknown';
   }
 
   public test(filename: string): boolean {

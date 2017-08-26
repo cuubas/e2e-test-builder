@@ -1,7 +1,7 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { AppComponent } from './app.component';
-import { Router } from "@angular/router";
+import { Router } from '@angular/router';
 
 describe('AppComponent', () => {
   let component: AppComponent;
@@ -11,11 +11,13 @@ describe('AppComponent', () => {
     mockWindow = {
       $registerUiWindow: jasmine.createSpy('$registerUiWindow').and.stub()
     };
-    let mockRouter = {
+    const mockRouter = {
       navigateByUrl: jasmine.createSpy('navigateByUrl').and.stub()
     };
     chrome.runtime = {} as any;
-    chrome.runtime.getBackgroundPage = jasmine.createSpy('getBackgroundPage').and.callFake((cb) => { cb && cb(mockWindow); })
+    chrome.runtime.getBackgroundPage = jasmine.createSpy('getBackgroundPage').and.callFake((cb) => {
+      cb(mockWindow);
+    });
     TestBed.configureTestingModule({
       schemas: [NO_ERRORS_SCHEMA],
       declarations: [AppComponent],
@@ -46,5 +48,5 @@ describe('AppComponent', () => {
   it('should call $registerUiWindow on init', () => {
     initComponent();
     expect(mockWindow.$registerUiWindow).toHaveBeenCalled();
-  })
+  });
 });

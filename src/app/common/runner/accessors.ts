@@ -1,13 +1,13 @@
 import { runner } from 'app/common/runner';
 
 runner.accessors.attribute = function (command) {
-  var index = command.locator.indexOf('@');
+  const index = command.locator.indexOf('@');
   if (index === -1) {
-    throw new Error("attribute name not provided (value after @ in locator)");
+    throw new Error('attribute name not provided (value after @ in locator)');
   }
-  var parts = command.locator.split('@');
+  const parts = command.locator.split('@');
   command.locator = parts.shift();
-  var name = parts.join('');
+  const name = parts.join('');
   return this.findElement(command.locator).getAttribute(name) || '';
 };
 
@@ -22,6 +22,7 @@ runner.accessors.scrollTop = runner.propertyAccessor.bind(runner, 'scrollTop');
 runner.accessors.scrollLeft = runner.propertyAccessor.bind(runner, 'scrollLeft');
 
 runner.accessors.eval = function (command) {
+  // tslint:disable-next-line:no-eval
   return eval(command.locator);
 };
 
@@ -39,27 +40,27 @@ runner.accessors.cookiePresent = function (command) {
   return document.cookie.indexOf(command.locator + '=') !== -1;
 };
 runner.accessors.cookieByName = function (command) {
-  var cookies = {};
+  const cookies = {};
   document.cookie.split(';').forEach((c) => {
-    var parts = c.split('=');
+    const parts = c.split('=');
     cookies[parts.shift().trim()] = parts.join('=');
   });
 
   return cookies[command.locator];
 };
 runner.accessors.cursorPosition = function (command) {
-  var el = this.findElement(command.locator);
+  const el = this.findElement(command.locator);
   if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
     return el.selectionStart;
   }
-  throw new Error("not an input element");
+  throw new Error('not an input element');
 };
 runner.accessors.editable = function (command) {
-  var el = this.findElement(command.locator);
+  const el = this.findElement(command.locator);
   if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
     return !el.disabled && !el.readOnly;
   }
-  throw new Error("not an input element");
+  throw new Error('not an input element');
 };
 runner.accessors.cssCount = function (command) {
   return this.findElements(command.locator).length;
@@ -74,7 +75,7 @@ runner.accessors.elementPositionLeft = function (command) {
   return this.findElement(command.locator).getBoundingClientRect().left;
 };
 runner.accessors.elementIndex = function (command) {
-  var el = this.findElement(command.locator);
+  const el = this.findElement(command.locator);
   return Array.prototype.indexOf.call(el.parentNode.children, el);
 };
 runner.accessors.elementPresent = function (command) {
@@ -89,7 +90,7 @@ runner.accessors.elementPresent = function (command) {
   }
 };
 runner.accessors.visible = function (command) {
-  var el;
+  let el;
   try {
     el = this.findElement(command.locator);
   } catch (err) {

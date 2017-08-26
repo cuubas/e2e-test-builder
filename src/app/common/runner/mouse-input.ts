@@ -2,16 +2,16 @@
 import { runner } from 'app/common/runner';
 
 runner.createMouseEvent = function (type, options) {
-  var ev = new MouseEvent(type, options);
+  const ev = new MouseEvent(type, options);
   return ev;
 };
 
 runner.fireMouseEvent = function (type, button, command) {
-  var el = this.findElement(command.locator);
-  var coords = command.value.split(',');
-  var rect = el.getBoundingClientRect();
+  const el = this.findElement(command.locator);
+  let coords = command.value.split(',');
+  const rect = el.getBoundingClientRect();
   if (coords.length === 2) {
-    coords = [parseInt(coords[0]), parseInt(coords[1])];
+    coords = [parseInt(coords[0], 10), parseInt(coords[1], 10)];
   } else {
     coords = [rect.width / 2, rect.height / 2];
   }

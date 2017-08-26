@@ -1,11 +1,11 @@
 import { SupportedLocators } from './locators';
 
 export function findAll(locator: string, parent: HTMLElement | Document) {
-  var index = locator && locator.indexOf('=');
+  const index = locator && locator.indexOf('=');
   if (index) {
     try {
-      var type = locator.substr(0, index);
-      var selector = locator.substr(index + 1).replace(/(.*)@[^/\\'"><\]\[]*$/, '$1'); // remove anything after @ as it may be used to specify attribute name
+      const type = locator.substr(0, index);
+      const selector = locator.substr(index + 1).replace(/(.*)@[^/\\'"><\]\[]*$/, '$1'); // remove anything after @ as it may be used to specify attribute name
       return SupportedLocators[type] && SupportedLocators[type].find(selector, parent);
     } catch (er) {
       console.error(er);
@@ -15,12 +15,12 @@ export function findAll(locator: string, parent: HTMLElement | Document) {
 }
 
 export function find(locator: string, parent: HTMLElement | Document) {
-  var list = findAll(locator, parent) || [];
+  const list = findAll(locator, parent) || [];
   return list[0];
 }
 
 export function findLocators(target: HTMLElement, settings) {
-  var types = (settings.locators || '').split(/\s|,/);
+  const types = (settings.locators || '').split(/\s|,/);
   return types.map((type) => {
     if (type && SupportedLocators[type]) {
       return SupportedLocators[type].create(target, settings);
@@ -38,23 +38,23 @@ export function highlight(element: HTMLElement, color?: string) {
   }
 
   element.dataset._highlighted = '1';
-  var backgroundColor = element.style.backgroundColor;
-  var transition = element.style.transition;
+  const backgroundColor = element.style.backgroundColor;
+  const transition = element.style.transition;
 
-  var restore1 = function () {
+  const restore1 = function () {
     element.style.backgroundColor = backgroundColor;
     element.removeEventListener('transitionend', restore1);
     element.addEventListener('transitionend', restore2);
-  }
+  };
 
-  var restore2 = function () {
+  const restore2 = function () {
     element.style.transition = transition;
     element.removeEventListener('transitionend', restore2);
     delete element.dataset._highlighted;
   };
 
   (<any>element).scrollIntoViewIfNeeded(); // this is chrome specific
-  element.style.transition = "background-color 0.3s ease-in";
+  element.style.transition = 'background-color 0.3s ease-in';
   element.style.backgroundColor = color || '#ffe004';
 
   element.addEventListener('transitionend', restore1);

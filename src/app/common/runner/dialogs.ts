@@ -1,7 +1,8 @@
 import { runner } from 'app/common/runner';
 
 ['alert', 'prompt', 'confirm'].forEach((fn) => {
-  var orgFn, accessor = fn === 'confirm' ? 'confirmation' : fn;
+  let orgFn;
+  const accessor = fn === 'confirm' ? 'confirmation' : fn;
 
   runner.accessors[accessor] = function (command) {
     return this.dialogs[accessor + 'Present'] && this.dialogs[accessor + 'Message'];

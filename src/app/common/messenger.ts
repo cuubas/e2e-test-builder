@@ -7,7 +7,7 @@ export class Messenger {
 
     return () => {
       chrome.runtime.onMessage.removeListener(messageHandler);
-    }
+    };
 
     function messageHandler(request, sender, sendResponse: (response: any) => void) {
       if (!request) {
@@ -25,9 +25,9 @@ export class Messenger {
     }
   }
 
-  public static send(message: CallAction, callback?: (response: any) => void)
-  public static send(message: GetAction, callback?: (response: any) => void)
-  public static send(message: SetAction, callback?: (response: any) => void)
+  public static send(message: CallAction, callback?: (response: any) => void);
+  public static send(message: GetAction, callback?: (response: any) => void);
+  public static send(message: SetAction, callback?: (response: any) => void);
   public static send(message: CallAction | GetAction | SetAction, callback?: (response: any) => void) {
     if (typeof callback === 'function') {
       chrome.runtime.sendMessage(chrome.runtime.id, message, {}, callback);
@@ -39,7 +39,7 @@ export class Messenger {
 
 export class CallAction {
   public call: string;
-  [prop:string]:any; // allow arbitrary properties
+  [prop: string]: any; // allow arbitrary properties
 }
 
 export class GetAction {

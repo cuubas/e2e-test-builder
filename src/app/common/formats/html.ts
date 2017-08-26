@@ -3,7 +3,7 @@ import { TestCase, TestCaseItem } from 'app/common/model';
 
 export class HtmlFormatter extends BaseFormatter {
   private charsMap: { [index: string]: string };
-  
+
   public constructor() {
     super();
     this.name = 'html';
@@ -18,7 +18,7 @@ export class HtmlFormatter extends BaseFormatter {
 
   private escapeAttribute(value) {
     return (value || '').replace(/"/g, '\"');
-  };
+  }
 
   private escapeHtml(value) {
     if (typeof (value) === 'undefined' || value === null) {
@@ -28,15 +28,15 @@ export class HtmlFormatter extends BaseFormatter {
     return value.replace(/[<>"&]/g, (char) => {
       return '&' + this.charsMap[char] + ';';
     });
-  };
+  }
 
   public parse(content: string): TestCase {
-    var result = new TestCase();
+    const result = new TestCase();
 
     content = content || '';
     content = content.replace(/<script/g, ' <no-script').replace(/<\/script/g, ' </no-script');
     if (content.indexOf('<html') !== -1) {
-      var div = document.createElement('div');
+      const div = document.createElement('div');
       div.innerHTML = content;
       result.title = div.querySelector('title').textContent;
       result.baseUrl = div.querySelector('link[rel="selenium.base"]').getAttribute('href');
@@ -47,7 +47,7 @@ export class HtmlFormatter extends BaseFormatter {
             type: 'comment',
             value: node.textContent
           } as TestCaseItem));
-        } else if (node.nodeType === 1) { //tag
+        } else if (node.nodeType === 1) { // tag
           result.items.push(new TestCaseItem({
             type: 'command',
             command: node.children[0].textContent,
@@ -61,7 +61,7 @@ export class HtmlFormatter extends BaseFormatter {
   }
 
   public stringify(testCase: TestCase): string {
-    var content = testCase.items.map((item) => {
+    const content = testCase.items.map((item) => {
       if (item.type === 'comment') {
         return `<!--${this.escapeHtml(item.value)}-->`;
       } else {
@@ -72,7 +72,7 @@ export class HtmlFormatter extends BaseFormatter {
           + '\n</tr>';
       }
     }).join('\n');
-    var prefix = `<?xml version="1.0" encoding="UTF-8"?>
+    const prefix = `<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head profile="http://selenium-ide.openqa.org/profiles/test-case">
@@ -86,7 +86,7 @@ export class HtmlFormatter extends BaseFormatter {
 <tr><td rowspan="1" colspan="3">${this.escapeHtml(testCase.title)}</td></tr>
 </thead><tbody>
 `;
-    var suffix = "\n</tbody></table>\n\t</body>\n\t</html>\n\t";
+    const suffix = `\n</tbody></table>\n\t</body>\n\t</html>\n\t`;
 
     return prefix + content + suffix;
   }

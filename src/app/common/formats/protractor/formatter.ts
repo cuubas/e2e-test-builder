@@ -1,5 +1,5 @@
 import { locators } from './locators';
-import { handlers} from './handlers';
+import { handlers } from './handlers';
 
 export function Formatter(options) {
     this.options = options || {};
@@ -38,13 +38,13 @@ Formatter.prototype.expression = function (v, forceString) {
 };
 
 Formatter.prototype.stringify = function (testCase) {
-    var content = [];
-    var variables = [];
-    var indentLevel = 0;
-    var standardIndentLevel = 0;
-    var inDescBlock = false;
-    var self = this;
-    var noDescOrExportCommand = true;
+    const content = [];
+    const self = this;
+    let indentLevel = 0;
+    let standardIndentLevel = 0;
+    let inDescBlock = false;
+    let variables = [];
+    let noDescOrExportCommand = true;
     push('\'use strict\'');
     push(this.endOfLine);
 
@@ -60,15 +60,15 @@ Formatter.prototype.stringify = function (testCase) {
     });
     // in case desc or export command is not used, define variables in top most scope
     if (noDescOrExportCommand && variables.length > 0) {
-        push("var " + variables.join(', ') + ';' + this.endOfLine.repeat(2));
+        push('var ' + variables.join(', ') + ';' + this.endOfLine.repeat(2));
     }
     // do we return a function or just run once?
     if (testCase.commands.length && testCase.commands[0].type === handlers.export.type) {
         standardIndentLevel++;
     }
     testCase.commands.forEach((cmd) => {
-        var handler = getHandler(cmd);
-        var res = handler(cmd, this);
+        const handler = getHandler(cmd);
+        const res = handler(cmd, this);
 
         // handle multiple desc commands
         if (handler.type === handlers.desc.type) {
@@ -94,7 +94,7 @@ Formatter.prototype.stringify = function (testCase) {
         }
         // variables should be declared inside first desc block or export block
         if (variables.length > 0 && (handler.type === handlers.desc.type || handler.type === handlers.export.type)) {
-            push("var " + variables.join(', ') + ';' + this.endOfLine.repeat(2));
+            push('var ' + variables.join(', ') + ';' + this.endOfLine.repeat(2));
             variables = [];
         }
     });
@@ -104,7 +104,7 @@ Formatter.prototype.stringify = function (testCase) {
     return content.join('');
 
     function getHandler(cmd) {
-        var handler = handlers[cmd.type.toLowerCase()];
+        let handler = handlers[cmd.type.toLowerCase()];
         if (!handler) {
             if (cmd.type.indexOf('assert') === 0) {
                 handler = handlers['defaultassert'];
@@ -115,7 +115,7 @@ Formatter.prototype.stringify = function (testCase) {
             } else if (cmd.type.indexOf('echo') === 0) {
                 handler = handlers['defaultecho'];
             } else {
-                handler = handlers['default']
+                handler = handlers['default'];
             }
         }
         return handler;

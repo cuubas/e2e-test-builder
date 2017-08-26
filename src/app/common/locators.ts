@@ -13,4 +13,4 @@ export {
   AttrLocator,
   IdLocator,
   CssLocator
-}
+};

@@ -2,11 +2,11 @@ import { runner } from 'app/common/runner';
 import { Key as SeleniumKey } from 'app/common/selenium-webdriver-input';
 import { default as KeyCode } from '../../../../node_modules/keycode-js/lib/KeyCode';
 
-var mapToKeyOptions = {};
+const mapToKeyOptions = {};
 // expose all keys as variables
 Object.keys(SeleniumKey).forEach((key) => {
   runner.variables['KEY_' + key] = SeleniumKey[key];
-  var keyName = key.substring(0, 1) + key.substring(1).toLowerCase();
+  const keyName = key.substring(0, 1) + key.substring(1).toLowerCase();
   mapToKeyOptions[SeleniumKey[key]] = {
     code: keyName,
     key: keyName,
@@ -20,7 +20,7 @@ mapToKeyOptions[SeleniumKey.ENTER].value = '\n';
 // TODO: handle compatibility with selenium ide
 
 runner.createKeyEvent = function (type, options) {
-  var evt = new KeyboardEvent(type, options);
+  const evt = new KeyboardEvent(type, options);
   // patch known issue
   Object.defineProperty(evt, 'which', { get: function () { return options.which; } });
   Object.defineProperty(evt, 'keyCode', { get: function () { return options.which; } });
@@ -29,7 +29,7 @@ runner.createKeyEvent = function (type, options) {
 };
 
 runner.simulateKeyInput = function (target, char) {
-  var options = mapToKeyOptions[char] || {
+  const options = mapToKeyOptions[char] || {
     key: char,
     code: char,
     which: char.charCodeAt(0),
@@ -49,7 +49,7 @@ runner.simulateKeyInput = function (target, char) {
   if (options.value === '\n' && target.form) {
     if (typeof (target.form.submit) === 'function') {
       target.form.submit();
-    } else if(target.form.submit && typeof(target.form.submit.click) === 'function') {
+    } else if (target.form.submit && typeof (target.form.submit.click) === 'function') {
       target.form.submit.click();
     }
   }

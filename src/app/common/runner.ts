@@ -5,7 +5,7 @@ import { Options } from './runner/options';
 
 export class Runner {
   public commands: { [index: string]: RunnableCommand } = {};
-  public accessors: { [index: string]: (command: RunnerCommand) => any } = {}
+  public accessors: { [index: string]: (command: RunnerCommand) => any } = {};
   public accessorCommands: string[] = [];
   public variables: { [index: string]: any } = {};
   public dialogs: { [index: string]: any } = {};
@@ -19,7 +19,7 @@ export class Runner {
   } = {
     onStart: [],
     onEnd: []
-  }
+  };
   public STATES = COMMAND_STATE;
   public ELEMENT_NOT_FOUND_ERROR = 'element could not be found';
 
@@ -32,12 +32,19 @@ export class Runner {
     this.waitForCheckInterval = options.waitForCheckInterval || Options.waitForCheckInterval;
   }
 
+  // extra methods defined in other files
+  public simulateKeyInput: (target: any, char: any) => void;
+  public createKeyEvent: (type: any, options: any) => KeyboardEvent;
+  public createMouseEvent: (type: any, options: any) => MouseEvent;
+  public fireMouseEvent: (type: any, button: any, command: any) => void;
+  public propertyAccessor: (property: any, command: any) => any;
+
   public callWhenReady(callback) {
     this.timeout = setTimeout(callback, this.interval);
   }
 
   public findElement(locator, parent) {
-    var element = find(locator, parent || document.documentElement);
+    const element = find(locator, parent || document.documentElement);
     if (!element) {
       throw new Error(this.ELEMENT_NOT_FOUND_ERROR);
     }
@@ -49,7 +56,7 @@ export class Runner {
   }
 
   public assertValue(input, value) {
-    var regex;
+    let regex;
     value = String(value || '');
     if (value.indexOf('regexp:') === 0) {
       regex = new RegExp(value.substring(7));
@@ -84,7 +91,7 @@ export class Runner {
   }
 
   public onStart(commands: RunnerCommand[], index: number, count: number, callback: (shouldRun: boolean) => void) {
-    let args = arguments;
+    const args = arguments;
     this.listeners.onStart.forEach((fn) => {
       fn.apply(this, args);
     });
@@ -92,7 +99,7 @@ export class Runner {
   }
 
   public onEnd(commands, index, count) {
-    let args = arguments;
+    const args = arguments;
     this.listeners.onEnd.forEach((fn) => {
       fn.apply(this, args);
     });
@@ -100,27 +107,27 @@ export class Runner {
 
   // borrowed from Selenium ide fork: https://github.com/FDIM/selenium/commit/2dbb4f2764c1e3d6f1c7c74bdbe9f896aaefafe8
   public injectVariables(str) {
-    var stringResult = str;
+    let stringResult = str;
 
     // Find all of the matching variable references
     ///////// only change is here to support . (dot) in variables
-    var match = stringResult.match(/\$\{[^\}]+\}/g);
+    const match = stringResult.match(/\$\{[^\}]+\}/g);
     if (!match) {
       return stringResult;
     }
 
     // For each match, lookup the variable value, and replace if found
-    for (var i = 0; match && i < match.length; i++) {
-      var variable = match[i]; // The replacement variable, with ${}
-      var name = variable.substring(2, variable.length - 1); // The replacement variable without ${}
+    for (let i = 0; match && i < match.length; i++) {
+      const variable = match[i]; // The replacement variable, with ${}
+      let name = variable.substring(2, variable.length - 1); // The replacement variable without ${}
       // extension for default values support
-      var defaultValue;
+      let defaultValue;
       if (name.indexOf('||') !== -1) {
-        var parts = name.split('||');
+        const parts = name.split('||');
         name = parts[0].trim();
         defaultValue = parts[1].trim();
       }
-      var replacement = this.variables[name];
+      let replacement = this.variables[name];
       if (!replacement && defaultValue) {
         if (/^["'].*["']$/.test(defaultValue)) {
           replacement = defaultValue.substring(1, defaultValue.length - 1);
@@ -128,10 +135,10 @@ export class Runner {
           replacement = this.variables[defaultValue];
         }
       }
-      if (replacement && typeof (replacement) === 'string' && replacement.indexOf('$') != -1) {
-        replacement = replacement.replace(/\$/g, '$$$$'); //double up on $'s because of the special meaning these have in 'replace'
+      if (replacement && typeof (replacement) === 'string' && replacement.indexOf('$') !== -1) {
+        replacement = replacement.replace(/\$/g, '$$$$'); // double up on $'s because of the special meaning these have in 'replace'
       }
-      if (replacement != undefined) {
+      if (replacement !== undefined) {
         stringResult = stringResult.replace(variable, replacement);
       }
     }
@@ -143,7 +150,7 @@ export class Runner {
       prefix = 'config';
     }
     Object.keys(object).forEach((key) => {
-      var value = object[key];
+      const value = object[key];
       if (typeof (value) === 'object') {
         this.exposeObjectAsVariables(value, prefix + '.' + key);
       } else {
@@ -152,20 +159,21 @@ export class Runner {
     });
   }
 
-  public start(commands, index, count, changeCallback) {
+  public start(commands, startIndex, count, changeCallback) {
     this.stop();
 
-    if (!index) {
-      index = 0;
+    if (!startIndex) {
+      startIndex = 0;
     }
     if (!count) {
-      count = commands.length - index;
+      count = commands.length - startIndex;
     }
 
-    var self = this, steps = 0;
-    this.onStart(commands, index, count, (shouldRun) => {
+    const self = this;
+    let steps = 0;
+    this.onStart(commands, startIndex, count, (shouldRun) => {
       if (shouldRun) {
-        step(index);
+        step(startIndex);
       }
     });
 
@@ -174,14 +182,14 @@ export class Runner {
       if (commands[index].type === 'comment') {
         self.callWhenReady(step.bind(this, index + 1));
       } else {
-        self.onBeforeExecute(commands, index, function (shouldContinue) {
+        self.onBeforeExecute(commands, index, (shouldContinue) => {
           steps++;
           if (shouldContinue) {
-            self.execute(commands, index, (index, state, message) => {
-              changeCallback(index, state, message);
+            self.execute(commands, index, (i, state, message) => {
+              changeCallback(i, state, message);
 
-              self.onAfterExecute(commands, index, state, message, function () {
-                done(index, state);
+              self.onAfterExecute(commands, i, state, message, () => {
+                done(i, state);
               });
             });
           } else {
@@ -207,7 +215,7 @@ export class Runner {
   }
 
   public execute(commands, index, changeCallback) {
-    var command = commands[index];
+    const command = commands[index];
     changeCallback(index, COMMAND_STATE.INPROGRESS);
 
     // handle variables
@@ -215,20 +223,20 @@ export class Runner {
     command.locator = this.injectVariables(command.locator || '');
     command.value = this.injectVariables(command.value || '');
 
-    var cmd = this.commands[command.command];
+    let cmd = this.commands[command.command];
     // try accessorCommands if exact command is not available
     if (!cmd) {
-      var prefix = this.accessorCommands.filter((c) => command.command.indexOf(c) === 0)[0];
+      const prefix = this.accessorCommands.filter((c) => command.command.indexOf(c) === 0)[0];
       if (prefix) {
-        var accessorName = command.command.substring(prefix.length);
+        let accessorName = command.command.substring(prefix.length);
         accessorName = accessorName.substring(0, 1).toLowerCase() + accessorName.substring(1);
-        var accessor = this.accessors[accessorName];
+        const accessor = this.accessors[accessorName];
         if (accessor) {
           try {
             command.accessor = accessor;
             command.input = accessor.call(this, command);
           } catch (err) {
-            changeCallback(index, COMMAND_STATE.FAILED, accessorName + ' accessor: ' + (err.message || ''))
+            changeCallback(index, COMMAND_STATE.FAILED, accessorName + ' accessor: ' + (err.message || ''));
             return;
           }
           cmd = this.commands[prefix];
@@ -251,15 +259,15 @@ export class Runner {
           changeCallback(index, COMMAND_STATE.DONE);
         }
       } catch (err) {
-        changeCallback(index, COMMAND_STATE.FAILED, err.message || "an error occured");
+        changeCallback(index, COMMAND_STATE.FAILED, err.message || 'an error occured');
       }
     } else {
-      changeCallback(index, COMMAND_STATE.FAILED, "unknown command");
+      changeCallback(index, COMMAND_STATE.FAILED, 'unknown command');
     }
   }
 
   public getSupportedCommands(): SupportedCommand[] {
-    var list = [];
+    const list = [];
     // expose direct commands
     Object.keys(this.commands).forEach((cmd) => {
       if (!this.commands[cmd].requiresAccessor) {
@@ -267,7 +275,7 @@ export class Runner {
       }
     });
     // expose accessors
-    var accessors = Object.keys(this.accessors);
+    const accessors = Object.keys(this.accessors);
     this.accessorCommands.forEach((prefix) => {
       accessors.forEach((cmd) => {
         cmd = cmd.substring(0, 1).toUpperCase() + cmd.substring(1);
@@ -276,28 +284,22 @@ export class Runner {
     });
     return list;
   }
-  // extra methods defined in other files
-  public simulateKeyInput: (target: any, char: any) => void;
-  public createKeyEvent: (type: any, options: any) => KeyboardEvent;
-  public createMouseEvent: (type: any, options: any) => MouseEvent;
-  public fireMouseEvent: (type: any, button: any, command: any) => void;
-  public propertyAccessor: (property: any, command: any) => any;
 }
 
 export interface SupportedCommand {
   value: string;
-  title: string
+  title: string;
 }
 
 export interface RunnableCommand {
-  (command: RunnerCommand, callback?: (state: COMMAND_STATE, message?: string) => void),
-  requiresAccessor?: boolean
+  (command: RunnerCommand, callback?: (state: COMMAND_STATE, message?: string) => void);
+  requiresAccessor?: boolean;
 }
 
 export class RunnerCommand extends TestCaseItem {
   public $skip?: boolean;
   public input?: boolean;
-  public accessor: (command: RunnerCommand) => any
+  public accessor: (command: RunnerCommand) => any;
 }
 
 export const runner = new Runner();

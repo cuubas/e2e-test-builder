@@ -21,12 +21,14 @@ export class CssLocator {
   ];
 
   public create(target: Element, settings: any): string {
-    var element = target, result = [], interrupt = false;
+    let element = target, interrupt = false;
+    const result = [];
 
     while (element !== document.documentElement) {
       // go through known attributes (in order) and create css selector
-      for (var i = 0; i < this.attributes.length; i++) {
-        var attr = this.attributes[i] as any, value, prefix = '', suffix = '', index;
+      for (let i = 0; i < this.attributes.length; i++) {
+        const attr = this.attributes[i] as any;
+        let value, prefix = '', suffix = '', index;
         // take as is
         if (attr === 'tagName') {
           value = element.tagName.toLowerCase();
@@ -76,15 +78,16 @@ export class CssLocator {
     if (!locator) {
       return undefined;
     }
-    var containsStartIndex = locator.indexOf(':contains(');
-    var containsEndIndex = locator.indexOf(')', containsStartIndex);
-    var result = [], item;
+    const containsStartIndex = locator.indexOf(':contains(');
+    const containsEndIndex = locator.indexOf(')', containsStartIndex);
+    let result = [];
+    let item;
     if (containsStartIndex !== -1 && containsEndIndex !== -1) {
-      var prefix = locator.substring(0, containsStartIndex);
-      var text = locator.substring(containsStartIndex + ":contains(".length + 1, containsEndIndex - 1).toLowerCase();
-      var suffix = locator.substring(containsEndIndex + 1).trim();
-      var items = prefix ? parent.querySelectorAll(prefix) : [parent];
-      for (var i = 0, len = items.length; i < len; i++) {
+      const prefix = locator.substring(0, containsStartIndex);
+      const text = locator.substring(containsStartIndex + ':contains('.length + 1, containsEndIndex - 1).toLowerCase();
+      const suffix = locator.substring(containsEndIndex + 1).trim();
+      const items = prefix ? parent.querySelectorAll(prefix) : [parent];
+      for (let i = 0, len = items.length; i < len; i++) {
         item = items[i];
         if (item.textContent.toLowerCase().indexOf(text) !== -1) {
           if (suffix) {
@@ -100,5 +103,5 @@ export class CssLocator {
       result = Array.prototype.slice.call(parent.querySelectorAll(locator));
     }
     return result;
-  };
+  }
 }

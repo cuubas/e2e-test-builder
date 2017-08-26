@@ -2,14 +2,15 @@ export class AttrLocator {
   public tagsWhitelist = ['INPUT', 'SELECT', 'TEXTAREA'];
 
   public create(target: Element, settings: any): string {
-    let element = target, result = [];
+    let element = target;
+    const result = [];
 
     while (element !== document.documentElement) {
-      let value = element.getAttribute(settings.customAttribute);
+      const value = element.getAttribute(settings.customAttribute);
       if (value) {
-        let index,
-          prefix = '[' + settings.customAttribute + '="',
-          suffix = '"]';
+        let index;
+        const prefix = '[' + settings.customAttribute + '="';
+        let suffix = '"]';
         // get element index
         index = Array.prototype.indexOf.call(element.parentNode.childNodes, element);
         if (index > 0 && element.parentElement.querySelectorAll(prefix + value + suffix).length > 1) {

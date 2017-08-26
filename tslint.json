@@ -26,7 +26,7 @@
     "label-position": true,
     "max-line-length": [
       true,
-      140
+      200
     ],
     "member-access": false,
     "member-ordering": [
@@ -43,7 +43,7 @@
     "no-arg": true,
     "no-bitwise": true,
     "no-console": [
-      true,
+      false,
       "debug",
       "info",
       "time",
@@ -104,7 +104,7 @@
       }
     ],
     "typeof-compare": true,
-    "unified-signatures": true,
+    "unified-signatures": false, // works better with vscode when this is disabled
     "variable-name": false,
     "whitespace": [
       true,

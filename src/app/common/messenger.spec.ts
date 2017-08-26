@@ -7,7 +7,9 @@ describe('messenger', () => {
     chrome.runtime = {} as any;
     chrome.runtime.id = '123456';
     chrome.runtime.onMessage = {} as any;
-    chrome.runtime.onMessage.addListener = jasmine.createSpy('onMessage.addListener').and.callFake((handler) => { messageHandler = handler; });
+    chrome.runtime.onMessage.addListener = jasmine.createSpy('onMessage.addListener').and.callFake((handler) => {
+      messageHandler = handler;
+    });
     chrome.runtime.onMessage.removeListener = jasmine.createSpy('onMessage.removeListener').and.stub();
     chrome.runtime.sendMessage = jasmine.createSpy('sendMessage').and.stub();
   });
@@ -15,7 +17,7 @@ describe('messenger', () => {
   describe('bind', () => {
     let target;
     beforeEach(() => {
-      var theAnswer = 42;
+      const theAnswer = 42;
       target = {
         foo: 1,
         baz: 2,
@@ -58,7 +60,7 @@ describe('messenger', () => {
     });
 
     it('should remove listener', () => {
-      let cleanup = Messenger.bind({});
+      const cleanup = Messenger.bind({});
       cleanup();
       expect(chrome.runtime.onMessage.removeListener).toHaveBeenCalled();
     });

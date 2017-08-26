@@ -11,12 +11,11 @@ describe('ListComponent', () => {
   beforeEach(async(() => {
     spyOn(MessengerWrapper.Messenger, 'send').and.stub();
     spyOn(MessengerWrapper.Messenger, 'bind').and.stub();
-    
+
     TestBed.configureTestingModule({
       schemas: [NO_ERRORS_SCHEMA],
-      declarations: [ ListComponent ]
-    })
-    .compileComponents();
+      declarations: [ListComponent]
+    }).compileComponents();
   }));
 
   beforeEach(() => {

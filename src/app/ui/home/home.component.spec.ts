@@ -10,7 +10,7 @@ describe('HomeComponent', () => {
   let fixture: ComponentFixture<HomeComponent>;
 
   beforeEach(async(() => {
-    let titleStub = {}, ioProxyStub = {}, ngZoneStub = {};
+    const titleStub = {}, ioProxyStub = {}, ngZoneStub = {};
 
     spyOn(MessengerWrapper.Messenger, 'send').and.stub();
     spyOn(MessengerWrapper.Messenger, 'bind').and.stub();

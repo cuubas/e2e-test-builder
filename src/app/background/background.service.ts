@@ -7,7 +7,7 @@ export class BackgroundService {
   private isRecordingEnabled: boolean;
   private currentTabId: number;
   private uiWindow: Window;
-  private skipNextTabActivationEvent: boolean = false;
+  private skipNextTabActivationEvent = false;
   private uiWindowSettings: UiWindowSettings;
   private api;
 
@@ -42,24 +42,46 @@ export class BackgroundService {
         this.uiWindow.currentTabId = this.currentTabId;
       }
       // notify active tab
-      chrome.tabs.sendMessage(this.currentTabId, { call: "toggleRecording", value: this.isRecordingEnabled });
+      chrome.tabs.sendMessage(this.currentTabId, { call: 'toggleRecording', value: this.isRecordingEnabled });
     });
   }
 
   private createContextMenu() {
-    var contentContexts = ["page", "frame", "selection", "link", "editable", "image", "video", "audio"];
-    var contentUris = ["http://*/*", "https://*/*", "file://*/*"];
+    const contentContexts = ['page', 'frame', 'selection', 'link', 'editable', 'image', 'video', 'audio'];
+    const contentUris = ['http://*/*', 'https://*/*', 'file://*/*'];
     // Create a parent item and two children.
-    this.recordingContextMenuItemId = <any>chrome.contextMenus.create({ "title": "Record interactions", type: 'checkbox', checked: false, enabled: false, contexts: ["all"], onclick: this.api.toggleRecording.bind(this.api) });
-    chrome.contextMenus.create({ type: 'separator', contexts: contentContexts, documentUrlPatterns: contentUris });
+    this.recordingContextMenuItemId = <any>chrome.contextMenus.create({
+      'title': 'Record interactions',
+      type: 'checkbox',
+      checked: false,
+      enabled: false,
+      contexts: ['all'],
+      onclick: this.api.toggleRecording.bind(this.api)
+    });
 
-    chrome.contextMenus.create({ "title": "Click", contexts: contentContexts, documentUrlPatterns: contentUris, onclick: this.handleContextMenuClick.bind(this, 'click', undefined) });
+    chrome.contextMenus.create({
+      type: 'separator',
+      contexts: contentContexts,
+      documentUrlPatterns: contentUris
+    });
+
+    chrome.contextMenus.create({
+      'title': 'Click',
+      contexts: contentContexts,
+      documentUrlPatterns: contentUris,
+      onclick: this.handleContextMenuClick.bind(this, 'click', undefined)
+    });
     // first item is the command prefix, 2nd is the prefix visible to the user
     [['assert', 'Assert'], ['waitFor', 'Wait for'], ['store', 'Store']].forEach((accessor) => {
       chrome.contextMenus.create({ type: 'separator', contexts: contentContexts, documentUrlPatterns: contentUris });
       // first item is the command suffix, 2nd is the suffix visible to the user
       [['Text', 'Text'], ['Value', 'Value'], ['Visible', 'Visible'], ['ElementPresent', 'Element Present']].forEach((cmd) => {
-        chrome.contextMenus.create({ "title": accessor[1] + " " + cmd[1], contexts: contentContexts, documentUrlPatterns: contentUris, onclick: this.handleContextMenuClick.bind(this, accessor[0] + cmd[0], cmd[0].substring(0, 1).toLowerCase() + cmd[0].substring(1)) });
+        chrome.contextMenus.create({
+          'title': accessor[1] + ' ' + cmd[1],
+          contexts: contentContexts,
+          documentUrlPatterns: contentUris,
+          onclick: this.handleContextMenuClick.bind(this, accessor[0] + cmd[0], cmd[0].substring(0, 1).toLowerCase() + cmd[0].substring(1))
+        });
       });
     });
 
@@ -72,11 +94,11 @@ export class BackgroundService {
       },
       toggleRecording: () => {
         this.isRecordingEnabled = !this.isRecordingEnabled;
-        chrome.browserAction.setIcon({ path: this.isRecordingEnabled ? "assets/icon-p@32.png" : "assets/icon-c@32.png" });
+        chrome.browserAction.setIcon({ path: this.isRecordingEnabled ? 'assets/icon-p@32.png' : 'assets/icon-c@32.png' });
         // notify self and anyone who is listening
         Messenger.send({ call: 'recordingToggled', value: this.isRecordingEnabled });
 
-        chrome.tabs.sendMessage(this.currentTabId, { call: "toggleRecording", value: this.isRecordingEnabled });
+        chrome.tabs.sendMessage(this.currentTabId, { call: 'toggleRecording', value: this.isRecordingEnabled });
 
         chrome.contextMenus.update(this.recordingContextMenuItemId, { checked: this.isRecordingEnabled });
       }
@@ -84,21 +106,21 @@ export class BackgroundService {
   }
 
   public handleContextMenuClick(command, accessor, info, tab) {
-    chrome.tabs.sendMessage(tab.id, { call: "handleContextMenuClick", command: command, accessor: accessor });
+    chrome.tabs.sendMessage(tab.id, { call: 'handleContextMenuClick', command: command, accessor: accessor });
   }
 
   public openUiWindow(_tab) {
     this.currentTabId = _tab.id;
     if (!this.uiWindow || this.uiWindow.closed) {
       this.skipNextTabActivationEvent = true;
-      var props = "width=" + (this.uiWindowSettings.width || 700) + ",height=" + (this.uiWindowSettings.height || 500) + ",status=no,scrollbars=yes,resizable=no";
+      let props = 'width=' + (this.uiWindowSettings.width || 700) + ',height=' + (this.uiWindowSettings.height || 500) + ',status=no,scrollbars=yes,resizable=no';
       if (this.uiWindowSettings.x) {
         props += ',left=' + this.uiWindowSettings.x;
       }
       if (this.uiWindowSettings.y) {
         props += ',top=' + this.uiWindowSettings.y;
       }
-      this.uiWindow = window.open("ui/index.html", "extension_popup", props);
+      this.uiWindow = window.open('ui/index.html', 'extension_popup', props);
       chrome.contextMenus.update(this.recordingContextMenuItemId, { enabled: true });
     } else {
       this.uiWindow.focus();
@@ -124,7 +146,7 @@ export class BackgroundService {
       this.api.toggleRecording();
     });
 
-    chrome.tabs.sendMessage(this.currentTabId, { call: "uiWindowOpened" });
+    chrome.tabs.sendMessage(this.currentTabId, { call: 'uiWindowOpened' });
   }
 
 }

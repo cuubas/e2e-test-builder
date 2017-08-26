@@ -8,7 +8,7 @@ describe('SettingsComponent', () => {
   let fixture: ComponentFixture<SettingsComponent>;
 
   beforeEach(async(() => {
-    let mockIoProxy = {};
+    const mockIoProxy = {};
     TestBed.configureTestingModule({
       declarations: [SettingsComponent],
       schemas: [NO_ERRORS_SCHEMA],

@@ -60,7 +60,7 @@ export class ContentService {
         this.api.recordingEnabled = request.value;
       },
       highlight: (request, callback) => {
-        let element = find(runner.injectVariables(request.locator), document)
+        const element = find(runner.injectVariables(request.locator), document);
         if (element) {
           highlight(element);
           callback(true);
@@ -79,7 +79,7 @@ export class ContentService {
       },
       select: (request) => {
         this.selector = new Selector(runner.injectVariables(request.locator || ''), (element) => {
-          let matchingLocators = findLocators(element, this.uiState.settings);
+          const matchingLocators = findLocators(element, this.uiState.settings);
           Messenger.send({ call: 'elementSelected', locator: matchingLocators[0], locators: matchingLocators, index: request.index });
         });
         this.selector.start();
@@ -95,7 +95,7 @@ export class ContentService {
         } else if (request.accessor === 'text') {
           value = this.lastEventTarget.textContent;
         }
-        let matchingLocators = findLocators(this.lastEventTarget as HTMLElement, this.uiState.settings);
+        const matchingLocators = findLocators(this.lastEventTarget as HTMLElement, this.uiState.settings);
         Messenger.send({ call: 'recordCommand', command: request.command, locator: matchingLocators[0], locators: matchingLocators, value: value });
       },
       supportedCommands: function (request, callback) {
@@ -128,7 +128,7 @@ export class ContentService {
       // value will be undefined if ui window is not open
       if (state.extensions) {
         // only these properties are available in extension scope
-        let context = {
+        const context = {
           window: window,
           document: document,
           runner: runner,
@@ -146,47 +146,60 @@ export class ContentService {
 
   public initRecording() {
 
-    document.addEventListener("mousedown", (event: MouseEvent) => {
+    document.addEventListener('mousedown', (event: MouseEvent) => {
       this.lastEventTarget = event.target as HTMLElement;
       // left click, is recording enabled?
       if (event.button === 0 && this.api.recordingEnabled) {
-        let matchingLocators = findLocators(this.lastEventTarget, this.uiState.settings);
-        Messenger.send({ call: 'recordCommand', command: "click", locator: matchingLocators[0], locators: matchingLocators });
+        const matchingLocators = findLocators(this.lastEventTarget, this.uiState.settings);
+        Messenger.send({ call: 'recordCommand', command: 'click', locator: matchingLocators[0], locators: matchingLocators });
       }
     }, true);
 
-    document.addEventListener("blur", (event: Event) => {
-      let input = event.target as HTMLInputElement;
+    document.addEventListener('blur', (event: Event) => {
+      const input = event.target as HTMLInputElement;
       if (this.api.recordingEnabled && (input.tagName === 'INPUT' || input.tagName === 'TEXTAREA')) {
-        let matchingLocators = findLocators(input, this.uiState.settings);
-        Messenger.send({ call: 'recordCommand', command: "sendKeys", locator: matchingLocators[0], locators: matchingLocators, value: input.value });
+        const matchingLocators = findLocators(input, this.uiState.settings);
+        Messenger.send({ call: 'recordCommand', command: 'sendKeys', locator: matchingLocators[0], locators: matchingLocators, value: input.value });
       }
     }, true);
   }
 
   public initPrompts() {
-    ['alert', 'confirm', 'prompt'].forEach((fn) => {
+    ['alert', 'confirm', 'prompt'].forEach((promptType) => {
       // first function is executed in page context and the callback in extension
       PageProxy.run((fn, callback) => {
-        let orgFn = window[fn];
+        const orgFn = window[fn];
         window[fn] = function (message) {
-          let res = orgFn.apply(this, arguments);
+          const res = orgFn.apply(this, arguments);
           callback(message, res);
           return res;
         };
-      }, fn, (message, res) => {
+      }, promptType, (message, res) => {
         if (!this.api.recordingEnabled) {
           return;
         }
-        if (fn === 'confirm' && !res) {
-          Messenger.send({ call: 'recordCommand', command: 'chooseCancelOnNextConfirmation', locator: '', value: '' });
-        } else if (fn === 'prompt') {
-          Messenger.send({ call: 'recordCommand', command: 'answerOnNextPrompt', locator: '', value: res });
+        if (promptType === 'confirm' && !res) {
+          Messenger.send({
+            call: 'recordCommand',
+            command: 'chooseCancelOnNextConfirmation',
+            locator: '', value: ''
+          });
+        } else if (promptType === 'prompt') {
+          Messenger.send({
+            call: 'recordCommand',
+            command: 'answerOnNextPrompt',
+            locator: '',
+            value: res
+          });
         }
-        if (fn === 'confirm') {
-          fn = 'confirmation';
+        if (promptType === 'confirm') {
+          promptType = 'confirmation';
         }
-        Messenger.send({ call: 'recordCommand', command: "assert" + (fn.substr(0, 1).toUpperCase() + fn.substr(1)), locator: '', value: message });
+        Messenger.send({
+          call: 'recordCommand',
+          command: 'assert' + (promptType.substr(0, 1).toUpperCase() + promptType.substr(1)),
+          locator: '', value: message
+        });
 
       });
     });

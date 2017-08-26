@@ -28,7 +28,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   public settings: IRunnerOptions;
   private file: FileResult;
   private formatter: BaseFormatter;
-  private promptMessage = 'Some changes are not persisted yet, are you sure?'
+  private promptMessage = 'Some changes are not persisted yet, are you sure?';
 
   public constructor(
     private titleService: Title,
@@ -68,7 +68,9 @@ export class HomeComponent implements OnInit, OnDestroy {
       },
       commandStateChange: (request, callback) => {
         this.ngZone.run(() => {
-          if (this.running && request.index === this.testCase.items.length - 1 && (request.state === COMMAND_STATE.DONE || request.state === COMMAND_STATE.FAILED)) {
+          if (this.running
+            && request.index === this.testCase.items.length - 1
+            && (request.state === COMMAND_STATE.DONE || request.state === COMMAND_STATE.FAILED)) {
             this.running = false;
           }
         });
@@ -101,12 +103,12 @@ export class HomeComponent implements OnInit, OnDestroy {
     window.removeEventListener('beforeunload', this.handleOnBeforeUnload);
   }
 
-  public toggleRecording(ev:MouseEvent): void {
+  public toggleRecording(ev: MouseEvent): void {
     Messenger.send({ call: 'toggleRecording' });
-  };
+  }
 
   private newTestCase(): TestCase {
-    var testCase = new TestCase({
+    const testCase = new TestCase({
       title: 'test case',
       baseUrl: '/',
       items: [{ type: 'command' } as TestCaseItem]
@@ -120,42 +122,49 @@ export class HomeComponent implements OnInit, OnDestroy {
     }
     this.testCase = this.newTestCase();
     this.save(null, true, format || this.supportedFormats[0]);
-  };
+  }
 
   public read(path: string): void {
     this.ioProxy.read(path)
       .subscribe(this.processFile.bind(this), this.handleError);
-  };
+  }
 
-  public open(ev:MouseEvent): void {
+  public open(ev: MouseEvent): void {
     this.ioProxy.open(window.localStorage.lastPath)
       .subscribe(this.processFile.bind(this), this.handleError);
-  };
+  }
 
   public reset(): void {
     this.testCase.items.forEach((item) => {
       item.state = undefined;
       item.message = undefined;
     });
-  };
+  }
 
-  public run(ev:MouseEvent): void {
+  public run(ev: MouseEvent): void {
     this.reset();
     this.running = true;
-    chrome.tabs.sendMessage(window.currentTabId, { call: 'execute', commands: this.testCase.items, index: this.selectedIndex, count: this.testCase.items.length, options: this.settings });
-  };
 
-  public interruptRunner(ev:MouseEvent): void {
+    chrome.tabs.sendMessage(window.currentTabId, {
+      call: 'execute',
+      commands: this.testCase.items,
+      index: this.selectedIndex,
+      count: this.testCase.items.length,
+      options: this.settings
+    });
+  }
+
+  public interruptRunner(ev: MouseEvent): void {
     chrome.tabs.sendMessage(window.currentTabId, { call: 'interruptRunner' });
     this.running = false;
-  };
+  }
 
   public toggleSettings(value: boolean): void {
     this.showSettings = value;
     if (!value) {
       window.localStorage.settings = JSON.stringify(this.settings);
     }
-  };
+  }
 
   public onChange(): void {
     this.dirty = true;
@@ -166,11 +175,11 @@ export class HomeComponent implements OnInit, OnDestroy {
       this.selectedIndex = this.testCase.items.length - 1;
     }
     this.updateTitle();
-  };
+  }
 
   public onSelect(index): void {
     this.selectedIndex = index;
-  };
+  }
 
   public save(ev: Event, saveAs: boolean = false, format: BaseFormatter = null) {
     if (format) {
@@ -179,8 +188,12 @@ export class HomeComponent implements OnInit, OnDestroy {
     if (!this.formatter) {
       this.formatter = this.supportedFormats[0];
     }
-    this.reset(); // reset uii state before saving
-    this.ioProxy.write(!saveAs && this.file ? this.file.path : undefined, this.formatter.stringify(this.testCase), this.replaceExtension(window.localStorage.lastPath || '', this.formatter.extension))
+    this.reset(); // reset ui state before saving
+
+    this.ioProxy.write(!saveAs && this.file ? this.file.path : undefined,
+      this.formatter.stringify(this.testCase),
+      this.replaceExtension(window.localStorage.lastPath || '',
+        this.formatter.extension))
       .subscribe((response) => {
         this.file = response;
         if (response.path) {
@@ -189,7 +202,7 @@ export class HomeComponent implements OnInit, OnDestroy {
           this.updateTitle();
         }
       }, this.handleError);
-  };
+  }
 
   private updateTitle(): void {
     this.titleService.setTitle(PageTitle + PageTitleSeparator + this.file.path + (this.dirty ? ' *' : ''));
@@ -210,7 +223,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     } else {
       throw new Error('unsupported file format');
     }
-  };
+  }
 
   private checkRecordingStatus(): void {
     // get initial state
@@ -261,5 +274,5 @@ export class HomeComponent implements OnInit, OnDestroy {
         });
       });
     });
-  };
+  }
 }

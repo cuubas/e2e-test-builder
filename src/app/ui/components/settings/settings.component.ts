@@ -21,30 +21,30 @@ export class SettingsComponent implements OnInit {
 
   }
 
-  public addExtension(ev:MouseEvent) {
+  public addExtension(ev: MouseEvent) {
     this.ioProxy.open(window.localStorage.lastPath)
       .subscribe((file) => {
         if (/\.js$/.test(file.path)) {
           this.extensions.push(file);
           this.saveExtensions(ev);
         } else {
-          this.handleError("Please select javascript file");
+          this.handleError('Please select javascript file');
         }
       }, this.handleError);
-  };
+  }
 
-  public removeExtension(ev:MouseEvent, ext) {
-    var index = this.extensions.indexOf(ext);
+  public removeExtension(ev: MouseEvent, ext) {
+    const index = this.extensions.indexOf(ext);
     if (index >= 0) {
       this.extensions.splice(index, 1);
       this.saveExtensions(ev);
     }
-  };
+  }
 
-  public reloadExtensions(ev:MouseEvent) {
+  public reloadExtensions(ev: MouseEvent) {
     this.reloadingExtensions = true;
-    var index = 0;
-    var step = () => {
+    let index = 0;
+    const step = () => {
       if (index >= this.extensions.length) {
         this.saveExtensions(ev);
         this.reloadingExtensions = false;
@@ -61,11 +61,11 @@ export class SettingsComponent implements OnInit {
         });
     };
     step();
-  };
+  }
 
-  public saveExtensions(ev:MouseEvent) {
+  public saveExtensions(ev: MouseEvent) {
     window.localStorage.extensions = JSON.stringify(this.extensions);
-  };
+  }
 
   private handleError(error) {
     alert(error);

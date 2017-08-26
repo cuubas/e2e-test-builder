@@ -1,5 +1,5 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { Router } from "@angular/router";
+import { Router } from '@angular/router';
 import { IoProxy } from 'app/common/ioproxy';
 import { InstallComponent } from './install.component';
 
@@ -7,11 +7,11 @@ describe('InstallComponent', () => {
   let component: InstallComponent;
   let fixture: ComponentFixture<InstallComponent>;
   beforeEach(async(() => {
-    let mockRouter = {},
-       mockIoProxy = {};
+    const mockRouter = {},
+      mockIoProxy = {};
     TestBed.configureTestingModule({
-      declarations: [ InstallComponent ],
-      providers:[
+      declarations: [InstallComponent],
+      providers: [
         {
           provide: Router,
           useValue: mockRouter
@@ -22,7 +22,7 @@ describe('InstallComponent', () => {
         }
       ]
     })
-    .compileComponents();
+      .compileComponents();
   }));
 
   beforeEach(() => {
