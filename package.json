@@ -8,8 +8,10 @@
     "release": "gulp release",
     "ng": "ng",
     "test": "ng test",
+    "test:once": "ng test --single-run --code-coverage",
     "lint": "ng lint",
-    "e2e": "ng e2e"
+    "e2e": "ng e2e",
+    "ci": "npm run test:once"
   },
   "dependencies": {
     "@angular/animations": "^4.2.4",
