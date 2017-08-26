@@ -101,7 +101,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     window.removeEventListener('beforeunload', this.handleOnBeforeUnload);
   }
 
-  toggleRecording(): void {
+  public toggleRecording(ev:MouseEvent): void {
     Messenger.send({ call: 'toggleRecording' });
   };
 
@@ -127,7 +127,7 @@ export class HomeComponent implements OnInit, OnDestroy {
       .subscribe(this.processFile.bind(this), this.handleError);
   };
 
-  public open(): void {
+  public open(ev:MouseEvent): void {
     this.ioProxy.open(window.localStorage.lastPath)
       .subscribe(this.processFile.bind(this), this.handleError);
   };
@@ -139,13 +139,13 @@ export class HomeComponent implements OnInit, OnDestroy {
     });
   };
 
-  public run(): void {
+  public run(ev:MouseEvent): void {
     this.reset();
     this.running = true;
     chrome.tabs.sendMessage(window.currentTabId, { call: 'execute', commands: this.testCase.items, index: this.selectedIndex, count: this.testCase.items.length, options: this.settings });
   };
 
-  public interruptRunner(): void {
+  public interruptRunner(ev:MouseEvent): void {
     chrome.tabs.sendMessage(window.currentTabId, { call: 'interruptRunner' });
     this.running = false;
   };
@@ -172,7 +172,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.selectedIndex = index;
   };
 
-  public save(ev: Event, saveAs: boolean, format: BaseFormatter) {
+  public save(ev: Event, saveAs: boolean = false, format: BaseFormatter = null) {
     if (format) {
       this.formatter = format;
     }

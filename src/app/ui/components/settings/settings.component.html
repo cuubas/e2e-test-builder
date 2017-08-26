@@ -40,13 +40,13 @@
 <div class="row">
   <h2 class="col">Extensions</h2>
   <div class="col actions">
-    <a (click)="reloadExtensions()" *ngIf="extensions.length" class="halflings" [ngClass]="{'halflings-refresh':!reloadingExtensions, 'halflings-time': reloadingExtensions}"
+    <a (click)="reloadExtensions($event)" *ngIf="extensions.length" class="halflings" [ngClass]="{'halflings-refresh':!reloadingExtensions, 'halflings-time': reloadingExtensions}"
       title="reload extensions from disk"></a>
-    <a (click)="addExtension()" class="halflings halflings-plus" title="add extension"></a>
+    <a (click)="addExtension($event)" class="halflings halflings-plus" title="add extension"></a>
   </div>
 </div>
 <div class="extensions">
-  <ul sv-root sv-on-sort="saveExtensions()" sv-part="extensions">
+  <ul sv-root sv-on-sort="saveExtensions($event)" sv-part="extensions">
     <li *ngFor="let ext of extensions" class="row" sv-element>
       <div class="col">{{ext.path}}</div>
       <a class="col remove" (click)="removeExtension($event, ext)"></a>

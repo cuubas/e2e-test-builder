@@ -25,7 +25,6 @@ export class Messenger {
     }
   }
 
-  public static send(message: any, callback?: (response: any) => void)
   public static send(message: CallAction, callback?: (response: any) => void)
   public static send(message: GetAction, callback?: (response: any) => void)
   public static send(message: SetAction, callback?: (response: any) => void)
@@ -40,6 +39,7 @@ export class Messenger {
 
 export class CallAction {
   public call: string;
+  [prop:string]:any; // allow arbitrary properties
 }
 
 export class GetAction {

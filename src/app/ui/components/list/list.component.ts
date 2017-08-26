@@ -55,7 +55,7 @@ export class ListComponent implements OnInit {
   };
 
   public notifySelect(index) {
-    this.onSelect.emit({ index: index });
+    this.onSelect.emit(index);
   };
 
   public highlight(ev, item) {
