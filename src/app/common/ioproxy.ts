@@ -1,5 +1,6 @@
 import { Injectable, NgZone } from '@angular/core';
-import { Observable, Observer } from 'rxjs';
+import { Observable } from 'rxjs/observable';
+import { Observer } from 'rxjs/observer';
 
 @Injectable()
 export class IoProxy {
