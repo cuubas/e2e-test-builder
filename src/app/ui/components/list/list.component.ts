@@ -21,7 +21,7 @@ export class ListComponent implements OnInit {
   @Output() onSelect = new EventEmitter();
 
   public STATES = COMMAND_STATE;
-  private dragState: DragState = new DragState();
+  public dragState: DragState = new DragState();
 
   constructor(
     private element: ElementRef,
