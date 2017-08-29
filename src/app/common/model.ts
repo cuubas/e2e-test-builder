@@ -23,6 +23,7 @@ export class TestCaseItem {
   public type: 'command' | 'comment';
   public command: string;
   public locator: string;
+  public selecting?: boolean;
   public value: string;
   public state?: string;
   public message?: string;

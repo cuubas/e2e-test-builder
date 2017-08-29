@@ -41,9 +41,35 @@ app-list {
       }
     }
     &:first-child,
-    &.sv-helper+.item-wrapper {
+    &.drag-target--initial:first-child + .item-wrapper {
       .item {
         border-top: 2px solid #eee;
+      }
+    }
+    &.drag-target {
+      &--after {
+        &:after {
+          display: block;
+          content: ' ';
+          height: 25px;
+          border: 2px dashed #ccc;
+          margin: 2px;
+        }
+      }
+      &--before {
+        &:before {
+          display: block;
+          content: ' ';
+          height: 25px;
+          border: 2px dashed #ccc;
+          margin: 2px;
+        }
+      }
+      &--initial {
+        .item,
+        .toolbar {
+          display: none;
+        }
       }
     }
   }
@@ -63,7 +89,8 @@ app-list {
     &.failed .command {
       background-color: #ffd3d3;
     }
-    &:hover, &.item--selected {
+    &:hover,
+    &.item--selected {
       background-color: #f6f6f6;
     }
     &:hover {
@@ -74,7 +101,8 @@ app-list {
     }
     &.item--comment {
       background-color: #d9efff;
-      &:hover, &.item--selected {
+      &:hover,
+      &.item--selected {
         background-color: #cbe9ff;
       }
     }

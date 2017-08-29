@@ -1,16 +1,23 @@
-<div sv-root sv-on-sort="onSort($indexFrom, $indexTo)" sv-part="items">
-  <div *ngFor="let item of items;index as $index; trackBy: trackByIndex" [ngSwitch]="item.type" sv-element class="item-wrapper" (mousedown)="notifySelect($index)">
+<div (drop)="handleDrop($event)" (dragover)="handleDragOver($event)">
+  <div *ngFor="let item of items;index as $index; trackBy: trackByIndex"
+       [ngSwitch]="item.type" class="item-wrapper" 
+       (mousedown)="handleSelect($event, item, $index)"
+       [ngClass]="{'drag-target--after': dragState.targetIndex === $index && !dragState.before, 'drag-target--before': dragState.targetIndex === $index && dragState.before,  'drag-target--initial': $index === dragState.initialIndex}"
+       draggable="true"
+       (dragstart)="handleDragStart($event, item, $index)"
+       (dragend)="handleDragEnd($event)"
+       (dragenter)="handleDragEnter($event, $index)">
     <div class="toolbar">
       <a (click)="add('command', $index)" class="add-command halflings halflings-plus" title="insert command here"></a>
       <a (click)="add('comment', $index)" class="add-comment halflings halflings-comments" title="insert comment here"></a>
     </div>
     <div *ngSwitchCase="comment" class="item item--comment" [ngClass]="{'item--selected': selectedIndex === $index}">
-      <div sv-handle class="handle"></div>
+      <div class="handle"></div>
       <div class="comment focus"><input [(ngModel)]="item.value" placeholder="enter a comment" /></div>
       <a (click)="remove($event, item)" class="remove"></a>
     </div>
     <div *ngSwitchDefault class="item item--command" [ngClass]="{'item--selected': selectedIndex === $index, 'in-progress': item.state === STATES.INPROGRESS, 'done': item.state === STATES.DONE, 'failed': item.state === STATES.FAILED }">
-      <div sv-handle class="handle"></div>
+      <div class="handle"></div>
       <div class="command focus"><input list="commands" [(ngModel)]="item.command" (dblclick)="execute($event, item, $index)" placeholder="command" /></div>
       <div class="locator">
         <input [(ngModel)]="item.locator" (click)="highlight($event, item)" placeholder="locator" />
