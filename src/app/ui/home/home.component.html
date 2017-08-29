@@ -24,6 +24,7 @@
   <span class="separator"></span>
   <a (click)="run($event)" *ngIf="!running" title="execute commands" class="home__toolbar-item halflings halflings-play"></a>
   <a (click)="interruptRunner($event)" *ngIf="running" title="cancel runner" class="home__toolbar-item halflings halflings-stop"></a>
+  <a (click)="remove()" *ngIf="selection.start!==selection.end" title="remove selected commands" class="home__toolbar-item halflings halflings-trash"></a>
   <a (click)="toggleRecording($event)" title="{{isRecordingEnabled?'stop recording':'start recording'}}" class="home__toolbar-item halflings"
     [ngClass]="{'halflings-record':isRecordingEnabled, 'halflings-record-empty':!isRecordingEnabled}"></a>
   <a (click)="toggleSettings(true)" title="open settings" class="home__toolbar-item halflings halflings-cog"></a>

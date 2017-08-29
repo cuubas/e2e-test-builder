@@ -69,7 +69,7 @@ export class HomeComponent implements OnInit, OnDestroy {
       commandStateChange: (request, callback) => {
         this.ngZone.run(() => {
           if (this.running
-            && request.index === (this.selection.end - this.selection.start) || (this.testCase.items.length - 1) // either execute all or selected range
+            && request.index === ((this.selection.end - this.selection.start) ? this.selection.end : (this.testCase.items.length - 1)) // either execute all or selected range
             && (request.state === COMMAND_STATE.DONE || request.state === COMMAND_STATE.FAILED)) {
             this.running = false;
           }
@@ -152,6 +152,12 @@ export class HomeComponent implements OnInit, OnDestroy {
       count: (this.selection.end - this.selection.start + 1) || this.testCase.items.length, // either execute all or selected range
       options: this.settings
     });
+  }
+
+  public remove(): void {
+    this.testCase.items.splice(this.selection.start, (this.selection.end - this.selection.start) + 1);
+    this.selection.end = this.selection.start;
+    this.onChange();
   }
 
   public interruptRunner(ev: MouseEvent): void {
