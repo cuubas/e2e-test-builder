@@ -37,3 +37,8 @@ export class TestCaseItem {
     }
   }
 }
+
+export class SelectionRange {
+  public start = 0;
+  public end = 0;
+}

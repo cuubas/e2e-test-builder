@@ -2,7 +2,7 @@ import { Component, OnInit, ViewEncapsulation, Input, Output, EventEmitter, Elem
 import { highlight } from 'app/common/element-helper';
 import { COMMAND_STATE } from 'app/common/runner/states';
 import { Messenger } from 'app/common/messenger';
-import { TestCaseItem } from 'app/common/model';
+import { TestCaseItem, SelectionRange } from 'app/common/model';
 import { IOptions } from 'app/common/runner/options';
 import { PositiveColor, NegativeColor } from 'app/ui/config';
 
@@ -14,11 +14,10 @@ import { PositiveColor, NegativeColor } from 'app/ui/config';
 })
 export class ListComponent implements OnInit {
   @Input() public items: TestCaseItem[];
-  @Input() public selectedIndex: number;
+  @Input() public selection: SelectionRange;
   @Input() public recording: boolean;
   @Input() public settings: IOptions;
   @Output() onChange = new EventEmitter();
-  @Output() onSelect = new EventEmitter();
 
   public STATES = COMMAND_STATE;
   public dragState: DragState = new DragState();
@@ -35,13 +34,14 @@ export class ListComponent implements OnInit {
 
         this.ngZone.run(() => {
           const indexOffset = request.indexOffset || 0;
-          this.items.splice(this.selectedIndex + 1 + indexOffset, 0, {
+          this.items.splice(this.selection.end + 1 + indexOffset, 0, {
             command: request.command,
             locator: request.locator,
             value: request.value,
             type: 'command'
           });
-          this.notifySelect(this.selectedIndex + 1);
+
+          this.selection.start = this.selection.end = this.selection.start + 1;
           this.onChange.emit();
         });
       },
@@ -60,10 +60,6 @@ export class ListComponent implements OnInit {
       }
     });
 
-  }
-
-  private notifySelect(index) {
-    this.onSelect.emit(index);
   }
 
   public highlight(ev, item) {
@@ -99,11 +95,6 @@ export class ListComponent implements OnInit {
     chrome.tabs.sendMessage(window.currentTabId, { call: 'select', locator: item.locator, index: this.items.indexOf(item) });
   }
 
-  public onSort(indexFrom, indexTo) {
-    this.notifySelect(indexTo);
-    this.onChange.emit();
-  }
-
   public add(type, index) {
     this.items.splice(index, 0, new TestCaseItem({ type: type } as TestCaseItem));
 
@@ -121,7 +112,15 @@ export class ListComponent implements OnInit {
   }
 
   public handleSelect(ev: MouseEvent, item: TestCaseItem, index: number) {
-    this.notifySelect(index);
+    if (ev.shiftKey) {
+      // if(this.selection.start === this.selection.end)
+      this.selection.end = index;
+    } else {
+      this.selection.start = this.selection.end = index;
+    }
+    if (this.selection.start > this.selection.end) {
+      [this.selection.start, this.selection.end] = [this.selection.end, this.selection.start];
+    }
     this.dragState.enabled = (<HTMLElement>ev.target).classList.contains('handle');
   }
 
@@ -170,7 +169,7 @@ export class ListComponent implements OnInit {
 
   public handleDrop(ev: DragEvent) {
     ev.preventDefault();
-    if (typeof this.dragState.initialIndex === 'number' && typeof this.dragState.targetIndex === 'number' && this.dragState.initialIndex !== this.dragState.targetIndex ) {
+    if (typeof this.dragState.initialIndex === 'number' && typeof this.dragState.targetIndex === 'number' && this.dragState.initialIndex !== this.dragState.targetIndex) {
       const data = JSON.parse(ev.dataTransfer.getData('application/json') || '{}');
       let targetIndex = this.dragState.initialIndex > this.dragState.targetIndex ? (this.dragState.targetIndex + 1) : this.dragState.targetIndex;
       if (this.dragState.before) {
@@ -178,7 +177,7 @@ export class ListComponent implements OnInit {
       }
       this.items.splice(this.dragState.initialIndex, 1);
       this.items.splice(targetIndex, 0, new TestCaseItem(data as TestCaseItem));
-      this.onSort(this.dragState.initialIndex, this.dragState.targetIndex);
+      this.onChange.emit();
     }
   }
 }

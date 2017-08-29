@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy, ViewEncapsulation, NgZone } from '@angula
 import { Title } from '@angular/platform-browser';
 import { IoProxy, FileResult } from 'app/common/ioproxy';
 import { PageTitle, PageTitleSeparator } from 'app/ui/config';
-import { TestCase, TestCaseItem } from 'app/common/model';
+import { TestCase, TestCaseItem, SelectionRange } from 'app/common/model';
 import { Messenger } from 'app/common/messenger';
 import { BaseFormatter, SupportedFormats } from 'app/common/formats';
 import { COMMAND_STATE } from 'app/common/runner/states';
@@ -23,7 +23,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   public testCase: TestCase;
   public supportedCommands: any[] = [];
   public extensions: FileResult[];
-  public selectedIndex = 0;
+  public selection: SelectionRange = new SelectionRange();
   public supportedFormats = SupportedFormats;
   public settings: IRunnerOptions;
   private file: FileResult;
@@ -69,7 +69,7 @@ export class HomeComponent implements OnInit, OnDestroy {
       commandStateChange: (request, callback) => {
         this.ngZone.run(() => {
           if (this.running
-            && request.index === this.testCase.items.length - 1
+            && request.index === (this.selection.end - this.selection.start) || (this.testCase.items.length - 1) // either execute all or selected range
             && (request.state === COMMAND_STATE.DONE || request.state === COMMAND_STATE.FAILED)) {
             this.running = false;
           }
@@ -148,8 +148,8 @@ export class HomeComponent implements OnInit, OnDestroy {
     chrome.tabs.sendMessage(window.currentTabId, {
       call: 'execute',
       commands: this.testCase.items,
-      index: this.selectedIndex,
-      count: this.testCase.items.length,
+      index: this.selection.start,
+      count: (this.selection.end - this.selection.start + 1) || this.testCase.items.length, // either execute all or selected range
       options: this.settings
     });
   }
@@ -171,14 +171,13 @@ export class HomeComponent implements OnInit, OnDestroy {
     if (this.testCase.items.length === 0) {
       this.testCase.items.push({ type: 'command' } as TestCaseItem);
     }
-    if (this.selectedIndex >= this.testCase.items.length) {
-      this.selectedIndex = this.testCase.items.length - 1;
+    if (this.selection.start >= this.testCase.items.length) {
+      this.selection.start = this.testCase.items.length - 1;
+    }
+    if (this.selection.end >= this.testCase.items.length) {
+      this.selection.end = this.testCase.items.length - 1;
     }
     this.updateTitle();
-  }
-
-  public onSelect(index): void {
-    this.selectedIndex = index;
   }
 
   public save(ev: Event, saveAs: boolean = false, format: BaseFormatter = null) {

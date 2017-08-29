@@ -29,7 +29,7 @@
   <a (click)="toggleSettings(true)" title="open settings" class="home__toolbar-item halflings halflings-cog"></a>
 </div>
 <div class="home__content">
-  <app-list [items]="testCase.items" [selectedIndex]="selectedIndex" (onSelect)="onSelect($event)" (onChange)="onChange()"
+  <app-list [items]="testCase.items" [selection]="selection" (onChange)="onChange()"
     [recording]="isRecordingEnabled" [settings]="settings"></app-list>
 </div>
 <div *ngIf="showSettings" class="modal">

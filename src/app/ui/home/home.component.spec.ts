@@ -3,6 +3,7 @@ import { Title } from '@angular/platform-browser';
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { IoProxy } from 'app/common/ioproxy';
 import { HomeComponent } from './home.component';
+import { SelectionRange } from 'app/common/model';
 import * as MessengerWrapper from 'app/common/messenger';
 
 describe('HomeComponent', () => {
@@ -42,11 +43,10 @@ describe('HomeComponent', () => {
 })
 class ListComponent {
   @Input() public items: any[];
-  @Input() public selectedIndex: number;
   @Input() public recording: boolean;
+  @Input() public selection: SelectionRange;
   @Input() public settings: any;
   @Output() onChange = new EventEmitter();
-  @Output() onSelect = new EventEmitter();
 }
 
 @Component({
