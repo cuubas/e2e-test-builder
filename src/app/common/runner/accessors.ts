@@ -12,7 +12,11 @@ runner.accessors.attribute = function (command) {
 };
 
 runner.propertyAccessor = function (property, command) {
-  return this.findElement(command.locator)[property];
+  let value = this.findElement(command.locator)[property];
+  if (property === 'textContent' || property === 'value') {
+    value = value.trim();
+  }
+  return value;
 };
 
 runner.accessors.text = runner.propertyAccessor.bind(runner, 'textContent');

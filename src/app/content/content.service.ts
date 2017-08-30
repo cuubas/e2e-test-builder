@@ -96,9 +96,15 @@ export class ContentService {
           value = this.lastEventTarget.textContent;
         }
         const matchingLocators = findLocators(this.lastEventTarget as HTMLElement, this.uiState.settings);
-        Messenger.send({ call: 'recordCommand', command: request.command, locator: matchingLocators[0], locators: matchingLocators, value: value });
+        Messenger.send({
+          call: 'recordCommand',
+          command: request.command,
+          locator: matchingLocators[0],
+          locators: matchingLocators,
+          value: (value || '').trim()
+        });
       },
-      supportedCommands: function (request, callback) {
+      supportedCommands: (request, callback) => {
         if (!this.supportedCommands) {
           this.supportedCommands = runner.getSupportedCommands();
         }
