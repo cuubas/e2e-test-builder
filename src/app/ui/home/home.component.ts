@@ -19,7 +19,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   public dirty: boolean;
   public running: boolean;
   public isRecordingEnabled: boolean;
-  public showSettings: boolean;
+  public modals: { settings: Modal, releaseNotes: Modal };
   public testCase: TestCase;
   public supportedCommands: any[] = [];
   public extensions: FileResult[];
@@ -35,18 +35,11 @@ export class HomeComponent implements OnInit, OnDestroy {
     private ngZone: NgZone,
     private ioProxy: IoProxy
   ) {
-    this.settings = Object.assign({}, RunnerOptions, JSON.parse(window.localStorage.settings || '{}'));
+    this.modals = {
+      settings: new SettingsModal(this),
+      releaseNotes: new ReleaseNotesModal(this)
+    };
 
-    Object.keys(this.settings).forEach((key) => {
-      if (this.settings[key] === '') {
-        this.settings[key] = RunnerOptions[key];
-      }
-    });
-
-    this.extensions = JSON.parse(window.localStorage.extensions || '[]');
-    if (!Array.isArray(this.extensions)) {
-      this.extensions = [];
-    }
     this.testCase = new TestCase();
     // maintain context for select methods
     this.checkRecordingStatus = this.checkRecordingStatus.bind(this);
@@ -165,13 +158,6 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.running = false;
   }
 
-  public toggleSettings(value: boolean): void {
-    this.showSettings = value;
-    if (!value) {
-      window.localStorage.settings = JSON.stringify(this.settings);
-    }
-  }
-
   public onChange(): void {
     this.dirty = true;
     if (this.testCase.items.length === 0) {
@@ -279,5 +265,52 @@ export class HomeComponent implements OnInit, OnDestroy {
         });
       });
     });
+  }
+}
+
+export class Modal {
+  public visible = false;
+  public constructor(protected view: HomeComponent) { }
+  public toggle(visible: boolean) {
+    this.visible = visible;
+  }
+}
+
+export class ReleaseNotesModal extends Modal {
+  public constructor(view: HomeComponent) {
+    super(view);
+    this.visible = window.localStorage.version !== chrome.runtime.getManifest().version;
+  }
+
+  public toggle(visible: boolean) {
+    super.toggle(visible);
+    if (!visible) {
+      window.localStorage.version = chrome.runtime.getManifest().version;
+    }
+  }
+}
+
+export class SettingsModal extends Modal {
+  public constructor(view: HomeComponent) {
+    super(view);
+    this.view.settings = Object.assign({}, RunnerOptions, JSON.parse(window.localStorage.settings || '{}'));
+
+    Object.keys(this.view.settings).forEach((key) => {
+      if (this.view.settings[key] === '') {
+        this.view.settings[key] = RunnerOptions[key];
+      }
+    });
+
+    this.view.extensions = JSON.parse(window.localStorage.extensions || '[]');
+    if (!Array.isArray(this.view.extensions)) {
+      this.view.extensions = [];
+    }
+  }
+
+  public toggle(visible: boolean) {
+    super.toggle(visible);
+    if (!visible) {
+      window.localStorage.settings = JSON.stringify(this.view.settings);
+    }
   }
 }

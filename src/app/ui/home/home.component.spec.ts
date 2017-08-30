@@ -17,7 +17,7 @@ describe('HomeComponent', () => {
     spyOn(MessengerWrapper.Messenger, 'bind').and.stub();
 
     TestBed.configureTestingModule({
-      declarations: [HomeComponent, ListComponent, SettingsComponent],
+      declarations: [HomeComponent, ListComponent, SettingsComponent, ReleaseNotesComponent],
       providers: [
         { provide: Title, useValue: titleStub },
         { provide: IoProxy, useValue: ioProxyStub }
@@ -27,6 +27,7 @@ describe('HomeComponent', () => {
   }));
 
   beforeEach(() => {
+    chrome.runtime.getManifest = jasmine.createSpy('getManifest').and.returnValue({ version: '1.1.3' });
     fixture = TestBed.createComponent(HomeComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
@@ -35,6 +36,7 @@ describe('HomeComponent', () => {
   it('should be created', () => {
     expect(component).toBeTruthy();
   });
+
 });
 
 @Component({
@@ -57,4 +59,11 @@ class SettingsComponent {
   @Input() public extensions;
   @Input() public testCase;
   @Input() public settings;
+}
+
+@Component({
+  selector: 'app-release-notes',
+  template: ''
+})
+class ReleaseNotesComponent {
 }

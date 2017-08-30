@@ -27,16 +27,22 @@
   <a (click)="remove()" *ngIf="selection.start!==selection.end" title="remove selected commands" class="home__toolbar-item halflings halflings-trash"></a>
   <a (click)="toggleRecording($event)" title="{{isRecordingEnabled?'stop recording':'start recording'}}" class="home__toolbar-item halflings"
     [ngClass]="{'halflings-record':isRecordingEnabled, 'halflings-record-empty':!isRecordingEnabled}"></a>
-  <a (click)="toggleSettings(true)" title="open settings" class="home__toolbar-item halflings halflings-cog"></a>
+  <a (click)="modals.settings.toggle(true)" title="open settings" class="home__toolbar-item halflings halflings-cog"></a>
 </div>
 <div class="home__content">
   <app-list [items]="testCase.items" [selection]="selection" (onChange)="onChange()"
     [recording]="isRecordingEnabled" [settings]="settings"></app-list>
 </div>
-<div *ngIf="showSettings" class="modal">
+<div *ngIf="modals.settings.visible" class="modal">
   <div class="modal__dialog">
-    <a (click)="toggleSettings(false)" title="close" class="halflings halflings-remove modal__close"></a>
+    <a (click)="modals.settings.toggle(false)" title="close" class="halflings halflings-remove modal__close"></a>
     <app-settings [testCase]="testCase" [settings]="settings" [extensions]="extensions" class="modal__content"></app-settings>
+  </div>
+</div>
+<div *ngIf="modals.releaseNotes.visible" class="modal">
+  <div class="modal__dialog">
+    <a (click)="modals.releaseNotes.toggle(false)" title="close" class="halflings halflings-remove modal__close"></a>
+    <app-release-notes class="modal__content"></app-release-notes>
   </div>
 </div>
 <datalist id="commands">

@@ -18,17 +18,21 @@
     position: relative;
     margin: auto;
     max-width: 90%;
-    max-height: 100%;
-    min-width: 40%;
+    max-height: 90%;
+    min-width: 450px;
     min-height: 50%;
     background-color: #fff;
     border-radius: 4px;
     box-shadow: $popout-shadow;
+    @media screen and (max-width: 500px) {
+      min-width: 90%;
+    }
   }
   &__content {
     display: block;
-    padding: 8px;
+    padding: 16px;
     overflow: auto;
-    max-height: 100vh;
+    max-height: 90vh;
+    box-sizing: border-box;    
   }
 }

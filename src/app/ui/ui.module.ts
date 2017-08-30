@@ -8,6 +8,7 @@ import { InstallComponent } from './install/install.component';
 import { ListComponent } from './components/list/list.component';
 import { SettingsComponent } from './components/settings/settings.component';
 import { IoProxy } from 'app/common/ioproxy';
+import { ReleaseNotesComponent } from './components/release-notes/release-notes.component';
 
 const routes: Routes = [
   { path: 'home', component: HomeComponent },
@@ -20,7 +21,7 @@ const routes: Routes = [
     RouterModule.forRoot(routes, { useHash: true })
   ],
   providers: [IoProxy],
-  declarations: [AppComponent, HomeComponent, InstallComponent, ListComponent, SettingsComponent],
+  declarations: [AppComponent, HomeComponent, InstallComponent, ListComponent, SettingsComponent, ReleaseNotesComponent],
   bootstrap: [AppComponent]
 })
 export class UiModule { }
