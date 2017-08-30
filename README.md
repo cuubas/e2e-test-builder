@@ -9,15 +9,15 @@ Chrome extension which allows you to record interactions and perform various ass
 ---
 ## concept
 
-In short: tag key elements with a custom attribute (e.g. test-id="input--name"), specify the name in settings and begin recording flows with reliable locators. 
+In short: tag key elements with a custom attribute (e.g. e2e-tag="input--name"), specify the name in settings and begin recording flows with reliable locators. 
 
-Convert these recorded test cases into code and use them as building blocks to make various suites that will eventually test your entire app. (need permission to open source protractor formatter)
+Test cases can be exported in selenium ide html format or as jasmine/protractor spec file that can be executed almost directly. The later exports a function that accepts 2 parameters: config and data.
 
-... to be continued
+See `/examples` on how to use them.
 
 ## extensions
 
-user extension is an additional javascript file that is executed in page context and have access to entire page and a test runner object. Runner itself is built with extensions in mind and allows you to add commands/accessors and hook into execution flow rather easily. New commands and accesors will automatically appear in suggestions list in ui window.
+User extension is an additional javascript file that is executed in page context and have access to entire page and a test runner object. Runner itself is built with extensions in mind and allows you to add commands/accessors and hook into execution flow rather easily. New commands and accesors will automatically appear in suggestions list in ui window.
 
 #### Some examples:
 
@@ -48,13 +48,15 @@ PRs are welcome for any open issues and feature requests. For anything new pleas
 
 ## development
 
-Most of the code base is written Javascript, except for IoProxy. At this point due to chrome extension limitations file system is accessed via Java app (uses JavaFx). Usable jar file is included in `host` / `host-win`. Java SDK and maven is required for it's development - source code is located in `src/io` and proxy is in `src/common/ioproxy.js`.
+Most of the code base is written TypeScript, except for IoProxy. At this point due to chrome extension limitations file system is accessed via Java app (uses JavaFx). Usable jar file and scripts are included in `host` / `host-win` directories. Java SDK and maven is required for it's development - source code is located in `src/io` and proxy is in `src/app/common/ioproxy.js`.
 
 #### steps:
 
 1. checkout repository
 2. run `npm install`
-3. run `gulp` (builds and watches related files)
+3. run `gulp` (builds and watches 3 angular-cli apps - background, content and ui)
 4. go to chrome://extensions/
 5. load unpacked extension - point to build directory
-6. run `host/register.sh` or `host-win/register.bat` to setup native client
+6. navigate to `host` (mac) or `host-win` (windows) directory
+7. edit `com.cuubas.ioproxy.json` and add `"chrome-extension://<EXTENSION_ID>/"` in `allowedOrigins` list.
+8. run `register.sh` or `register.bat` to setup native client
