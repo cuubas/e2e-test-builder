@@ -46,8 +46,8 @@
   </div>
 </div>
 <div class="extensions">
-  <ul sv-root sv-on-sort="saveExtensions($event)" sv-part="extensions">
-    <li *ngFor="let ext of extensions" class="row" sv-element>
+  <ul>
+    <li *ngFor="let ext of extensions" class="row">
       <div class="col">{{ext.path}}</div>
       <a class="col remove" (click)="removeExtension($event, ext)"></a>
     </li>
