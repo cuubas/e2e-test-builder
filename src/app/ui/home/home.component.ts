@@ -111,7 +111,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     const testCase = new TestCase({
       title: 'test case',
       baseUrl: '/',
-      items: [{ type: 'command' } as TestCaseItem]
+      items: [new TestCaseItem({ type: 'command' } as TestCaseItem)]
     });
     return testCase;
   }
@@ -175,7 +175,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   public onChange(): void {
     this.dirty = true;
     if (this.testCase.items.length === 0) {
-      this.testCase.items.push({ type: 'command' } as TestCaseItem);
+      this.testCase.items.push(new TestCaseItem({ type: 'command' } as TestCaseItem));
     }
     if (this.selection.start >= this.testCase.items.length) {
       this.selection.start = this.testCase.items.length - 1;
@@ -223,7 +223,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     if (this.formatter) {
       this.testCase = this.formatter.parse(this.file.data);
       if (!this.testCase.items.length) {
-        this.testCase.items.push({ type: 'command' } as TestCaseItem);
+        this.testCase.items.push(new TestCaseItem({ type: 'command' } as TestCaseItem));
       }
     } else {
       throw new Error('unsupported file format');

@@ -1,17 +1,21 @@
 <div (drop)="handleDrop($event)" (dragover)="handleDragOver($event)">
   <div *ngFor="let item of items;index as $index; trackBy: trackByIndex"
        [ngSwitch]="item.type" class="item-wrapper" 
-       (mousedown)="handleSelect($event, item, $index)"
-       [ngClass]="{'drag-target--after': dragState.targetIndex === $index && !dragState.before, 'drag-target--before': dragState.targetIndex === $index && dragState.before,  'drag-target--initial': $index === dragState.initialIndex}"
+       (mousedown)="handleSelect($event, $index)"
+       [ngClass]="{
+         'drag-target--after': dragState.targetIndex === $index && !dragState.before,
+         'drag-target--before': dragState.targetIndex === $index && dragState.before,
+         'drag-target--initial': dragState.startIndex <= $index &&  dragState.endIndex >= $index && !dragState.shouldCopy
+        }"
        draggable="true"
-       (dragstart)="handleDragStart($event, item, $index)"
+       (dragstart)="handleDragStart($event, $index)"
        (dragend)="handleDragEnd($event)"
        (dragenter)="handleDragEnter($event, $index)">
     <div class="toolbar">
       <a (click)="add('command', $index)" class="add-command halflings halflings-plus" title="insert command here"></a>
       <a (click)="add('comment', $index)" class="add-comment halflings halflings-comments" title="insert comment here"></a>
     </div>
-    <div *ngSwitchCase="comment" class="item item--comment" [ngClass]="{'item--selected': selection.start <= $index && selection.end >= $index}">
+    <div *ngSwitchCase="'comment'" class="item item--comment" [ngClass]="{'item--selected': selection.start <= $index && selection.end >= $index}">
       <div class="handle"></div>
       <div class="comment focus"><input [(ngModel)]="item.value" placeholder="enter a comment" /></div>
       <a (click)="remove($event, item)" class="remove"></a>
@@ -20,11 +24,11 @@
       <div class="handle"></div>
       <div class="command focus"><input list="commands" [(ngModel)]="item.command" (dblclick)="execute($event, item, $index)" placeholder="command" /></div>
       <div class="locator">
-        <input [(ngModel)]="item.locator" (click)="highlight($event, item)" placeholder="locator" />
+        <input [(ngModel)]="item.locator" (click)="highlight($event, item)" placeholder="locator" title="Keep in mind that you can use :contains('value ${value}') pseudo class in css locator, e.g. css=button:contains('ok')" />
         <a class="select-handle halflings" [ngClass]="{'halflings-record-empty': !item.selecting, 'halflings-record': item.selecting}" (click)="selectElement($event, item)" title="Select an element in the page"></a>
       </div>
       <div class="value"><input [(ngModel)]="item.value" placeholder="value" /></div>
-      <a (click)="remove($event, item)" class="remove"></a>
+      <a (click)="remove($event, item)" class="remove" title="remove"></a>
     </div>
     <div class="message" *ngIf="item.message">{{item.message}}</div>
     <div class="toolbar">
