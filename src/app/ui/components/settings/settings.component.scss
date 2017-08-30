@@ -1,0 +1,53 @@
+app-settings {
+  h2 {
+    margin: 8px 0;
+    &:first-child {
+      margin-top: 0;
+    }
+  }
+  .actions {
+    flex-grow: 0;
+    display: flex;
+    align-items: center;
+    flex-direction: row;
+    a {
+      cursor: pointer;
+      margin-left: 8px;
+    }
+  }
+  .fields {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    margin: 0px -8px;
+    >div {
+      flex: 1;
+      padding: 8px;
+      label {
+        span {
+          display: block;
+          margin-bottom: 2px;
+        }
+        input {
+          display: block;
+          width: 100%;
+          min-width: 200px;
+          box-sizing: border-box;
+          padding: 6px;
+        }
+      }
+    }
+  }
+  .extensions {
+    ul {
+      margin: 0;
+      padding: 0;
+      li {
+        padding: 8px 0px;
+        box-sizing: border-box;
+        margin: 0;
+        cursor: move;
+      }
+    }
+  }
+}

@@ -1,0 +1,56 @@
+<h2>Test case options</h2>
+<div class="fields">
+  <div>
+    <label>
+      <span>Title</span>
+      <input type="text" [(ngModel)]="testCase.title" />
+    </label>
+  </div>
+  <div>
+    <label>
+      <span>Base Url</span>
+      <input type="text" [(ngModel)]="testCase.baseUrl" />
+    </label>
+  </div>
+</div>
+<h2>Settings</h2>
+<div class="fields">
+  <div>
+    <label>
+      <span>Interval (ms)</span>
+      <input type="number" [(ngModel)]="settings.interval" title="wait time between commands" />
+    </label>
+  </div>
+  <div>
+    <label>
+      <span>Custom attribute</span>
+      <input type="text" [(ngModel)]="settings.customAttribute" />
+    </label>
+  </div>
+</div>
+<h2>Locators</h2>
+<div class="fields">
+  <div>
+    <label>
+      <span>List of types (space or comma separated)</span>
+      <input type="text" [(ngModel)]="settings.locators" />
+    </label>
+  </div>
+</div>
+<div class="row">
+  <h2 class="col">Extensions</h2>
+  <div class="col actions">
+    <a (click)="reloadExtensions($event)" *ngIf="extensions.length" class="halflings" [ngClass]="{'halflings-refresh':!reloadingExtensions, 'halflings-time': reloadingExtensions}"
+      title="reload extensions from disk"></a>
+    <a (click)="addExtension($event)" class="halflings halflings-plus" title="add extension"></a>
+  </div>
+</div>
+<div class="extensions">
+  <ul sv-root sv-on-sort="saveExtensions($event)" sv-part="extensions">
+    <li *ngFor="let ext of extensions" class="row" sv-element>
+      <div class="col">{{ext.path}}</div>
+      <a class="col remove" (click)="removeExtension($event, ext)"></a>
+    </li>
+  </ul>
+  <p *ngIf="!extensions.length">Click the plus button above to add an extension</p>
+</div>

@@ -1,0 +1,22 @@
+app-release-notes {
+  h2 {
+    margin: 8px 0;
+    &:first-child {
+      margin-top: 0;
+    }
+  }
+  dl {
+    dt {
+      font-size: 16px;
+    }
+    dd {
+      margin-top: 8px;
+      margin-bottom: 8px;
+      ul {
+        margin: 0;
+        padding: 0;
+        font-size: 14px;
+      }
+    }
+  }
+}

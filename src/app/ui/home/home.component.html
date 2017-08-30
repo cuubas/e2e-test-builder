@@ -1,0 +1,50 @@
+<div class="toolbar home__toolbar">
+  <span class="home__toolbar-item home__toolbar-item--dropdown">
+    <span class="halflings halflings-file"></span>
+    <span class="dropdown home__toolbar-dropdown">
+      <span class="dropdown__label">New test case format:</span>
+      <a class="dropdown__item" *ngFor="let format of supportedFormats" (click)="create($event, format)">
+        <span class="home__toolbar-dropdown-name">{{format.name}}</span>
+        <span class="home__toolbar-dropdown-ext">{{format.extension}}</span>
+      </a>
+    </span>
+  </span>
+  <a (click)="open($event)" title="open existing test case" class="home__toolbar-item halflings halflings-folder-open"></a>
+  <a (click)="save($event)" title="save" class="home__toolbar-item halflings halflings-floppy-disk"></a>
+  <span class="home__toolbar-item home__toolbar-item--dropdown">
+    <span class="halflings halflings-floppy-save"></span>
+    <span class="dropdown home__toolbar-dropdown">
+      <span class="dropdown__label">Save as:</span>
+      <a class="dropdown__item" *ngFor="let format of supportedFormats" (click)="save($event, true, format)">
+        <span class="home__toolbar-dropdown-name">{{format.name}}</span>
+        <span class="home__toolbar-dropdown-ext">{{format.extension}}</span>
+      </a>
+    </span>
+  </span>
+  <span class="separator"></span>
+  <a (click)="run($event)" *ngIf="!running" title="execute commands" class="home__toolbar-item halflings halflings-play"></a>
+  <a (click)="interruptRunner($event)" *ngIf="running" title="cancel runner" class="home__toolbar-item halflings halflings-stop"></a>
+  <a (click)="remove()" *ngIf="selection.start!==selection.end" title="remove selected commands" class="home__toolbar-item halflings halflings-trash"></a>
+  <a (click)="toggleRecording($event)" title="{{isRecordingEnabled?'stop recording':'start recording'}}" class="home__toolbar-item halflings"
+    [ngClass]="{'halflings-record':isRecordingEnabled, 'halflings-record-empty':!isRecordingEnabled}"></a>
+  <a (click)="modals.settings.toggle(true)" title="open settings" class="home__toolbar-item halflings halflings-cog"></a>
+</div>
+<div class="home__content">
+  <app-list [items]="testCase.items" [selection]="selection" (onChange)="onChange()"
+    [recording]="isRecordingEnabled" [settings]="settings"></app-list>
+</div>
+<div *ngIf="modals.settings.visible" class="modal">
+  <div class="modal__dialog">
+    <a (click)="modals.settings.toggle(false)" title="close" class="halflings halflings-remove modal__close"></a>
+    <app-settings [testCase]="testCase" [settings]="settings" [extensions]="extensions" class="modal__content"></app-settings>
+  </div>
+</div>
+<div *ngIf="modals.releaseNotes.visible" class="modal">
+  <div class="modal__dialog">
+    <a (click)="modals.releaseNotes.toggle(false)" title="close" class="halflings halflings-remove modal__close"></a>
+    <app-release-notes class="modal__content"></app-release-notes>
+  </div>
+</div>
+<datalist id="commands">
+  <option *ngFor="let cmd of supportedCommands" value="{{cmd.value}}">{{cmd.title}}</option>
+</datalist>

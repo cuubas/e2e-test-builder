@@ -2,7 +2,7 @@ runner.commands.alert = function (command) {
   alert(command.command + '|' + command.locator + '|' + command.value);
 };
 runner.commands.ajax = function (command, callback) {
-  pageProxy.run(function (command, callback) {
+  PageProxy.run(function (command, callback) {
     jQuery.get(command.locator).success(function (content, status, response) {
       callback(response.status);
     }).error(function (response) {
@@ -13,7 +13,7 @@ runner.commands.ajax = function (command, callback) {
   });
 };
 // angular detection and waiting
-var ngProxy = pageProxy.create(function (callback) {
+var ngProxy = new PageProxy(function (callback) {
   if (window.angular) {
     // window.angular.getTestability(document).whenStable(function () { // somehow whenStable doesn't invoke the callback
     angular.element(document).injector().get('$timeout')(function () {
