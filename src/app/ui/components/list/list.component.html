@@ -3,6 +3,7 @@
        [ngSwitch]="item.type" class="item-wrapper" 
        (mousedown)="handleSelect($event, $index)"
        [ngClass]="{
+         'selected': selection.start <= $index && selection.end >= $index,
          'drag-target--after': dragState.targetIndex === $index && !dragState.before,
          'drag-target--before': dragState.targetIndex === $index && dragState.before,
          'drag-target--initial': dragState.startIndex <= $index &&  dragState.endIndex >= $index && !dragState.shouldCopy
@@ -15,12 +16,12 @@
       <a (click)="add('command', $index)" class="add-command halflings halflings-plus" title="insert command here"></a>
       <a (click)="add('comment', $index)" class="add-comment halflings halflings-comments" title="insert comment here"></a>
     </div>
-    <div *ngSwitchCase="'comment'" class="item item--comment" [ngClass]="{'item--selected': selection.start <= $index && selection.end >= $index}">
+    <div *ngSwitchCase="'comment'" class="item item--comment">
       <div class="handle"></div>
       <div class="comment focus"><input [(ngModel)]="item.value" placeholder="enter a comment" /></div>
       <a (click)="remove($event, item)" class="remove"></a>
     </div>
-    <div *ngSwitchDefault class="item item--command" [ngClass]="{'item--selected': selection.start <= $index && selection.end >= $index, 'in-progress': item.state === STATES.INPROGRESS, 'done': item.state === STATES.DONE, 'failed': item.state === STATES.FAILED }">
+    <div *ngSwitchDefault class="item item--command" [ngClass]="{'in-progress': item.state === STATES.INPROGRESS, 'done': item.state === STATES.DONE, 'failed': item.state === STATES.FAILED }">
       <div class="handle"></div>
       <div class="command focus"><input list="commands" [(ngModel)]="item.command" (dblclick)="execute($event, item, $index)" placeholder="command" /></div>
       <div class="locator">

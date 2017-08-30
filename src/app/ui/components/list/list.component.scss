@@ -41,7 +41,7 @@ app-list {
       }
     }
     &:first-child,
-    &.drag-target--initial:first-child + .item-wrapper {
+    &.drag-target--initial:first-child+.item-wrapper {
       .item {
         border-top: 2px solid #eee;
       }
@@ -72,6 +72,19 @@ app-list {
         }
       }
     }
+    &.selected {
+      .item {
+        background-color: #f6f6f6;
+        &.item--comment {
+          background-color: #cbe9ff;
+        }
+      }
+      &+.selected {
+        .handle {
+          visibility: hidden;
+        }
+      }
+    }
   }
   .item {
     display: flex;
@@ -89,8 +102,7 @@ app-list {
     &.failed .command {
       background-color: #ffd3d3;
     }
-    &:hover,
-    &.item--selected {
+    &:hover {
       background-color: #f6f6f6;
     }
     &:hover {
@@ -101,8 +113,7 @@ app-list {
     }
     &.item--comment {
       background-color: #d9efff;
-      &:hover,
-      &.item--selected {
+      &:hover {
         background-color: #cbe9ff;
       }
     }
