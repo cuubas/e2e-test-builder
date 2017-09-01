@@ -23,9 +23,9 @@
     </div>
     <div *ngSwitchDefault class="item item--command" [ngClass]="{'in-progress': item.state === STATES.INPROGRESS, 'done': item.state === STATES.DONE, 'failed': item.state === STATES.FAILED }">
       <div class="handle"></div>
-      <div class="command focus"><input list="commands" [(ngModel)]="item.command" (dblclick)="execute($event, item, $index)" placeholder="command" /></div>
+      <div class="command focus"><input list="commands" [(ngModel)]="item.command" (dblclick)="execute($event, item, $index)" placeholder="command" title="double click to execute the command in active tab" /></div>
       <div class="locator">
-        <input [(ngModel)]="item.locator" (click)="highlight($event, item)" placeholder="locator" title="Keep in mind that you can use :contains('value ${value}') pseudo class in css locator, e.g. css=button:contains('ok')" />
+        <input [(ngModel)]="item.locator" (click)="highlight($event, item)" placeholder="locator" title="click to test the locator. Keep in mind that you can use :contains('value ${value}') pseudo class in css locator, e.g. css=button:contains('ok')" />
         <a class="select-handle halflings" [ngClass]="{'halflings-record-empty': !item.selecting, 'halflings-record': item.selecting}" (click)="selectElement($event, item)" title="Select an element in the page"></a>
       </div>
       <div class="value"><input [(ngModel)]="item.value" placeholder="value" /></div>
