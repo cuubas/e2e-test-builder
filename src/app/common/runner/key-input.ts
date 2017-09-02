@@ -10,7 +10,8 @@ Object.keys(SeleniumKey).forEach((key) => {
   mapToKeyOptions[SeleniumKey[key]] = {
     code: keyName,
     key: keyName,
-    which: KeyCode['KEY_' + key]
+    which: KeyCode['KEY_' + key],
+    bubbles: true
   };
 });
 // assign values
@@ -30,6 +31,7 @@ runner.createKeyEvent = function (type, options) {
 
 runner.simulateKeyInput = function (target, char) {
   const options = mapToKeyOptions[char] || {
+    bubbles: true,
     key: char,
     code: char,
     which: char.charCodeAt(0),
@@ -46,6 +48,8 @@ runner.simulateKeyInput = function (target, char) {
       target.value += options.value;
     }
   }
+  target.dispatchEvent(new InputEvent('input', { data: char, inputType: 'insertText', bubbles: true }));
+
   if (options.value === '\n' && target.form) {
     if (typeof (target.form.submit) === 'function') {
       target.form.submit();
@@ -53,6 +57,6 @@ runner.simulateKeyInput = function (target, char) {
       target.form.submit.click();
     }
   }
-  target.dispatchEvent(new Event('change'));
   target.dispatchEvent(this.createKeyEvent('keyup', options));
+  target.dispatchEvent(new Event('change'));
 };

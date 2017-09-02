@@ -133,8 +133,9 @@ runner.commands.type = function (command) {
   const element = this.findElement(command.locator);
   element.scrollIntoViewIfNeeded();
   element.dispatchEvent(new FocusEvent('focus'));
-  element.value = command.value;
-  element.dispatchEvent(new Event('change'));
+  element.value = '';
+  const chars = command.value.split('');
+  chars.forEach(runner.simulateKeyInput.bind(runner, element));
 };
 
 runner.commands.clear = function (command) {
