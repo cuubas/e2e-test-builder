@@ -2,6 +2,7 @@ import { Component, Input, OnInit, ViewEncapsulation } from '@angular/core';
 import { RequiredNativeClientVersion } from 'app/ui/config';
 import { Router } from '@angular/router';
 import { IoProxy } from 'app/common/ioproxy';
+import { NativeClientDownloadLink } from 'app/ui/config';
 
 @Component({
   selector: 'app-install',
@@ -28,7 +29,7 @@ export class InstallComponent implements OnInit {
       this.executable = 'register.bat';
     }
     this.nativeClientVersion = window.localStorage.nativeClientVersion;
-    this.hostLink = 'https://github.com/Cuubas/e2e-test-builder/releases/download/v1.0.0/' + name;
+    this.hostLink = NativeClientDownloadLink + name;
   }
 
   public verify(ev: Event) {
