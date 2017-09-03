@@ -137,12 +137,14 @@ export class HomeComponent implements OnInit, OnDestroy {
   public run(ev: MouseEvent): void {
     this.reset();
     this.running = true;
+     // either execute all starting at selected one or only selected range
+    const count = this.selection.end === this.selection.start ? this.testCase.items.length : (1 + this.selection.end - this.selection.start);
 
     chrome.tabs.sendMessage(window.currentTabId, {
       call: 'execute',
       commands: this.testCase.items,
       index: this.selection.start,
-      count: (this.selection.end - this.selection.start + 1) || this.testCase.items.length, // either execute all or selected range
+      count: count,
       options: this.settings
     });
   }
