@@ -22,9 +22,9 @@ export class ReleaseNotesComponent implements OnInit {
       const div = document.createElement('div');
       div.innerHTML = content.substring(content.indexOf('<body'), content.indexOf('</body') + 1);
       const latestNotes = div.querySelector('.release.label-latest .markdown-body');
-      this.makeLinksExternal(latestNotes);
       const target: HTMLElement = this.element.nativeElement.querySelector('.release-notes-placeholder');
       if (latestNotes) {
+        this.makeLinksExternal(latestNotes);
         target.innerHTML = '';
         target.appendChild(latestNotes);
       } else {
