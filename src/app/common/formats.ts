@@ -3,7 +3,7 @@ import { HtmlFormatter } from 'app/common/formats/html';
 import { ProtractorFormatter } from 'app/common/formats/protractor';
 
 
-const SupportedFormats = [
+const SupportedFormats: BaseFormatter[] = [
   new HtmlFormatter(),
   new ProtractorFormatter()
 ];

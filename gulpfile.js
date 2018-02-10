@@ -14,7 +14,7 @@ var release = tasks.indexOf('release') !== -1;
 
 function runNgBuild(app, done) {
   util.log('building ' + (shouldWatch ? ' and watching ' : '') + app);
-  var args = ['build', '--vendor-chunk=false', '--output-hashing=none'];
+  var args = ['build', '--vendor-chunk=false', '--output-hashing=none', '--aot=true'];
   args.push('--app=' + app);
   if (shouldWatch) {
     args.push('--watch');
