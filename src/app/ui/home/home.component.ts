@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ViewEncapsulation, NgZone } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewEncapsulation, NgZone, HostListener } from '@angular/core';
 import { Title } from '@angular/platform-browser';
 import { IoProxy, FileResult } from 'app/common/ioproxy';
 import { PageTitle, PageTitleSeparator } from 'app/ui/config';
@@ -7,6 +7,7 @@ import { Messenger } from 'app/common/messenger';
 import { BaseFormatter, SupportedFormats } from 'app/common/formats';
 import { COMMAND_STATE } from 'app/common/runner/states';
 import { Options as RunnerOptions, IOptions as IRunnerOptions } from 'app/common/runner/options';
+import { KeyCodes } from 'app/common/key-codes';
 
 @Component({
   selector: 'app-home',
@@ -122,7 +123,7 @@ export class HomeComponent implements OnInit, OnDestroy {
       .subscribe(this.processFile.bind(this), this.handleError);
   }
 
-  public open(ev: MouseEvent): void {
+  public open(ev: Event): void {
     this.ioProxy.open(window.localStorage.lastPath)
       .subscribe(this.processFile.bind(this), this.handleError);
   }
@@ -137,7 +138,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   public run(ev: MouseEvent): void {
     this.reset();
     this.running = true;
-     // either execute all starting at selected one or only selected range
+    // either execute all starting at selected one or only selected range
     const count = this.selection.end === this.selection.start ? this.testCase.items.length : (1 + this.selection.end - this.selection.start);
 
     chrome.tabs.sendMessage(window.currentTabId, {
@@ -267,6 +268,20 @@ export class HomeComponent implements OnInit, OnDestroy {
         });
       });
     });
+  }
+
+  @HostListener('window:keydown', ['$event'])
+  private handleKeyInput(ev: KeyboardEvent) {
+    if (ev.ctrlKey && ev.which === KeyCodes.S) {
+      ev.preventDefault();
+      this.save(ev, ev.shiftKey, this.formatter);
+    } else if (ev.ctrlKey && ev.which === KeyCodes.O) {
+      ev.preventDefault();
+      this.open(ev);
+    } else if (ev.ctrlKey && ev.which === KeyCodes.N) {
+      ev.preventDefault();
+      this.create(ev, this.formatter);
+    }
   }
 }
 

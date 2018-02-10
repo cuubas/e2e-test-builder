@@ -1,6 +1,6 @@
 <div class="toolbar home__toolbar">
   <span class="home__toolbar-item home__toolbar-item--dropdown">
-    <span class="halflings halflings-file"></span>
+    <span class="halflings halflings-file" title="new test case (ctrl + n)"></span>
     <span class="dropdown home__toolbar-dropdown">
       <span class="dropdown__label">New test case format:</span>
       <a class="dropdown__item" *ngFor="let format of supportedFormats" (click)="create($event, format)">
@@ -9,10 +9,10 @@
       </a>
     </span>
   </span>
-  <a (click)="open($event)" title="open existing test case" class="home__toolbar-item halflings halflings-folder-open"></a>
-  <a (click)="save($event)" title="save" class="home__toolbar-item halflings halflings-floppy-disk"></a>
+  <a (click)="open($event)" title="open existing test case (ctrl + o)" class="home__toolbar-item halflings halflings-folder-open"></a>
+  <a (click)="save($event)" title="save (ctrl + s)" class="home__toolbar-item halflings halflings-floppy-disk"></a>
   <span class="home__toolbar-item home__toolbar-item--dropdown">
-    <span class="halflings halflings-floppy-save"></span>
+    <span class="halflings halflings-floppy-save" title="save as (ctrl + shift + s)"></span>
     <span class="dropdown home__toolbar-dropdown">
       <span class="dropdown__label">Save as:</span>
       <a class="dropdown__item" *ngFor="let format of supportedFormats" (click)="save($event, true, format)">
