@@ -150,7 +150,7 @@ register('assertnot', (cmd, formatter) => {
 
     register('store' + type, (cmd, formatter) => {
         return [
-            'browser.switchTo().alert().getText().then(function (_value){' + formatter.endOfLine,
+            'browser.switchTo().alert().getText().then((_value) => {' + formatter.endOfLine,
             formatter.whitespace + cmd.value + ' = _value;' + formatter.endOfLine,
             formatter.whitespace + 'browser.switchTo().alert().accept();' + formatter.endOfLine
         ];
@@ -158,15 +158,15 @@ register('assertnot', (cmd, formatter) => {
 });
 
 register('it', (cmd, formatter) => {
-    return (cmd.skip ? 'xit' : 'it') + '(' + formatter.quote(cmd.value) + ', function() {' + formatter.endOfLine.repeat(2);
+    return (cmd.skip ? 'xit' : 'it') + '(' + formatter.quote(cmd.value) + ', () => {' + formatter.endOfLine.repeat(2);
 }, true, true);
 
 register('desc', (cmd, formatter) => {
-    return (cmd.skip ? 'xdescribe' : 'describe') + '(' + formatter.quote(cmd.value) + ', function() {' + formatter.endOfLine.repeat(2);
+    return (cmd.skip ? 'xdescribe' : 'describe') + '(' + formatter.quote(cmd.value) + ', () => {' + formatter.endOfLine.repeat(2);
 }, true);
 
 register('export', (cmd, formatter) => {
-    return 'module.exports = (function(config, data) {' + formatter.endOfLine.repeat(2);
+    return 'module.exports = ((config, data) => {' + formatter.endOfLine.repeat(2);
 }, true);
 
 register('breakif', (cmd, formatter) => {
@@ -209,7 +209,7 @@ register('callback', (cmd, formatter) => {
 register('click', (cmd, formatter) => {
     return [
         handlers['focus'](cmd, formatter),
-        locator(cmd.locator, formatter) + '.click().then(function(){},function(err){ fail(err+"\\ncommand: "+' + formatter.quote(formatter.stringifyCommand(cmd), true) + '); });' + formatter.endOfLine.repeat(2)
+        locator(cmd.locator, formatter) + '.click().then(null, (err) => fail(err + "\\ncommand: " + ' + formatter.quote(formatter.stringifyCommand(cmd), true) + '));' + formatter.endOfLine.repeat(2)
     ];
 });
 function mouseAction(type, button, withOffset, cmd, formatter) {
@@ -222,7 +222,7 @@ function mouseAction(type, button, withOffset, cmd, formatter) {
     }
     return [
         handlers['focus'](cmd, formatter),
-        'browser.actions().mouseMove(' + locator(cmd.locator, formatter) + offset + ').' + type + '(' + button + ').perform().then(function(){},function(err){ fail(err+"\\ncommand: "+' + formatter.quote(formatter.stringifyCommand(cmd), true) + '); });' + formatter.endOfLine.repeat(2)
+        'browser.actions().mouseMove(' + locator(cmd.locator, formatter) + offset + ').' + type + '(' + button + ').perform().then(null, (err) => fail(err + "\\ncommand: " + ' + formatter.quote(formatter.stringifyCommand(cmd), true) + '));' + formatter.endOfLine.repeat(2)
     ];
 }
 register('mousedown', mouseAction.bind(this, 'mouseDown', 0, false));
@@ -303,11 +303,11 @@ register('select', (cmd, formatter) => {
 register('selectframe', (cmd, formatter) => {
     const list = [];
     if (cmd.locator === 'relative=top' || !cmd.locator) {
-        list.push('browser.switchTo().defaultContent().then(function (){' + formatter.endOfLine);
+        list.push('browser.switchTo().defaultContent().then(() => {' + formatter.endOfLine);
         list.push(formatter.whitespace + 'browser.ignoreSynchronization = false;' + formatter.endOfLine);
     } else {
         list.push('browser.ignoreSynchronization = true;' + formatter.endOfLine);
-        list.push('browser.switchTo().frame(' + locator(cmd.locator, formatter) + '.getWebElement()).then(function (){' + formatter.endOfLine);
+        list.push('browser.switchTo().frame(' + locator(cmd.locator, formatter) + '.getWebElement()).then(() => {' + formatter.endOfLine);
     }
     return list;
 }, true);

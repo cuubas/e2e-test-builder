@@ -60,7 +60,7 @@ Formatter.prototype.stringify = function (testCase) {
     });
     // in case desc or export command is not used, define variables in top most scope
     if (noDescOrExportCommand && variables.length > 0) {
-        push('var ' + variables.join(', ') + ';' + this.endOfLine.repeat(2));
+        push('let ' + variables.join(', ') + ';' + this.endOfLine.repeat(2));
     }
     // do we return a function or just run once?
     if (testCase.commands.length && testCase.commands[0].type === handlers.export.type) {
@@ -94,7 +94,7 @@ Formatter.prototype.stringify = function (testCase) {
         }
         // variables should be declared inside first desc block or export block
         if (variables.length > 0 && (handler.type === handlers.desc.type || handler.type === handlers.export.type)) {
-            push('var ' + variables.join(', ') + ';' + this.endOfLine.repeat(2));
+            push('let ' + variables.join(', ') + ';' + this.endOfLine.repeat(2));
             variables = [];
         }
     });

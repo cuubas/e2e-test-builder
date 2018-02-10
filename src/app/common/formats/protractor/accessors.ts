@@ -28,17 +28,17 @@ export function format(type, cmd, formatter, output) {
         cmd.locator = parts.join('@');
     }
     if (getter.isGlobal) {
-        output.push('browser' + getter(cmd.locator, formatter) + '.then(function (_value) {' + formatter.endOfLine);
+        output.push('browser' + getter(cmd.locator, formatter) + '.then((_value) => {' + formatter.endOfLine);
     } else if (getter.inBrowserContext && !cmd.locator) {
         // executeAsyncScript passes callback as last argument, thus arguments[arguments.length - 1]
         // tslint:disable-next-line:max-line-length
-        output.push(`browser.executeAsyncScript('arguments[arguments.length - 1](document.documentElement` + getter(type, formatter) + ` || document.body` + getter(type, formatter) + `)')` + `.then(function (_value) {` + formatter.endOfLine);
+        output.push(`browser.executeAsyncScript('arguments[arguments.length - 1](document.documentElement` + getter(type, formatter) + ` || document.body` + getter(type, formatter) + `)')` + `.then((_value) => {` + formatter.endOfLine);
     } else if (getter.inBrowserContext) {
         // executeAsyncScript passes callback as last argument, thus arguments[arguments.length - 1]
         // tslint:disable-next-line:max-line-length
-        output.push(`browser.executeAsyncScript('arguments[arguments.length - 1](arguments[0]` + getter(type, formatter) + `)', ` + locator(cmd.locator, formatter) + `.getWebElement())` + `.then(function (_value) {` + formatter.endOfLine);
+        output.push(`browser.executeAsyncScript('arguments[arguments.length - 1](arguments[0]` + getter(type, formatter) + `)', ` + locator(cmd.locator, formatter) + `.getWebElement())` + `.then((_value) => {` + formatter.endOfLine);
     } else {
-        output.push(locator(cmd.locator, formatter, getter.isMulti) + getter(type, formatter) + `.then(function (_value) {` + formatter.endOfLine);
+        output.push(locator(cmd.locator, formatter, getter.isMulti) + getter(type, formatter) + `.then((_value) => {` + formatter.endOfLine);
     }
     return getter;
 }
@@ -60,23 +60,23 @@ register('text', (value, formatter) => {
 });
 
 register('elementwidth', (value, formatter) => {
-    return '.getSize().then(function (s){return s.width;})';
+    return '.getSize().then(s => s.width)';
 }, 'number');
 
 register('elementheight', (value, formatter) => {
-    return '.getSize().then(function (s){return s.height;})';
+    return '.getSize().then(s => s.height)';
 }, 'number');
 
 register('elementpositionleft', (value, formatter) => {
-    return '.getLocation().then(function (l){return l.x;})';
+    return '.getLocation().then(l => l.x)';
 }, 'number');
 
 register('elementpositiontop', (value, formatter) => {
-    return '.getLocation().then(function (l){return l.y;})';
+    return '.getLocation().then(l => l.y)';
 }, 'number');
 
 register('elementheight', (value, formatter) => {
-    return '.getSize().then(function (s){return s.height;})';
+    return '.getSize().then(s => s.height)';
 }, 'number');
 
 register('elementpresent', (value, formatter) => {
