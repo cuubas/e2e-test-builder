@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewEncapsulation, ElementRef } from '@angular/core';
-import { Http } from '@angular/http';
+import { HttpClient } from '@angular/common/http';
 import { ReleaseNotesLink } from 'app/ui/config';
 @Component({
   selector: 'app-release-notes',
@@ -11,14 +11,13 @@ export class ReleaseNotesComponent implements OnInit {
   public releaseNotesUrl: string = ReleaseNotesLink;
   public version: string;
   constructor(
-    private http: Http,
+    private http: HttpClient,
     private element: ElementRef
   ) { }
 
   ngOnInit() {
     this.version = chrome.runtime.getManifest().version;
-    this.http.get(this.releaseNotesUrl).subscribe((response) => {
-      const content = response.text();
+    this.http.get(this.releaseNotesUrl, { responseType: 'text' }).subscribe((content) => {
       const div = document.createElement('div');
       div.innerHTML = content.substring(content.indexOf('<body'), content.indexOf('</body') + 1);
       const latestNotes = div.querySelector('.release.label-latest .markdown-body');

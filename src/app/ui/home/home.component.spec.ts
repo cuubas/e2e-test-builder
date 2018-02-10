@@ -48,7 +48,7 @@ class ListComponent {
   @Input() public recording: boolean;
   @Input() public selection: SelectionRange;
   @Input() public settings: any;
-  @Output() onChange = new EventEmitter();
+  @Output() change = new EventEmitter();
 }
 
 @Component({

@@ -17,7 +17,7 @@ export class ListComponent implements OnInit {
   @Input() public selection: SelectionRange;
   @Input() public recording: boolean;
   @Input() public settings: IOptions;
-  @Output() onChange = new EventEmitter();
+  @Output() change = new EventEmitter();
 
   public STATES = COMMAND_STATE;
   public dragState: DragState = new DragState();
@@ -42,7 +42,7 @@ export class ListComponent implements OnInit {
           });
 
           this.selection.start = this.selection.end = this.selection.end + 1;
-          this.onChange.emit();
+          this.change.emit();
         });
       },
       commandStateChange: (request, callback) => {
@@ -104,7 +104,7 @@ export class ListComponent implements OnInit {
 
   public remove(ev: MouseEvent, item: TestCaseItem) {
     this.items.splice(this.items.indexOf(item), 1);
-    this.onChange.emit();
+    this.change.emit();
   }
 
   public trackByIndex(index: number, obj: any): any {
@@ -200,7 +200,7 @@ export class ListComponent implements OnInit {
       // update selected items
       this.selection.start = targetIndex;
       this.selection.end = this.selection.start + length;
-      this.onChange.emit();
+      this.change.emit();
     }
   }
 }

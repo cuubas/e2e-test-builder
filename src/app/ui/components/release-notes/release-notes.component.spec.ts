@@ -1,5 +1,5 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { Http } from '@angular/http';
+import { HttpClient } from '@angular/common/http';
 import { By } from '@angular/platform-browser';
 import { ReleaseNotesComponent } from './release-notes.component';
 
@@ -12,9 +12,7 @@ describe('ReleaseNotesComponent', () => {
       get: () => {
         return {
           subscribe: (cb) => {
-            cb({
-              text: () => '<html><head></head><body><div class="release label-latest"><div class="markdown-body">Hi!</div></div></body></html>'
-            });
+            cb('<html><head></head><body><div class="release label-latest"><div class="markdown-body">Hi!</div></div></body></html>');
           }
         };
       }
@@ -22,7 +20,7 @@ describe('ReleaseNotesComponent', () => {
     TestBed.configureTestingModule({
       declarations: [ReleaseNotesComponent],
       providers: [
-        { provide: Http, useValue: fakeHttp }
+        { provide: HttpClient, useValue: fakeHttp }
       ]
     })
       .compileComponents();
