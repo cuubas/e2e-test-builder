@@ -22,6 +22,8 @@ fi
 
 HOST_NAME=com.cuubas.ioproxy
 
+chmod +x "./$HOST_NAME"
+
 # Create directory to store native messaging host.
 mkdir -p "$TARGET_DIR"
 
