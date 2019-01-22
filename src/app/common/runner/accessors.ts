@@ -112,3 +112,19 @@ runner.accessors.selectedValue = runner.propertyAccessor.bind(runner, 'selectedV
 runner.accessors.selectedLabel = function (command) {
   return this.findElement(command.locator).selectedOptions.item(0).textContent;
 };
+
+runner.accessors.elementToBeClickable = function(command) {
+  const element = this.findElement(command.locator) as HTMLElement;
+  if (element) {
+    const rect = element.getBoundingClientRect();
+
+    // TODO: possibly check of overlapping elements
+    if (rect && rect.width && rect.height) {
+      if (element.tagName === 'INPUT' || element.tagName === 'BUTTON') {
+        return !(element as HTMLInputElement).disabled;
+      }
+      return true;
+    }
+  }
+  return false;
+};

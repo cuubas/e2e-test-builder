@@ -1,63 +1,30 @@
-"use strict";
-var tasks = process.argv.slice(2);
-var spawn = require('child_process').spawn;
-var exec = require('child_process').exec;
-var fs = require('fs');
-var gulp = require('gulp');
-var util = require("gulp-util");
+const { series, parallel, watch, src, dest } = require('gulp');
+const replace = require('gulp-replace');
 var zip = require('gulp-zip');
-var replace = require('gulp-replace');
+const spawn = require('child_process').spawn;
+const exec = require('child_process').exec;
+const fs = require('fs');
 
-// few flags
-var shouldWatch = tasks.length === 0;
-var release = tasks.indexOf('release') !== -1;
-
-function runNgBuild(app, done) {
-  util.log('building ' + (shouldWatch ? ' and watching ' : '') + app);
-  var args = ['build', '--vendor-chunk=false', '--output-hashing=none', '--aot=true'];
-  args.push('--app=' + app);
+function createNgBuildTask(app, shouldWatch, isProduction) {
+  console.log('building ' + (shouldWatch ? ' and watching ' : '') + app);
+  var args = ['build', app, '--vendor-chunk=false', '--output-hashing=none', '--aot=true'];
   if (shouldWatch) {
     args.push('--watch');
   }
-  if (release) {
+  if (isProduction) {
     args.push('--prod');
   }
 
-  var cmd = spawn(process.platform === "win32" ? "ng.cmd" : "ng", args, { stdio: 'inherit' });
-  cmd.on('exit', done);
+  const ngBuild = function () {
+    return spawn(process.platform === "win32" ? "ng.cmd" : "ng", args, { stdio: 'inherit' });
+  }
+
+  ngBuild.displayName = 'ng ' + args.join(' ');
+
+  return ngBuild;
 }
-gulp.task('copy-assets', () => {
-  return gulp.src('assets/**/*').pipe(gulp.dest('build/assets/'));
-});
 
-gulp.task('build-manifest', () => {
-  var pack = JSON.parse(fs.readFileSync('./package.json'));
-  return gulp.src('src/manifest.json')
-    .pipe(replace('{{package.version}}', pack.version))
-    .pipe(replace('{{defaultIcon}}', 'assets/icon-c@32.png'))
-    .pipe(replace('"{{icons}}"', '{ ' + [16, 32, 48, 128, 256, 512].map((size) => `"${size}" : "assets/icon-c@${size}.png"`).join(', ') + ' }'))
-    .pipe(gulp.dest('build/'));
-});
-
-gulp.task('build-background-script', runNgBuild.bind(this, 'background'));
-gulp.task('build-content-script', runNgBuild.bind(this, 'content'));
-gulp.task('build-ui', runNgBuild.bind(this, 'ui'));
-
-gulp.task('build-io-proxy', (done) => {
-
-  var child = exec("mvn package", { cwd: 'src/io' }, (err) => {
-    if (err) {
-      util.log(err);
-    } else {
-      util.log('io built');
-    }
-    gulp.src("src/io/target/ioproxy-1.0.jar").pipe(gulp.dest("host"));
-    gulp.src("src/io/target/ioproxy-1.0.jar").pipe(gulp.dest("host-win"));
-    done();
-  });
-});
-
-gulp.task('pack', () => {
+function pack() {
   try {
     fs.unlinkSync('build.zip');
   } catch (err) {
@@ -65,19 +32,64 @@ gulp.task('pack', () => {
       throw err;
     }
   }
-  return gulp.src(['build/**/*', '!**/*.db', '!background/index.html', '!content/index.html'])
+  return src(['build/**/*', '!**/*.db', '!background/index.html', '!content/index.html'])
     .pipe(zip('build.zip'))
-    .pipe(gulp.dest('./'));
-});
+    .pipe(dest('./'));
+}
 
-gulp.task('build', ['copy-assets', 'build-manifest', 'build-background-script', 'build-content-script', 'build-ui']);
-gulp.task('release', ['build'], (cb) => {
-  gulp.start('pack', [], cb);
-});
+function copyAssets() {
+  return src('assets/**/*').pipe(dest('build/assets/'));
+}
 
-gulp.task('default', () => {
-  gulp.start('build');
-  gulp.watch(['src/manifest.json', 'package.json'], ['build-manifest']);
-  gulp.watch('src/io/src/**/*', ['build-io-proxy']);
+function buildManifest() {
+  const pack = JSON.parse(fs.readFileSync('./package.json'));
+  return src('src/manifest.json')
+    .pipe(replace('{{package.version}}', pack.version))
+    .pipe(replace('{{defaultIcon}}', 'assets/icon-c@32.png'))
+    .pipe(replace('"{{icons}}"', '{ ' + [16, 32, 48, 128, 256, 512].map((size) => `"${size}" : "assets/icon-c@${size}.png"`).join(', ') + ' }'))
+    .pipe(dest('build/'));
+}
 
-});
+function buildIoProxy() {
+  return exec("mvn package", { cwd: 'src/io' });
+}
+
+const ioProxy = series(
+  buildIoProxy,
+  parallel(
+    () => src("src/io/target/ioproxy-1.0.jar").pipe(dest("host")),
+    () => src("src/io/target/ioproxy-1.0.jar").pipe(dest("host-win"))
+  )
+);
+
+exports['io-proxy'] = ioProxy;
+
+exports.dev = series(
+  parallel(copyAssets, buildManifest),
+  parallel(
+    createNgBuildTask('background', true),
+    createNgBuildTask('content', true),
+    createNgBuildTask('ui', true),
+    function watchManifest() { watch(['src/manifest.json', 'package.json'], buildManifest) },
+    function watchIoProxy() { watch('src/io/src/**/*', ioProxy) }
+  )
+);
+
+exports.build = series(
+  parallel(copyAssets, buildManifest),
+  parallel(
+    createNgBuildTask('background'),
+    createNgBuildTask('content'),
+    createNgBuildTask('ui')
+  )
+);
+
+exports.release = series(
+  parallel(copyAssets, buildManifest),
+  parallel(
+    createNgBuildTask('background', false, true),
+    createNgBuildTask('content', false, true),
+    createNgBuildTask('ui', false, true)
+  ),
+  pack
+);
