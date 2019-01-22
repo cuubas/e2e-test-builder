@@ -2,10 +2,11 @@
   "name": "e2e-test-builder",
   "version": "1.3.0",
   "scripts": {
-    "start": "gulp default",
+    "start": "gulp dev",
     "build": "gulp build",
     "build-release": "gulp build-release",
     "release": "gulp release",
+    "build-io-proxy": "gulp io-proxy",
     "ng": "ng",
     "test": "ng test",
     "test:once": "ng test --single-run --code-coverage",
