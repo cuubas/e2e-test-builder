@@ -171,17 +171,6 @@
             "browserTarget": "background:build"
           }
         },
-        "test": {
-          "builder": "@angular-devkit/build-angular:karma",
-          "options": {
-            "main": "src/test.background.ts",
-            "karmaConfig": "./karma.conf.js",
-            "tsConfig": "src/tsconfig.spec.json",
-            "scripts": [],
-            "styles": [],
-            "assets": []
-          }
-        },
         "lint": {
           "builder": "@angular-devkit/build-angular:tslint",
           "options": {
@@ -272,17 +261,6 @@
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
             "browserTarget": "content:build"
-          }
-        },
-        "test": {
-          "builder": "@angular-devkit/build-angular:karma",
-          "options": {
-            "main": "src/test.content.ts",
-            "karmaConfig": "./karma.conf.js",
-            "tsConfig": "src/tsconfig.spec.json",
-            "scripts": [],
-            "styles": [],
-            "assets": []
           }
         },
         "lint": {

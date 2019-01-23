@@ -1,6 +1,6 @@
 {
   "name": "e2e-test-builder",
-  "version": "1.3.0",
+  "version": "1.3.1",
   "scripts": {
     "start": "gulp dev",
     "build": "gulp build",
@@ -8,8 +8,8 @@
     "release": "gulp release",
     "build-io-proxy": "gulp io-proxy",
     "ng": "ng",
-    "test": "ng test",
-    "test:once": "ng test --single-run --code-coverage",
+    "test": "ng test --watch --code-coverage --source-map",
+    "test:once": "ng test --watch=false --code-coverage --source-map",
     "lint": "ng lint",
     "e2e": "ng e2e",
     "ci": "npm run lint && npm run test:once"
