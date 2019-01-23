@@ -1,6 +1,6 @@
 import { runner } from 'app/common/runner';
 import { Key as SeleniumKey } from 'app/common/selenium-webdriver-input';
-import { default as KeyCode } from '../../../../node_modules/keycode-js/lib/KeyCode';
+import * as KeyCode from '../../../../node_modules/keycode-js/lib/KeyCode';
 
 const mapToKeyOptions = {};
 // expose all keys as variables
