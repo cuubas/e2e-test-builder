@@ -37,6 +37,15 @@ Formatter.prototype.expression = function (v, forceString) {
     }
 };
 
+Formatter.prototype.comparisonExpression = function (left, right) {
+    var operator = '=';
+    if (right.indexOf('<') === 0 || right.indexOf('>') === 0) {
+        operator = right.substring(0, 1);
+        right = right.substring(1);
+    }
+    return this.expression(left) + ' ' + operator + ' ' + this.expression(right);
+};
+
 Formatter.prototype.stringify = function (testCase) {
     const content = [];
     const self = this;
