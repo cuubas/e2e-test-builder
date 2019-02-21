@@ -371,12 +371,27 @@ register('eval', (cmd, formatter) => {
 register('waitforelementpresent', (cmd, formatter) => {
     return 'browser.wait(protractor.ExpectedConditions.presenceOf(' + locator(cmd.locator, formatter) + '), ' + (cmd.value || 2000) + ',' + formatter.quote(formatter.stringifyCommand(cmd), true) + ');' + formatter.endOfLine;
 });
-register('waitforelementnotpresent', (cmd, formatter) => {
-    return 'browser.wait(protractor.ExpectedConditions.stalenessOf(' + locator(cmd.locator, formatter) + '), ' + (cmd.value || 2000) + ',' + formatter.quote(formatter.stringifyCommand(cmd), true) + ');' + formatter.endOfLine;
+
+register('waitforelementtobeclickable', (cmd, formatter) => {
+    return "browser.wait(protractor.ExpectedConditions.elementToBeClickable(" + locator(cmd.locator, formatter) + "), " + (cmd.value || 2000) + "," + formatter.quote(formatter.stringifyCommand(cmd), true) + ");" + formatter.endOfLine;
+});
+
+register('waitfornotelementpresent', (cmd, formatter) => {
+    return "browser.wait(protractor.ExpectedConditions.stalenessOf(" + locator(cmd.locator, formatter) + "), " + (cmd.value || 2000) + "," + formatter.quote(formatter.stringifyCommand(cmd), true) + ");" + formatter.endOfLine;
 });
 
 register('waitforvisible', (cmd, formatter) => {
     return 'browser.wait(protractor.ExpectedConditions.visibilityOf(' + locator(cmd.locator, formatter) + '), ' + (cmd.value || 2000) + ',' + formatter.quote(formatter.stringifyCommand(cmd), true) + ');' + formatter.endOfLine;
+});
+
+registerHandler('waitforcsscount', (cmd, formatter) => {
+    return [
+        "browser.wait(function() {" + formatter.endOfLine,
+        formatter.whitespace + "return " + locator(cmd.locator, formatter, true) + '.count().then(function(_count) {' + formatter.endOfLine,
+        formatter.indent(2) + "return " + formatter.comparisonExpression('${_count}', cmd.value) + ';' + formatter.endOfLine,
+        formatter.whitespace + "});" + formatter.endOfLine,
+        "}, 3000);" + formatter.endOfLine
+    ];
 });
 
 register('waitfornotvisible', (cmd, formatter) => {
