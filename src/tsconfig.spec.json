@@ -2,10 +2,7 @@
   "extends": "../tsconfig.json",
   "compilerOptions": {
     "outDir": "../out-tsc/spec",
-    "baseUrl": "./",
-    "module": "commonjs",
-    "target": "es5"
-  },
+    "baseUrl": "./"},
   "files": [
     "test.ts",
     "polyfills.ts"

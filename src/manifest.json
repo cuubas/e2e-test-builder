@@ -8,13 +8,21 @@
   },
   "icons": "{{icons}}",
   "background": {
-    "scripts": ["background/runtime.js", "background/main.js"]
+    "scripts": [
+      "background/{{runtimeScript}}", 
+      "background/{{polyfillsScript}}", 
+      "background/{{mainScript}}"
+    ]
   },
   "content_scripts": [
     {
       "matches": ["http://*/*", "https://*/*"],
       "run_at": "document_start",
-      "js": ["content/runtime.js", "content/main.js"],
+      "js": [
+        "content/{{runtimeScript}}",
+        "content/{{polyfillsScript}}",
+        "content/{{mainScript}}"
+      ],
       "all_frames()": true
     }
   ],
