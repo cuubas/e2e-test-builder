@@ -41,13 +41,21 @@ function copyAssets() {
   return src('assets/**/*').pipe(dest('build/assets/'));
 }
 
-function buildManifest() {
-  const pack = JSON.parse(fs.readFileSync('./package.json'));
-  return src('src/manifest.json')
-    .pipe(replace('{{package.version}}', pack.version))
-    .pipe(replace('{{defaultIcon}}', 'assets/icon-c@32.png'))
-    .pipe(replace('"{{icons}}"', '{ ' + [16, 32, 48, 128, 256, 512].map((size) => `"${size}" : "assets/icon-c@${size}.png"`).join(', ') + ' }'))
-    .pipe(dest('build/'));
+function buildManifest(isProduction) {
+  const runtimeScript = isProduction ? 'runtime-es2015.js' : 'runtime.js';
+  const polyfillsScript = isProduction ? 'polyfills-es2015.js' : 'polyfills-es5.js';
+  const mainScript = isProduction ? 'main-es2015.js' : 'main.js';
+  return function () {
+    const pack = JSON.parse(fs.readFileSync('./package.json'));
+    return src('src/manifest.json')
+      .pipe(replace('{{package.version}}', pack.version))
+      .pipe(replace('{{defaultIcon}}', 'assets/icon-c@32.png'))
+      .pipe(replace('"{{icons}}"', '{ ' + [16, 32, 48, 128, 256, 512].map((size) => `"${size}" : "assets/icon-c@${size}.png"`).join(', ') + ' }'))
+      .pipe(replace('{{runtimeScript}}', runtimeScript))
+      .pipe(replace('{{polyfillsScript}}', polyfillsScript))
+      .pipe(replace('{{mainScript}}', mainScript))
+      .pipe(dest('build/'));
+  };
 }
 
 function buildIoProxy() {
@@ -64,8 +72,12 @@ const ioProxy = series(
 
 exports['io-proxy'] = ioProxy;
 
+exports.manifest = series(
+  buildManifest(true)
+);
+
 exports.dev = series(
-  parallel(copyAssets, buildManifest),
+  parallel(copyAssets, buildManifest(false)),
   parallel(
     createNgBuildTask('background', true),
     createNgBuildTask('content', true),
@@ -76,7 +88,7 @@ exports.dev = series(
 );
 
 exports.build = series(
-  parallel(copyAssets, buildManifest),
+  parallel(copyAssets, buildManifest(true)),
   parallel(
     createNgBuildTask('background'),
     createNgBuildTask('content'),
@@ -85,7 +97,7 @@ exports.build = series(
 );
 
 exports.release = series(
-  parallel(copyAssets, buildManifest),
+  parallel(copyAssets, buildManifest(true)),
   parallel(
     createNgBuildTask('background', false, true),
     createNgBuildTask('content', false, true),
