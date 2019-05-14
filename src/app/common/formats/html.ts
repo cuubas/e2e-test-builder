@@ -30,6 +30,14 @@ export class HtmlFormatter extends BaseFormatter {
     });
   }
 
+  private unescapeHtml(value) {
+    value = String(value);
+    Object.keys(this.charsMap).forEach((key) => {
+      value = value.replace(new RegExp(`&${this.charsMap[key]};`, 'g'), key);
+    });
+    return value;
+  }
+
   public parse(content: string): TestCase {
     const result = new TestCase();
 
@@ -45,7 +53,7 @@ export class HtmlFormatter extends BaseFormatter {
         if (node.nodeType === 8 && node.textContent.trim() !== '') { // comment
           result.items.push(new TestCaseItem({
             type: 'comment',
-            value: node.textContent
+            value: this.unescapeHtml(node.textContent)
           } as TestCaseItem));
         } else if (node.nodeType === 1) { // tag
           result.items.push(new TestCaseItem({
