@@ -173,7 +173,7 @@ export class ContentService {
   public initPrompts() {
     ['alert', 'confirm', 'prompt'].forEach((promptType) => {
       // first function is executed in page context and the callback in extension
-      PageProxy.run((fn, callback) => {
+      PageProxy.run((fn: string, callback) => {
         const orgFn = window[fn];
         window[fn] = function (message) {
           const res = orgFn.apply(this, arguments);
