@@ -1,6 +1,6 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { Title } from '@angular/platform-browser';
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { IoProxy } from 'app/common/ioproxy';
 import { HomeComponent } from './home.component';
 import { SelectionRange } from 'app/common/model';
@@ -10,7 +10,7 @@ describe('HomeComponent', () => {
   let component: HomeComponent;
   let fixture: ComponentFixture<HomeComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     const titleStub = {}, ioProxyStub = {}, ngZoneStub = {};
 
     spyOn(MessengerWrapper.Messenger, 'send').and.stub();

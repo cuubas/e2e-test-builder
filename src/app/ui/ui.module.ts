@@ -20,7 +20,7 @@ const routes: Routes = [
     FormsModule,
     BrowserModule,
     HttpClientModule,
-    RouterModule.forRoot(routes, { useHash: true })
+    RouterModule.forRoot(routes, { useHash: true, relativeLinkResolution: 'legacy' })
   ],
   providers: [IoProxy],
   declarations: [AppComponent, HomeComponent, InstallComponent, ListComponent, SettingsComponent, ReleaseNotesComponent],
