@@ -48,15 +48,12 @@ PRs are welcome for any open issues and feature requests. For anything new pleas
 
 ## development
 
-Most of the code base is written TypeScript, except for IoProxy. At this point due to chrome extension limitations file system is accessed via Java app (uses JavaFx). Usable jar file and scripts are included in `host` / `host-win` directories. Java SDK and maven is required for it's development - source code is located in `src/io` and proxy is in `src/app/common/ioproxy.js`.
+Most of the code base is written TypeScript.
 
 #### steps:
 
 1. checkout repository
 2. run `npm install`
-3. run `gulp` (builds and watches 3 angular-cli apps - background, content and ui)
+3. run `npm start` (builds and watches 3 angular-cli apps - background, content and ui)
 4. go to chrome://extensions/
 5. load unpacked extension - point to build directory
-6. navigate to `host` (mac) or `host-win` (windows) directory
-7. edit `com.cuubas.ioproxy.json` and add `"chrome-extension://<EXTENSION_ID>/"` in `allowedOrigins` list.
-8. run `register.sh` or `register.bat` to setup native client

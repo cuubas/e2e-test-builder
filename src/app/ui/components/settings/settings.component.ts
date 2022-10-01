@@ -22,7 +22,7 @@ export class SettingsComponent implements OnInit {
   }
 
   public addExtension(ev: MouseEvent) {
-    this.ioProxy.open(window.localStorage.lastPath)
+    this.ioProxy.open()
       .subscribe((file) => {
         if (/\.js$/.test(file.path)) {
           this.extensions.push(file);
