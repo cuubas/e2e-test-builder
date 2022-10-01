@@ -1,84 +1,68 @@
-import { Injectable, NgZone } from '@angular/core';
-import { Observable } from 'rxjs/Observable';
-import { Observer } from 'rxjs/Observer';
+import { Injectable } from "@angular/core";
+import { from } from "rxjs";
+import { Observable } from "rxjs/Observable";
 
 @Injectable()
 export class IoProxy {
-  private packageName = 'com.cuubas.ioproxy';
-
-  public constructor(private ngZone: NgZone) {
-
+  public constructor() {
   }
 
-  public about(): Observable<AboutResult> {
-    return Observable.create((observer: Observer<AboutResult>) => {
-      chrome.runtime.sendNativeMessage(this.packageName,
-        {
-          op: 'about'
-        },
-        this.genericCallback.bind(this, observer)
-      );
-    });
+  public open(): Observable<any> {
+    return from(
+      (async () => {
+        const [handle] = await window["showOpenFilePicker"]();
+
+        const file = await handle.getFile();
+        return {
+          handle,
+          path: file.name,
+          data: await file.text(),
+        };
+      })()
+    );
   }
 
-  public open(lastPath): Observable<FileResult> {
-    return Observable.create((observer: Observer<FileResult>) => {
-      chrome.runtime.sendNativeMessage(this.packageName,
-        {
-          op: 'open',
-          lastPath: lastPath
-        },
-        this.genericCallback.bind(this, observer)
-      );
-    });
+  public read(handle: any): Observable<any> {
+    return from(
+      (async () => {
+        const file = await handle.getFile();
+        return {
+          handle,
+          path: file.name,
+          data: await file.text(),
+        };
+      })()
+    );
   }
 
-  public read(path): Observable<FileResult> {
-    return Observable.create((observer: Observer<FileResult>) => {
-      chrome.runtime.sendNativeMessage(this.packageName,
-        {
-          op: 'read',
-          path: path
-        },
-        this.genericCallback.bind(this, observer)
-      );
-    });
-  }
-
-  public write(path, data, lastPath): Observable<FileResult> {
-    return Observable.create((observer: Observer<FileResult>) => {
-      chrome.runtime.sendNativeMessage(this.packageName,
-        {
-          op: 'write',
-          path: path,
-          data: data,
-          lastPath: lastPath
-        },
-        this.genericCallback.bind(this, observer)
-      );
-    });
-  }
-
-  private genericCallback(observer: Observer<any>, response) {
-    this.ngZone.run(() => {
-      if (response && response.code > 0) {
-        observer.next(response);
-        observer.complete();
-      } else {
-        if (response && response.stacktrace) {
-          console.warn(response.message, response.stacktrace);
+  public write(handle, data, suggestedName): Observable<any> {
+    return from(
+      (async () => {
+        if (!handle) {
+          handle = await window["showSaveFilePicker"]({
+            suggestedName,
+          });
         }
-        observer.error((chrome.runtime.lastError && chrome.runtime.lastError.message) || (response && response.message) || 'unknown error');
-      }
-    });
+        const writable = await handle.createWritable();
+
+        // Write the contents of the file to the stream.
+        await writable.write(data);
+
+        // Close the file and write the contents to disk.
+        await writable.close();
+
+        return this.read(handle).toPromise();
+      })()
+    );
   }
 }
 
 export class FileResult {
-  public path: string;
-  public data: string;
+  handle: any;
+  path: string;
+  data: string;
 }
 
 export class AboutResult {
-  public version: number;
+  version: number;
 }

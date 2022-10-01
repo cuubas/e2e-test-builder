@@ -22,16 +22,21 @@
     </span>
   </span>
   <span class="separator"></span>
-  <a (click)="run($event)" *ngIf="!running" title="execute commands" class="home__toolbar-item halflings halflings-play"></a>
+  <a (click)="run($event)" *ngIf="testCase && !running" title="execute commands" class="home__toolbar-item halflings halflings-play"></a>
   <a (click)="interruptRunner($event)" *ngIf="running" title="cancel runner" class="home__toolbar-item halflings halflings-stop"></a>
   <a (click)="remove()" *ngIf="selection.start!==selection.end" title="remove selected commands" class="home__toolbar-item halflings halflings-trash"></a>
-  <a (click)="toggleRecording($event)" title="{{isRecordingEnabled?'stop recording':'start recording'}}" class="home__toolbar-item halflings"
+  <a *ngIf="testCase" (click)="toggleRecording($event)" title="{{isRecordingEnabled?'stop recording':'start recording'}}" class="home__toolbar-item halflings"
     [ngClass]="{'halflings-record':isRecordingEnabled, 'halflings-record-empty':!isRecordingEnabled}"></a>
   <a (click)="modals.settings.toggle(true)" title="open settings" class="home__toolbar-item halflings halflings-cog"></a>
 </div>
-<div class="home__content">
+<div class="home__content" *ngIf="testCase">
   <app-list [items]="testCase.items" [selection]="selection" (change)="onChange()"
     [recording]="isRecordingEnabled" [settings]="settings"></app-list>
+</div>
+<div class="home__content" *ngIf="!testCase">
+  <div class="home__content-reopen">
+    <button (click)="reopenLastCase(true)">Reopen last case</button>
+  </div>
 </div>
 <div *ngIf="modals.settings.visible" class="modal">
   <div class="modal__dialog">

@@ -2,7 +2,6 @@ const { series, parallel, watch, src, dest } = require('gulp');
 const replace = require('gulp-replace');
 var zip = require('gulp-zip');
 const spawn = require('child_process').spawn;
-const exec = require('child_process').exec;
 const fs = require('fs');
 
 function createNgBuildTask(app, shouldWatch, isProduction) {
@@ -58,19 +57,6 @@ function buildManifest(isProduction) {
   };
 }
 
-function buildIoProxy() {
-  return exec("mvn package", { cwd: 'src/io' });
-}
-
-const ioProxy = series(
-  buildIoProxy,
-  parallel(
-    () => src("src/io/target/ioproxy-1.0.jar").pipe(dest("host")),
-    () => src("src/io/target/ioproxy-1.0.jar").pipe(dest("host-win"))
-  )
-);
-
-exports['io-proxy'] = ioProxy;
 
 exports.manifest = series(
   buildManifest(true)
@@ -82,8 +68,7 @@ exports.dev = series(
     createNgBuildTask('background', true),
     createNgBuildTask('content', true),
     createNgBuildTask('ui', true),
-    function watchManifest() { watch(['src/manifest.json', 'package.json'], buildManifest) },
-    function watchIoProxy() { watch('src/io/src/**/*', ioProxy) }
+    function watchManifest() { watch(['src/manifest.json', 'package.json'], buildManifest()) },
   )
 );
 
