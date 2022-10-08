@@ -43,7 +43,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   public selection: SelectionRange = new SelectionRange();
   public supportedFormats = SupportedFormats;
   public settings: IRunnerOptions;
-  private file: FileResult;
+  private file?: FileResult;
   private formatter: BaseFormatter;
   private promptMessage = "Some changes are not persisted yet, are you sure?";
   private db: IDBDatabase;
@@ -276,7 +276,7 @@ export class HomeComponent implements OnInit, OnDestroy {
       .write(
         !saveAs && this.file ? this.file.handle : undefined,
         this.formatter.stringify(this.testCase),
-        this.replaceExtension(this.file.path || "", this.formatter.extension)
+        this.replaceExtension(this.file && this.file.path || "", this.formatter.extension)
       )
       .subscribe((response) => {
         this.file = response;
