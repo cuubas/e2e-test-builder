@@ -281,7 +281,6 @@
       }
     }
   },
-  "defaultProject": "ui",
   "schematics": {
     "@schematics/angular:component": {
       "viewEncapsulation": "None",
