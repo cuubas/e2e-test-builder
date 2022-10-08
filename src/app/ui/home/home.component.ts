@@ -165,7 +165,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     const request = this.db
       .transaction(ConfigObjectStore, "readwrite")
       .objectStore(ConfigObjectStore)
-      .add({ id: SelectedFileKey, handle: handle });
+      .put({ id: SelectedFileKey, handle: handle });
 
     return new Promise((resolve, reject) => {
       request.onerror = reject;
