@@ -10,7 +10,6 @@
   "background": {
     "scripts": [
       "background/{{runtimeScript}}",
-      "background/{{polyfillsScript}}",
       "background/{{mainScript}}"
     ]
   },
@@ -20,7 +19,6 @@
       "run_at": "document_start",
       "js": [
         "content/{{runtimeScript}}",
-        "content/{{polyfillsScript}}",
         "content/{{mainScript}}"
       ],
       "all_frames()": true

@@ -47,7 +47,7 @@ export class BackgroundService {
   }
 
   private createContextMenu() {
-    const contentContexts = ['page', 'frame', 'selection', 'link', 'editable', 'image', 'video', 'audio'];
+    const contentContexts: chrome.contextMenus.ContextType[] = ['page', 'frame', 'selection', 'link', 'editable', 'image', 'video', 'audio'];
     const contentUris = ['http://*/*', 'https://*/*', 'file://*/*'];
     // Create a parent item and two children.
     this.recordingContextMenuItemId = <any>chrome.contextMenus.create({

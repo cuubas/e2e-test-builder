@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { HttpClient } from '@angular/common/http';
 import { By } from '@angular/platform-browser';
 import { ReleaseNotesComponent } from './release-notes.component';
@@ -7,7 +7,7 @@ describe('ReleaseNotesComponent', () => {
   let component: ReleaseNotesComponent;
   let fixture: ComponentFixture<ReleaseNotesComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     const fakeHttp = {
       get: () => {
         return {

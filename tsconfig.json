@@ -7,19 +7,18 @@
     "sourceMap": true,
     "declaration": false,
     "moduleResolution": "node",
-    "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
-    "target": "es2015",
+    "target": "es2020",
     "typeRoots": [
-      "node_modules/@types",
-      "src/@types"
+      "./node_modules/@types",
+      "./src/@types"
     ],
     "allowJs": true,
     "lib": [
       "es2017",
       "dom"
     ],
-    "module": "esnext"
+    "module": "es2020"
   },
   "angularCompilerOptions": {
     "enableIvy": true

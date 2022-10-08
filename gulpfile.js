@@ -5,13 +5,13 @@ const spawn = require('child_process').spawn;
 const fs = require('fs');
 
 function createNgBuildTask(app, shouldWatch, isProduction) {
-  console.log('building ' + (shouldWatch ? ' and watching ' : '') + app);
-  var args = ['build', app, '--vendor-chunk=false', '--output-hashing=none', '--aot=true'];
+  console.log('building ' + (shouldWatch ? 'and watching ' : '') + app);
+  var args = ['build', app];
   if (shouldWatch) {
     args.push('--watch');
   }
   if (isProduction) {
-    args.push('--prod');
+    args.push('--configuration=production');
   }
 
   const ngBuild = function () {
@@ -40,10 +40,10 @@ function copyAssets() {
   return src('assets/**/*').pipe(dest('build/assets/'));
 }
 
-function buildManifest(isProduction) {
-  const runtimeScript = isProduction ? 'runtime-es2015.js' : 'runtime.js';
-  const polyfillsScript = isProduction ? 'polyfills-es2015.js' : 'polyfills-es5.js';
-  const mainScript = isProduction ? 'main-es2015.js' : 'main.js';
+function buildManifest(_isProduction) {
+  const runtimeScript = 'runtime.js';
+  const polyfillsScript = 'polyfills.js';
+  const mainScript = 'main.js';
   return function () {
     const pack = JSON.parse(fs.readFileSync('./package.json'));
     return src('src/manifest.json')

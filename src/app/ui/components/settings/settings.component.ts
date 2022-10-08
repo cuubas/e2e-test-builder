@@ -42,6 +42,7 @@ export class SettingsComponent implements OnInit {
   }
 
   public reloadExtensions(ev: MouseEvent) {
+    // TODO: migrate to indexed DB
     this.reloadingExtensions = true;
     let index = 0;
     const step = () => {
@@ -50,7 +51,7 @@ export class SettingsComponent implements OnInit {
         this.reloadingExtensions = false;
         return;
       }
-      this.ioProxy.read(this.extensions[index].path)
+      this.ioProxy.read(this.extensions[index].path as any)
         .subscribe((file) => {
           this.extensions[index] = file;
           index++;

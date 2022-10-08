@@ -174,8 +174,8 @@ export class ContentService {
     ['alert', 'confirm', 'prompt'].forEach((promptType) => {
       // first function is executed in page context and the callback in extension
       PageProxy.run((fn, callback) => {
-        const orgFn = window[fn];
-        window[fn] = function (message) {
+        const orgFn = (window as any)[fn] as Function;
+        (window as any)[fn] = function (message) {
           const res = orgFn.apply(this, arguments);
           callback(message, res);
           return res;

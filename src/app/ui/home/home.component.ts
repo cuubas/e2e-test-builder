@@ -143,7 +143,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     Messenger.send({ call: "toggleRecording" });
   }
 
-  async getLastUsedFileHandle(): Promise<any> {
+  async getLastUsedFileHandle(): Promise<FileSystemFileHandle> {
     return new Promise((resolve, reject) => {
       const request = this.db
         .transaction(ConfigObjectStore, "readonly")
@@ -161,7 +161,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     });
   }
 
-  async setLastUsedFileHandle(handle: any): Promise<any> {
+  async setLastUsedFileHandle(handle: FileSystemFileHandle): Promise<FileSystemFileHandle> {
     const request = this.db
       .transaction(ConfigObjectStore, "readwrite")
       .objectStore(ConfigObjectStore)
@@ -192,9 +192,9 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.save(null, true, format || this.supportedFormats[0]);
   }
 
-  public read(path: string): void {
+  public read(handle: FileSystemFileHandle): void {
     this.ioProxy
-      .read(path)
+      .read(handle)
       .subscribe(this.processFile.bind(this), this.handleError);
   }
 
