@@ -40,10 +40,10 @@ function copyAssets() {
   return src('assets/**/*').pipe(dest('build/assets/'));
 }
 
-function buildManifest(isProduction) {
-  const runtimeScript = isProduction ? 'runtime-es2015.js' : 'runtime-es5.js';
-  const polyfillsScript = isProduction ? 'polyfills-es2015.js' : 'polyfills-es5.js';
-  const mainScript = isProduction ? 'main-es2015.js' : 'main-es5.js';
+function buildManifest(_isProduction) {
+  const runtimeScript = 'runtime.js';
+  const polyfillsScript = 'polyfills.js';
+  const mainScript = 'main.js';
   return function () {
     const pack = JSON.parse(fs.readFileSync('./package.json'));
     return src('src/manifest.json')
