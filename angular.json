@@ -11,7 +11,6 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
-            "aot": true,
             "outputPath": "build/ui",
             "index": "src/index.html",
             "main": "src/main.ui.ts",
@@ -26,7 +25,12 @@
             ],
             "scripts": [],
             "outputHashing": "none",
-            "vendorChunk": false
+            "extractLicenses": false,
+            "buildOptimizer": false,
+            "vendorChunk": false,
+            "sourceMap": true,
+            "optimization": false,
+            "namedChunks": true
           },
           "configurations": {
             "production": {
@@ -36,11 +40,16 @@
                   "maximumWarning": "6kb"
                 }
               ],
-              "optimization": true,
+              "optimization":{
+                "scripts": true,
+                "styles": {
+                  "minify": true,
+                  "inlineCritical": false
+                }
+              },
               "outputHashing": "none",
               "sourceMap": false,
               "namedChunks": false,
-              "aot": true,
               "extractLicenses": true,
               "vendorChunk": false,
               "buildOptimizer": true,
@@ -51,7 +60,8 @@
                 }
               ]
             }
-          }
+          },
+          "defaultConfiguration": ""
         },
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
@@ -139,7 +149,6 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
-            "aot": true,
             "outputPath": "build/background",
             "index": "src/index.html",
             "main": "src/main.background.ts",
@@ -148,7 +157,12 @@
             "styles": [],
             "scripts": [],
             "outputHashing": "none",
-            "vendorChunk": false
+            "extractLicenses": false,
+            "buildOptimizer": false,
+            "vendorChunk": false,
+            "sourceMap": true,
+            "optimization": false,
+            "namedChunks": true
           },
           "configurations": {
             "production": {
@@ -162,7 +176,6 @@
               "outputHashing": "none",
               "sourceMap": false,
               "namedChunks": false,
-              "aot": true,
               "extractLicenses": true,
               "vendorChunk": false,
               "buildOptimizer": true,
@@ -173,7 +186,8 @@
                 }
               ]
             }
-          }
+          },
+          "defaultConfiguration": ""
         },
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
@@ -239,7 +253,6 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
-            "aot": true,
             "outputPath": "build/content",
             "index": "src/index.html",
             "main": "src/main.content.ts",
@@ -248,7 +261,12 @@
             "styles": [],
             "scripts": [],
             "outputHashing": "none",
-            "vendorChunk": false
+            "extractLicenses": false,
+            "buildOptimizer": false,
+            "vendorChunk": false,
+            "sourceMap": true,
+            "optimization": false,
+            "namedChunks": true
           },
           "configurations": {
             "production": {
@@ -262,7 +280,6 @@
               "outputHashing": "none",
               "sourceMap": false,
               "namedChunks": false,
-              "aot": true,
               "extractLicenses": true,
               "vendorChunk": false,
               "buildOptimizer": true,
@@ -273,7 +290,8 @@
                 }
               ]
             }
-          }
+          },
+          "defaultConfiguration": ""
         },
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
