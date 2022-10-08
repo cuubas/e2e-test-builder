@@ -18,9 +18,9 @@ export class ReleaseNotesComponent implements OnInit {
   ngOnInit() {
     this.version = chrome.runtime.getManifest().version;
     this.http.get(this.releaseNotesUrl, { responseType: 'text' }).subscribe((content) => {
-      const div = document.createElement('div');
-      div.innerHTML = content.substring(content.indexOf('<body'), content.indexOf('</body') + 1);
-      const latestNotes = div.querySelector('.release.label-latest .markdown-body');
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(content.substring(content.indexOf('<body'), content.indexOf('</body') + 1), 'text/html');
+      const latestNotes = doc.querySelector('[data-test-selector="release-card"] [data-test-selector="body-content"]');
       const target: HTMLElement = this.element.nativeElement.querySelector('.release-notes-placeholder');
       if (latestNotes) {
         this.makeLinksExternal(latestNotes);
