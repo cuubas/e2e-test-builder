@@ -1,6 +1,6 @@
 {
   "name": "e2e-test-builder",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "scripts": {
     "start": "gulp dev",
     "build": "gulp build",
@@ -34,6 +34,7 @@
     "@types/chrome": "0.0.197",
     "@types/jasmine": "~3.7.0",
     "@types/node": "^12.11.1",
+    "@types/wicg-file-system-access": "2020.9.5",
     "@types/gulp": "4.0.5",
     "codelyzer": "^6.0.0",
     "jasmine-core": "~3.7.0",

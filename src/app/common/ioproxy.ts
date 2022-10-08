@@ -6,10 +6,10 @@ export class IoProxy {
   public constructor() {
   }
 
-  public open(): Observable<any> {
+  public open(): Observable<FileResult> {
     return from(
       (async () => {
-        const [handle] = await window["showOpenFilePicker"]();
+        const [handle] = await window.showOpenFilePicker();
 
         const file = await handle.getFile();
         return {
@@ -21,7 +21,7 @@ export class IoProxy {
     );
   }
 
-  public read(handle: any): Observable<any> {
+  public read(handle: FileSystemFileHandle): Observable<FileResult> {
     return from(
       (async () => {
         const file = await handle.getFile();
@@ -34,11 +34,11 @@ export class IoProxy {
     );
   }
 
-  public write(handle, data, suggestedName): Observable<any> {
+  public write(handle: FileSystemFileHandle | undefined, data: string, suggestedName?: string): Observable<FileResult> {
     return from(
       (async () => {
         if (!handle) {
-          handle = await window["showSaveFilePicker"]({
+          handle = await window.showSaveFilePicker({
             suggestedName,
           });
         }
@@ -56,12 +56,8 @@ export class IoProxy {
   }
 }
 
-export class FileResult {
-  handle: any;
+export interface FileResult {
+  handle: FileSystemFileHandle;
   path: string;
   data: string;
-}
-
-export class AboutResult {
-  version: number;
 }
