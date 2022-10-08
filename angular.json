@@ -11,10 +11,11 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
+            "aot": true,
             "outputPath": "build/ui",
             "index": "src/index.html",
             "main": "src/main.ui.ts",
-            "tsConfig": "src/tsconfig.app.json",
+            "tsConfig": "src/tsconfig.ui.json",
             "polyfills": "src/polyfills.ts",
             "assets": [
               "src/assets",
@@ -27,6 +28,12 @@
           },
           "configurations": {
             "production": {
+              "budgets": [
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "6kb"
+                }
+              ],
               "optimization": true,
               "outputHashing": "all",
               "sourceMap": false,
@@ -83,7 +90,7 @@
           "builder": "@angular-devkit/build-angular:tslint",
           "options": {
             "tsConfig": [
-              "src/tsconfig.app.json",
+              "src/tsconfig.ui.json",
               "src/tsconfig.spec.json"
             ],
             "exclude": [
@@ -126,16 +133,23 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
+            "aot": true,
             "outputPath": "build/background",
             "index": "src/index.html",
             "main": "src/main.background.ts",
-            "tsConfig": "src/tsconfig.app.json",
+            "tsConfig": "src/tsconfig.background.json",
             "assets": [],
             "styles": [],
             "scripts": []
           },
           "configurations": {
             "production": {
+              "budgets": [
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "6kb"
+                }
+              ],
               "optimization": true,
               "outputHashing": "all",
               "sourceMap": false,
@@ -175,7 +189,7 @@
           "builder": "@angular-devkit/build-angular:tslint",
           "options": {
             "tsConfig": [
-              "src/tsconfig.app.json",
+              "src/tsconfig.background.json",
               "src/tsconfig.spec.json"
             ],
             "exclude": [
@@ -218,16 +232,23 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
+            "aot": true,
             "outputPath": "build/content",
             "index": "src/index.html",
             "main": "src/main.content.ts",
-            "tsConfig": "src/tsconfig.app.json",
+            "tsConfig": "src/tsconfig.content.json",
             "assets": [],
             "styles": [],
             "scripts": []
           },
           "configurations": {
             "production": {
+              "budgets": [
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "6kb"
+                }
+              ],
               "optimization": true,
               "outputHashing": "all",
               "sourceMap": false,
@@ -267,7 +288,7 @@
           "builder": "@angular-devkit/build-angular:tslint",
           "options": {
             "tsConfig": [
-              "src/tsconfig.app.json",
+              "src/tsconfig.content.json",
               "src/tsconfig.spec.json"
             ],
             "exclude": [
@@ -308,10 +329,13 @@
     "@schematics/angular:component": {
       "viewEncapsulation": "None",
       "prefix": "app",
-      "styleext": "scss"
+      "style": "scss"
     },
     "@schematics/angular:directive": {
       "prefix": "app"
     }
+  },
+  "cli": {
+    "analytics": "9edcda0b-1491-4faf-88b2-25d8c337c518"
   }
 }
