@@ -80,6 +80,11 @@
             "styles": [
               "src/app/ui/app.scss"
             ],
+            "stylePreprocessorOptions": {
+              "includePaths": [
+                "src/app/assets"
+              ]
+            },
             "assets": [
               "src/assets",
               "src/favicon.ico"
