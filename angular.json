@@ -24,7 +24,9 @@
             "styles": [
               "src/app/ui/app.scss"
             ],
-            "scripts": []
+            "scripts": [],
+            "outputHashing": "none",
+            "vendorChunk": false
           },
           "configurations": {
             "production": {
@@ -35,9 +37,8 @@
                 }
               ],
               "optimization": true,
-              "outputHashing": "all",
+              "outputHashing": "none",
               "sourceMap": false,
-              "extractCss": true,
               "namedChunks": false,
               "aot": true,
               "extractLicenses": true,
@@ -145,7 +146,9 @@
             "tsConfig": "src/tsconfig.background.json",
             "assets": [],
             "styles": [],
-            "scripts": []
+            "scripts": [],
+            "outputHashing": "none",
+            "vendorChunk": false
           },
           "configurations": {
             "production": {
@@ -156,9 +159,8 @@
                 }
               ],
               "optimization": true,
-              "outputHashing": "all",
+              "outputHashing": "none",
               "sourceMap": false,
-              "extractCss": true,
               "namedChunks": false,
               "aot": true,
               "extractLicenses": true,
@@ -244,7 +246,9 @@
             "tsConfig": "src/tsconfig.content.json",
             "assets": [],
             "styles": [],
-            "scripts": []
+            "scripts": [],
+            "outputHashing": "none",
+            "vendorChunk": false
           },
           "configurations": {
             "production": {
@@ -255,9 +259,8 @@
                 }
               ],
               "optimization": true,
-              "outputHashing": "all",
+              "outputHashing": "none",
               "sourceMap": false,
-              "extractCss": true,
               "namedChunks": false,
               "aot": true,
               "extractLicenses": true,

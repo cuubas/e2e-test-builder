@@ -16,7 +16,7 @@ const routes: Routes = [{ path: "home", component: HomeComponent }];
     FormsModule,
     BrowserModule,
     HttpClientModule,
-    RouterModule.forRoot(routes, { useHash: true }),
+    RouterModule.forRoot(routes, { useHash: true, relativeLinkResolution: 'legacy' }),
   ],
   providers: [IoProxy],
   declarations: [

@@ -1,5 +1,5 @@
 import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
 import { ListComponent } from './list.component';
 import * as MessengerWrapper from 'app/common/messenger';
@@ -8,7 +8,7 @@ describe('ListComponent', () => {
   let component: ListComponent;
   let fixture: ComponentFixture<ListComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     spyOn(MessengerWrapper.Messenger, 'send').and.stub();
     spyOn(MessengerWrapper.Messenger, 'bind').and.stub();
 
